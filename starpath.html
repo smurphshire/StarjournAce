@@ -1,0 +1,2051 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Miner: Interstellar Sector Voyage</title>
+    <style>
+        :root {
+            --bg-color: #05050a;
+            --panel-bg: #0d0d1a;
+            --panel-border: #26264d;
+            --text-main: #d5d5f2;
+            --accent-gold: #ffd700;
+            --accent-uranium: #39ff14;
+            --accent-eridium: #da70d6;
+            --accent-blue: #00ffff;
+            --accent-red: #ff3333;
+        }
+
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #game-container {
+            display: flex;
+
+            flex: 1;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        @media (max-width: 900px) {
+            #game-container {
+                flex-direction: column;
+            }
+            #sidebar {
+                display: none;
+            }
+            #mobile-controls {
+                display: none !important;
+            }
+            #mobile-hud {
+                display: grid !important;
+            }
+        }
+
+        #canvas-wrapper {
+
+            flex: 1;
+            position: relative;
+            background-color: #020205;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            touch-action: none;
+        }
+
+        #sidebar {
+            width: 330px;
+            background-color: var(--panel-bg);
+            border-left: 2px solid var(--panel-border);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+
+            overflow-y: auto;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.6);
+            scrollbar-width: thin;
+            scrollbar-color: #3b3b55 transparent;
+        }
+
+        #sidebar::-webkit-scrollbar,
+        #msg-log::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #sidebar::-webkit-scrollbar-track,
+        #msg-log::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #sidebar::-webkit-scrollbar-thumb,
+        #msg-log::-webkit-scrollbar-thumb {
+            background: #3b3b55;
+            border-radius: 3px;
+        }
+
+        #sidebar::-webkit-scrollbar-thumb:hover,
+        #msg-log::-webkit-scrollbar-thumb:hover {
+            background: #596276;
+        }
+
+        @media (max-width: 900px) {
+            #sidebar {
+                border-left: none;
+                border-top: 2px solid var(--panel-border);
+            }
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 1px solid var(--panel-border);
+            padding-bottom: 4px;
+            color: var(--accent-blue);
+
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: #7a7a99;
+
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-top: 2px;
+        }
+
+        .mineral-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 10px;
+            background: rgba(0,0,0,0.25);
+            border-radius: 4px;
+            border-left: 4px solid #fff;
+        }
+        .m-gold { border-left-color: var(--accent-gold); color: var(--accent-gold); }
+
+        .m-uranium { border-left-color: var(--accent-uranium); color: var(--accent-uranium); }
+        .m-eridium { border-left-color: var(--accent-eridium); color: var(--accent-eridium); }
+
+        #merchant-panel, #spaceport-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px dashed var(--panel-border);
+            padding: 10px;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        #merchant-panel {
+            height: 200px;
+            min-height: 200px;
+            overflow: hidden;
+        }
+
+        .merchant-msg {
+            font-size: 0.68rem;
+            line-height: 1.3;
+            color: #a8a8c4;
+            overflow-wrap: anywhere;
+        }
+
+        #merchant-content {
+            min-width: 0;
+            overflow-wrap: anywhere;
+            overflow: hidden;
+        }
+
+        #merchant-content .trade-reqs {
+            font-size: 0.68rem;
+            padding: 4px;
+        }
+
+
+        .trade-reqs {
+            font-size: 0.85rem;
+            background: rgba(0,0,0,0.5);
+            padding: 6px;
+            border-radius: 4px;
+        }
+
+        .btn {
+            background: #111126;
+            border: 1px solid var(--accent-blue);
+            color: var(--accent-blue);
+            padding: 8px;
+            font-family: inherit;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.1);
+
+            text-align: center;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: var(--accent-blue);
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+        }
+
+        .btn:disabled {
+            border-color: #333344;
+            color: #444455;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        #spaceport-panel .btn {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+
+        }
+        #spaceport-panel .btn:hover:not(:disabled) {
+            background: var(--accent-blue);
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+        }
+
+        #msg-log {
+            height: 76px;
+            min-height: 76px;
+            max-height: 76px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.03);
+            padding: 8px;
+            font-size: 0.7rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            color: #9292a4;
+            scrollbar-width: thin;
+            scrollbar-color: #3b3b55 transparent;
+
+        }
+
+        #sidebar > div:last-child {
+            flex: 0 0 auto !important;
+        }
+
+        #reset-game {
+            width: auto;
+            padding: 3px 6px;
+            font-size: 0.58rem;
+            border-color: #55556b;
+            color: #8b8b9d;
+            box-shadow: none;
+        }
+
+        .sidebar-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        #audio-toggle {
+            width: auto;
+            padding: 3px 6px;
+            font-size: 0.58rem;
+            border-color: #3e6f76;
+            color: #79b8bc;
+            box-shadow: none;
+        }
+
+        #audio-toggle:hover:not(:disabled) {
+            background: #182b30;
+            color: #9ed3d5;
+            border-color: #679da2;
+            box-shadow: none;
+        }
+
+        .log-entry {
+            border-bottom: 1px solid rgba(255,255,255,0.01);
+            padding-bottom: 2px;
+        }
+
+        #mobile-controls {
+            display: none;
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            right: 15px;
+            justify-content: space-between;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        #mobile-hud {
+            display: none;
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+            z-index: 20;
+            pointer-events: none;
+            font-size: 0.62rem;
+            color: var(--text-main);
+        }
+
+        .mobile-hud-panel {
+            background: rgba(8, 8, 20, 0.82);
+            border: 1px solid rgba(0, 255, 255, 0.45);
+            padding: 5px 7px;
+            min-width: 0;
+        }
+
+        #mobile-hud .mobile-hud-wide {
+            grid-column: 1 / -1;
+        }
+
+        .mobile-goal-row {
+            display: grid;
+            grid-template-columns: 0.8fr 2fr 0.8fr;
+            gap: 5px;
+            grid-column: 1 / -1;
+            align-items: stretch;
+        }
+
+        .mobile-hud-values {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .mobile-hud-value {
+            color: var(--accent-gold);
+            font-weight: bold;
+        }
+
+        #mobile-goal-fill {
+            height: 4px;
+            margin-top: 3px;
+            background: var(--accent-gold);
+            width: 0%;
+        }
+
+        #mobile-shield-fill {
+            height: 4px;
+            background: var(--accent-blue);
+            width: 100%;
+        }
+
+        .mobile-hud-action {
+            pointer-events: auto;
+            width: 100%;
+            padding: 5px;
+            font-size: 0.62rem;
+        }
+
+        .control-group {
+
+            display: flex;
+            gap: 12px;
+            pointer-events: auto;
+        }
+
+        .touch-btn {
+            width: 55px;
+            height: 55px;
+            background: rgba(15, 15, 30, 0.6);
+            border: 2px solid var(--accent-blue);
+            border-radius: 50%;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+
+        .touch-btn:active {
+            background: var(--accent-blue);
+            color: #000;
+        }
+
+        #system-alert {
+            position: absolute;
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 51, 51, 0.25);
+            border: 1px solid var(--accent-red);
+            color: #ff9999;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            border-radius: 4px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+
+            text-align: center;
+            z-index: 100;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <div id="canvas-wrapper">
+            <div id="system-alert">SHIELD LOW - RECHARGE AT SPACEPORT</div>
+            <canvas id="gameCanvas"></canvas>
+            
+            <!-- Mobile Control Overlays -->
+            <div id="mobile-controls">
+                <div class="control-group">
+                    <div class="touch-btn" id="ctrl-left">↺</div>
+                    <div class="touch-btn" id="ctrl-thrust">▲</div>
+
+                    <div class="touch-btn" id="ctrl-right">↻</div>
+                </div>
+                <div class="control-group">
+                    <div class="touch-btn" id="ctrl-fire" style="border-color: var(--accent-red); color: var(--accent-red); width:65px; height:65px;">⚡</div>
+                </div>
+            </div>
+
+            <div id="mobile-hud" aria-label="Mobile game status">
+                <div class="mobile-hud-panel mobile-hud-wide">
+                    <div class="mobile-hud-values">
+                        <span>WALLET <span class="mobile-hud-value" id="mobile-wallet">\$0</span></span>
+                        <span>BANK <span class="mobile-hud-value" id="mobile-bank-value">\$0</span></span>
+                    </div>
+                </div>
+                <div class="mobile-goal-row">
+                    <button class="btn mobile-hud-action" id="mobile-trade" type="button">Trade</button>
+                    <div class="mobile-hud-panel">
+                        <div class="mobile-hud-values">
+                            <span id="mobile-sector">SECTOR 1</span>
+                            <span id="mobile-goal-text">\$0 / \$5,000</span>
+                        </div>
+                        <div id="mobile-goal-fill"></div>
+                    </div>
+                    <button class="btn mobile-hud-action" id="mobile-bank" type="button">Bank</button>
+                </div>
+                <div class="mobile-hud-panel mobile-hud-wide">
+                    <span>SHIELD</span>
+                    <div id="mobile-shield-fill"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="sidebar">
+            <div>
+                <div class="section-title" id="sector-title">Sector 1: Orion Perimeter</div>
+                <div class="stats-grid" style="margin-top: 8px;">
+                    <div class="stat-card">
+                        <div class="stat-label">Trade Wallet</div>
+                        <div class="stat-value" id="stat-wallet">\$0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Sector Bank</div>
+                        <div class="stat-value" id="stat-bank" style="color: var(--accent-uranium);">\$0</div>
+
+                    </div>
+                    <div class="stat-card" style="grid-column: span 2;">
+                        <div class="stat-label">Overall Earnings</div>
+                        <div class="stat-value" id="stat-earnings" style="color: var(--accent-gold);">\$0</div>
+                    </div>
+                    <div class="stat-card" style="grid-column: span 2;">
+                        <div class="stat-label">Goal to Warp Matrix</div>
+                        <div id="stat-goal-bar" style="height:5px; background:#1a1a33; margin-top:4px; border-radius:2px; overflow:hidden;">
+                            <div id="stat-goal-fill" style="width:0%; height:100%; background:var(--accent-gold);"></div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#8a8a99; margin-top:2px;">
+                            <span>Progress:</span>
+                            <span id="stat-goal-text">\$0 / \$5,000</span>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="grid-column: span 2;">
+                        <div class="stat-label">Shield Integrity</div>
+                        <div id="stat-shield-bar" style="height:6px; background:#331111; margin-top:4px; border-radius:3px; overflow:hidden;">
+                            <div id="stat-shield-fill" style="width:100%; height:100%; background:var(--accent-blue);"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div>
+                <div class="section-title">Cargo Systems</div>
+                <div style="display: flex; flex-direction: column; gap: 5px; margin-top: 8px;">
+                    <div class="mineral-row m-gold">
+                        <span>Gold (AU):</span>
+                        <span id="inv-gold" class="stat-value">0</span>
+                    </div>
+                    <div class="mineral-row m-uranium">
+                        <span>Uranium (U):</span>
+                        <span id="inv-uranium" class="stat-value">0</span>
+                    </div>
+                    <div class="mineral-row m-eridium">
+                        <span>Eridium (ER):</span>
+                        <span id="inv-eridium" class="stat-value">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="merchant-panel">
+
+                <div class="section-title" style="color: var(--accent-gold); border-color: rgba(255,215,0,0.3);">Comms Hub</div>
+                <p class="merchant-msg" id="pirate-status" style="display:none; color:var(--accent-red); font-weight:bold;"></p>
+                <div id="merchant-content">
+                    <p class="merchant-msg">No merchant signals nearby. Search deep outer border zones for trade ships.</p>
+                </div>
+            </div>
+
+            <div id="spaceport-panel">
+                <div class="section-title" style="color: var(--accent-blue); border-color: rgba(0,255,255,0.3);">Station Central</div>
+                <div id="spaceport-content">
+                    <p class="merchant-msg" id="spaceport-dist">Range: 0m</p>
+                    <button class="btn" id="btn-bank" disabled>Bank Wallet Cash & Repair</button>
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; flex: 1; min-height: 80px;">
+                <div class="section-title" style="font-size:0.75rem; color:#8080a0;">Log Terminal</div>
+                <div id="msg-log" style="margin-top: 5px;">
+                    <div class="log-entry">Navigation online. System configuration set.</div>
+                </div>
+                <div class="sidebar-actions">
+                    <button class="btn" id="audio-toggle" type="button">Enable Audio</button>
+                    <button class="btn" id="reset-game" type="button">Reset Game</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const wrapper = document.getElementById('canvas-wrapper');
+
+        // Global Parameters & Expanded Coordinates
+        const WORLD_SIZE = 10800; 
+        const MERCHANT_RANGE = 160; 
+        const BASE_SECTOR_GOAL = 5000;
+        const SECTOR_GOAL_INCREASE = 1200;
+        const POINTER_AIM_RADIUS = 34;
+        
+        let keys = {};
+        let touchControls = { left: false, right: false, thrust: false, fire: false };
+        let pointerControls = { active: false, fireOnly: false, x: 0, y: 0 };
+        let currentSector = 1;
+
+        let starfield = [];
+
+        let nebulae = [];
+
+        // Sector Environmental Palette Profiles
+        const SECTOR_THEMES = {
+            1: { name: "Orion Perimeter", primary: "#00ffff", background: "#020208", nebula: "rgba(0, 120, 255, 0.05)", generic: "#88889a" },
+            2: { name: "Nebular Abyss", primary: "#da70d6", background: "#06020c", nebula: "rgba(218, 112, 214, 0.05)", generic: "#998899" },
+            3: { name: "Xenon Core Alpha", primary: "#39ff14", background: "#020603", nebula: "rgba(57, 255, 20, 0.04)", generic: "#8a998a" },
+            4: { name: "Supernova Remnant", primary: "#ff6600", background: "#090302", nebula: "rgba(255, 102, 0, 0.04)", generic: "#aa9988" }
+        };
+        
+        let player = {
+            x: WORLD_SIZE / 2,
+            y: WORLD_SIZE / 2,
+            vx: 0,
+            vy: 0,
+            angle: -Math.PI / 2,
+            rotationSpeed: 0.06,
+            thrust: 0.13,
+            friction: 0.985,
+
+            radius: 12,
+            shield: 100,
+            maxShield: 100,
+            wallet: 0,
+            bank: 0,
+            overallEarnings: 0,
+            cargo: { gold: 0, uranium: 0, eridium: 0 },
+            lastShot: 0,
+            shootDelay: 240,
+            invulnerable: 0
+        };
+
+        const SPACEPORT = {
+            x: WORLD_SIZE / 2,
+            y: WORLD_SIZE / 2,
+            radius: 110
+        };
+
+        let asteroids = [];
+        let bullets = [];
+
+        let enemyBullets = [];
+        let minerals = [];
+        let merchants = [];
+        let enemies = [];
+        let civilianShips = [];
+        let particles = [];
+        let pirateStatusUntil = 0;
+        const SAVE_KEY = 'starpath-save-v1';
+
+        const ASTEROID_TYPES = {
+            GENERIC: { name: 'Generic', color: '#888899', mineral: null },
+            GOLD: { name: 'Auric', color: 'rgba(255, 215, 0, 0.9)', mineral: 'gold' },
+            URANIUM: { name: 'Radiant', color: 'rgba(57, 255, 20, 0.9)', mineral: 'uranium' },
+            ERIDIUM: { name: 'Nebula', color: 'rgba(218, 112, 214, 0.9)', mineral: 'eridium' }
+        };
+
+        const MINERAL_COLORS = {
+            gold: '#ffd700',
+            uranium: '#39ff14',
+            eridium: '#da70d6'
+        };
+
+        function saveGame() {
+            try {
+                localStorage.setItem(SAVE_KEY, JSON.stringify({
+                    currentSector,
+                    player: {
+                        wallet: player.wallet,
+                        bank: player.bank,
+                        overallEarnings: player.overallEarnings,
+                        cargo: player.cargo,
+                        shield: player.shield
+                    }
+                }));
+            } catch (error) {
+                console.warn('Starpath save unavailable:', error);
+            }
+        }
+
+        function loadGame() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
+                if (!saved || !saved.player) return;
+
+                currentSector = Number.isFinite(saved.currentSector) ? Math.max(1, saved.currentSector) : 1;
+                player.wallet = Math.max(0, Number(saved.player.wallet) || 0);
+                player.bank = Math.max(0, Number(saved.player.bank) || 0);
+                player.overallEarnings = Math.max(0, Number(saved.player.overallEarnings) || 0);
+                player.cargo = {
+                    gold: Math.max(0, Number(saved.player.cargo?.gold) || 0),
+                    uranium: Math.max(0, Number(saved.player.cargo?.uranium) || 0),
+                    eridium: Math.max(0, Number(saved.player.cargo?.eridium) || 0)
+                };
+                player.shield = Math.max(1, Math.min(player.maxShield, Number(saved.player.shield) || player.maxShield));
+            } catch (error) {
+                console.warn('Starpath save could not be loaded:', error);
+            }
+        }
+
+        function resetGame() {
+            if (!window.confirm('Are you sure you want to reset the game? All saved progress will be cleared.')) return;
+            localStorage.removeItem(SAVE_KEY);
+            window.location.reload();
+        }
+
+
+        function resize() {
+            canvas.width = wrapper.clientWidth;
+            canvas.height = wrapper.clientHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        window.addEventListener('keydown', e => { wakeAudio(); keys[e.code] = true; });
+        window.addEventListener('keyup', e => { keys[e.code] = false; });
+
+        function setupTouch(id, prop) {
+            const el = document.getElementById(id);
+            el.addEventListener('touchstart', (e) => { e.preventDefault(); wakeAudio(); touchControls[prop] = true; });
+            el.addEventListener('touchend', (e) => { e.preventDefault(); touchControls[prop] = false; });
+        }
+        setupTouch('ctrl-left', 'left');
+        setupTouch('ctrl-right', 'right');
+        setupTouch('ctrl-thrust', 'thrust');
+        setupTouch('ctrl-fire', 'fire');
+
+        function updatePointerPosition(event) {
+            const rect = canvas.getBoundingClientRect();
+            pointerControls.x = (event.clientX - rect.left) * (canvas.width / rect.width);
+            pointerControls.y = (event.clientY - rect.top) * (canvas.height / rect.height);
+        }
+
+        canvas.addEventListener('pointerdown', event => {
+            if (event.pointerType !== 'touch' && event.button !== 0 && event.button !== 2) return;
+            event.preventDefault();
+            wakeAudio();
+            pointerControls.active = true;
+            pointerControls.fireOnly = event.button === 2;
+            updatePointerPosition(event);
+            canvas.setPointerCapture(event.pointerId);
+        });
+
+        canvas.addEventListener('contextmenu', event => {
+            event.preventDefault();
+        });
+
+        canvas.addEventListener('pointermove', event => {
+            if (!pointerControls.active) return;
+            event.preventDefault();
+            updatePointerPosition(event);
+        });
+
+        function releasePointer(event) {
+            pointerControls.active = false;
+            pointerControls.fireOnly = false;
+            if (canvas.hasPointerCapture(event.pointerId)) {
+                canvas.releasePointerCapture(event.pointerId);
+            }
+        }
+
+        canvas.addEventListener('pointerup', releasePointer);
+        canvas.addEventListener('pointercancel', releasePointer);
+
+
+        function addLog(text) {
+            const log = document.getElementById('msg-log');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerText = `[${new Date().toLocaleTimeString()}] ${text}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function showAlert(msg) {
+            const alertBox = document.getElementById('system-alert');
+            alertBox.innerText = msg;
+            alertBox.style.opacity = 1;
+            setTimeout(() => alertBox.style.opacity = 0, 3000);
+        }
+
+        class GameAudioEngine {
+            constructor() {
+                this.ctx = null;
+                this.master = null;
+                this.filter = null;
+                this.delay = null;
+                this.muted = true;
+                this.initialized = false;
+                this.chordIndex = 0;
+                this.chords = [
+                    [65.41, 130.81, 196.00, 233.08, 293.66],
+                    [51.91, 103.83, 155.56, 207.65, 293.66],
+                    [43.65, 87.31, 130.81, 174.61, 220.00]
+                ];
+            }
+
+            init() {
+                if (this.initialized) {
+                    if (this.ctx.state === 'suspended') this.ctx.resume();
+                    return;
+                }
+
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContextClass) return;
+
+                this.ctx = new AudioContextClass();
+                this.filter = this.ctx.createBiquadFilter();
+                this.filter.type = 'lowpass';
+                this.filter.frequency.setValueAtTime(850, this.ctx.currentTime);
+                this.delay = this.ctx.createDelay();
+                this.delay.delayTime.setValueAtTime(0.45, this.ctx.currentTime);
+
+                const feedback = this.ctx.createGain();
+                feedback.gain.setValueAtTime(0.35, this.ctx.currentTime);
+                this.delay.connect(feedback);
+                feedback.connect(this.delay);
+
+                this.master = this.ctx.createGain();
+                this.master.gain.setValueAtTime(0, this.ctx.currentTime);
+                this.filter.connect(this.master);
+                this.filter.connect(this.delay);
+                this.delay.connect(this.master);
+                this.master.connect(this.ctx.destination);
+                this.initialized = true;
+
+                setInterval(() => {
+                    this.chordIndex = (this.chordIndex + 1) % this.chords.length;
+                }, 9000);
+                setInterval(() => this.playAmbientNote(), 650);
+            }
+
+            createTone(frequency, duration, type = 'triangle', volume = 0.15, endFrequency = frequency, outputNode = this.filter) {
+                if (!this.initialized || this.muted) return;
+                const now = this.ctx.currentTime;
+                const oscillator = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                oscillator.type = type;
+                oscillator.frequency.setValueAtTime(frequency, now);
+                if (endFrequency !== frequency) oscillator.frequency.exponentialRampToValueAtTime(endFrequency, now + duration);
+                gain.gain.setValueAtTime(volume, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+                oscillator.connect(gain);
+                gain.connect(outputNode);
+                oscillator.start(now);
+                oscillator.stop(now + duration + 0.03);
+            }
+
+            playAmbientTone(frequency, duration, type = 'sine', volume = 0.06, endFrequency = frequency) {
+                this.createTone(frequency, duration, type, volume, endFrequency, this.filter);
+            }
+
+            playSfx(frequency, duration, type = 'triangle', volume = 0.15, endFrequency = frequency) {
+                this.createTone(frequency, duration, type, volume, endFrequency, this.master);
+            }
+
+            playAmbientNote() {
+                if (!this.initialized || this.muted || Math.random() <= 0.4) return;
+                let frequency = this.chords[this.chordIndex][Math.floor(Math.random() * this.chords[this.chordIndex].length)];
+                if (Math.random() > 0.6) frequency *= 2;
+                if (Math.random() > 0.85) frequency *= 2;
+                this.playAmbientTone(frequency, 1.2, 'sine', 0.06);
+            }
+
+            playFire() { this.playSfx(140, 0.35, 'triangle', 0.18, 30); }
+            playMining() { this.playSfx(260, 0.2, 'triangle', 0.12, 520); }
+            playPickup() { this.playSfx(660, 0.3, 'sine', 0.12, 990); }
+            playDamage() { this.playSfx(90, 0.45, 'sawtooth', 0.2, 35); }
+            playTrade() { this.playSfx(440, 0.25, 'triangle', 0.16, 880); }
+            playBank() { this.playSfx(523.25, 0.45, 'sine', 0.14, 783.99); }
+            playWarp() { this.playSfx(65, 0.75, 'triangle', 0.3, 15); }
+
+            toggle() {
+                this.init();
+                if (!this.initialized) return;
+                this.muted = !this.muted;
+                const now = this.ctx.currentTime;
+                this.master.gain.linearRampToValueAtTime(this.muted ? 0 : 0.25, now + 0.05);
+                document.getElementById('audio-toggle').innerText = this.muted ? 'Enable Audio' : 'Mute Audio';
+            }
+        }
+
+        const gameAudio = new GameAudioEngine();
+        function wakeAudio() { gameAudio.init(); }
+        document.getElementById('audio-toggle').addEventListener('click', () => gameAudio.toggle());
+        document.getElementById('reset-game').addEventListener('click', resetGame);
+
+        document.getElementById('mobile-bank').addEventListener('click', () => {
+            document.getElementById('btn-bank').click();
+        });
+
+        document.getElementById('mobile-trade').addEventListener('click', () => {
+            let closestMerchant = null;
+            let closestDistance = MERCHANT_RANGE;
+            merchants.forEach(merchant => {
+                const merchantDistance = distanceBetween(player, merchant);
+                if (merchantDistance <= closestDistance) {
+                    closestDistance = merchantDistance;
+                    closestMerchant = merchant;
+                }
+            });
+
+            if (closestMerchant) {
+                executeMerchantTrade(closestMerchant.id);
+            } else {
+                addLog('Trade link unavailable: no merchant in range.');
+            }
+        });
+
+        function generateBackgroundAssets() {
+            starfield = [];
+            for (let i = 0; i < 400; i++) {
+
+                starfield.push({
+                    x: Math.random() * canvas.width * 2,
+                    y: Math.random() * canvas.height * 2,
+                    size: Math.random() * 1.8 + 0.5,
+                    depth: Math.random() * 0.6 + 0.15, 
+                    alpha: Math.random() * 0.7 + 0.3
+                });
+            }
+
+            nebulae = [];
+            for (let j = 0; j < 12; j++) {
+                nebulae.push({
+                    x: Math.random() * WORLD_SIZE,
+                    y: Math.random() * WORLD_SIZE,
+                    radius: Math.random() * 400 + 300,
+                    seed: Math.random() * 10
+                });
+            }
+        }
+
+
+        function createAsteroidGeometry(radius, pointsCount = 10) {
+            let points = [];
+            for (let i = 0; i < pointsCount; i++) {
+                let angle = (i / pointsCount) * Math.PI * 2;
+                let offset = (Math.random() * 0.4 - 0.2) * radius; 
+                points.push({
+                    x: Math.cos(angle) * (radius + offset),
+                    y: Math.sin(angle) * (radius + offset)
+                });
+            }
+            return points;
+        }
+
+        function spawnAsteroid(x, y, size, typeKey) {
+            let radius = size === 3 ? 48 : size === 2 ? 26 : 13;
+            asteroids.push({
+                id: Math.random(),
+                x: x, y: y,
+                vx: (Math.random() * 2.2 - 1.1) * (4 - size) * 0.7,
+
+                vy: (Math.random() * 2.2 - 1.1) * (4 - size) * 0.7,
+                size: size, 
+                type: ASTEROID_TYPES[typeKey],
+                typeKey: typeKey,
+                radius: radius,
+                points: createAsteroidGeometry(radius, size === 3 ? 12 : 9),
+                angle: Math.random() * Math.PI * 2,
+                rotSpeed: (Math.random() * 0.02 - 0.01)
+            });
+        }
+
+        function wrapEntity(entity) {
+            entity.x = (entity.x + WORLD_SIZE) % WORLD_SIZE;
+            entity.y = (entity.y + WORLD_SIZE) % WORLD_SIZE;
+        }
+
+        function wrappedDelta(from, to) {
+            let delta = to - from;
+            if (delta > WORLD_SIZE / 2) delta -= WORLD_SIZE;
+            if (delta < -WORLD_SIZE / 2) delta += WORLD_SIZE;
+            return delta;
+        }
+
+        function distanceBetween(first, second) {
+            return Math.hypot(
+                wrappedDelta(first.x, second.x),
+                wrappedDelta(first.y, second.y)
+            );
+        }
+
+        function getSectorGoal() {
+            return BASE_SECTOR_GOAL + ((currentSector - 1) * SECTOR_GOAL_INCREASE);
+        }
+
+        function spawnMerchant() {
+            const merchantAngle = Math.random() * Math.PI * 2;
+            const minSpawnRadius = 900;
+            const maxSpawnRadius = WORLD_SIZE / 2 - 650;
+            const merchantRadius = minSpawnRadius + Math.random() * (maxSpawnRadius - minSpawnRadius);
+            const mx = WORLD_SIZE / 2 + Math.cos(merchantAngle) * merchantRadius;
+            const my = WORLD_SIZE / 2 + Math.sin(merchantAngle) * merchantRadius;
+
+            let reqs = {};
+            let possible = ['gold', 'uranium', 'eridium'];
+            let reward = 120;
+            
+            possible.forEach(m => {
+                if (Math.random() > 0.3) {
+                    reqs[m] = Math.floor(Math.random() * 4) + 3 + currentSector;
+
+                    reward += reqs[m] * (m === 'gold' ? 35 : m === 'uranium' ? 60 : 95);
+                }
+            });
+
+            if (Object.keys(reqs).length === 0) {
+                reqs['gold'] = 5 + currentSector;
+                reward += reqs['gold'] * 35;
+            }
+
+            merchants.push({
+                id: Math.random().toString(36).substr(2, 5).toUpperCase(),
+                x: mx, y: my,
+                vx: (Math.random() * 0.3 - 0.15),
+                vy: (Math.random() * 0.3 - 0.15),
+                radius: 28,
+                reqs: reqs,
+                reward: reward,
+                heading: Math.random() * Math.PI * 2
+            });
+
+        }
+
+        function spawnEnemy() {
+            let angle = Math.random() * Math.PI * 2;
+            let dist = 1800 + Math.random() * 1800;
+            enemies.push({
+                x: player.x + Math.cos(angle) * dist,
+                y: player.y + Math.sin(angle) * dist,
+                vx: 0, vy: 0,
+                speed: 0.8 + (currentSector * 0.1),
+                radius: 15,
+                lastShot: 0,
+                shootDelay: Math.max(900, 1700 - (currentSector * 150)),
+                hp: 2 + Math.floor(currentSector / 2)
+            });
+        }
+
+        function spawnCivilian() {
+            const horizontalRoute = Math.random() < 0.5;
+            const travelDirection = Math.random() < 0.5 ? 1 : -1;
+            const speed = 1.1 + Math.random() * 0.7;
+            const ship = {
+                x: horizontalRoute ? (travelDirection > 0 ? 0 : WORLD_SIZE) : Math.random() * WORLD_SIZE,
+                y: horizontalRoute ? Math.random() * WORLD_SIZE : (travelDirection > 0 ? 0 : WORLD_SIZE),
+                vx: horizontalRoute ? speed * travelDirection : (Math.random() - 0.5) * 0.15,
+                vy: horizontalRoute ? (Math.random() - 0.5) * 0.15 : speed * travelDirection,
+                radius: 9,
+                angle: horizontalRoute ? (travelDirection > 0 ? 0 : Math.PI) : (travelDirection > 0 ? Math.PI / 2 : -Math.PI / 2),
+                routeAngle: horizontalRoute ? (travelDirection > 0 ? 0 : Math.PI) : (travelDirection > 0 ? Math.PI / 2 : -Math.PI / 2),
+                meanderAngle: 0,
+                meanderTarget: (Math.random() * 50 - 25) * Math.PI / 180,
+                nextMeander: Date.now() + 2500 + Math.random() * 4500,
+                nextReversal: Date.now() + 20000 + Math.random() * 15000,
+                asteroidAvoidUntil: 0
+            };
+            civilianShips.push(ship);
+        }
+
+        function spawnPirateWave(count) {
+            const edgeDistance = Math.max(canvas.width, canvas.height) / 2 + 450;
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const distance = edgeDistance + Math.random() * 350;
+                const enemy = {
+                    x: player.x + Math.cos(angle) * distance,
+                    y: player.y + Math.sin(angle) * distance,
+                    vx: 0,
+                    vy: 0,
+                    speed: 0.8 + (currentSector * 0.1),
+                    radius: 15,
+                    lastShot: 0,
+                    shootDelay: Math.max(900, 1700 - (currentSector * 150)),
+                    hp: 2 + Math.floor(currentSector / 2)
+                };
+                wrapEntity(enemy);
+                enemies.push(enemy);
+            }
+        }
+
+        function spawnBurst(x, y, color, count = 12) {
+            for (let i = 0; i < count; i++) {
+
+                let pAngle = Math.random() * Math.PI * 2;
+                let spd = Math.random() * 3.5 + 1;
+                particles.push({
+                    x: x, y: y,
+                    vx: Math.cos(pAngle) * spd,
+                    vy: Math.sin(pAngle) * spd,
+                    life: 1.0,
+                    decay: Math.random() * 0.025 + 0.01,
+                    color: color,
+                    size: Math.random() * 2 + 1
+                });
+            }
+        }
+
+        function initWorld() {
+            asteroids = [];
+            merchants = [];
+            enemies = [];
+            civilianShips = [];
+            minerals = [];
+
+            bullets = [];
+            enemyBullets = [];
+
+            const activeTheme = SECTOR_THEMES[Math.min(4, currentSector)];
+            ASTEROID_TYPES.GENERIC.color = activeTheme.generic;
+
+            const asteroidCount = 72 + ((currentSector - 1) * 8);
+            for (let i = 0; i < asteroidCount; i++) {
+                let x, y, d;
+                do {
+                    x = Math.random() * WORLD_SIZE;
+                    y = Math.random() * WORLD_SIZE;
+                    d = Math.hypot(x - WORLD_SIZE/2, y - WORLD_SIZE/2);
+                } while (d < 450);
+
+                let keysArr = Object.keys(ASTEROID_TYPES);
+                let selectedType = keysArr[Math.floor(Math.random() * keysArr.length)];
+                spawnAsteroid(x, y, 3, selectedType);
+            }
+
+
+            for (let i = 0; i < 10; i++) {
+                spawnMerchant();
+            }
+            const populationBase = 4 + Math.floor((currentSector - 1) / 2);
+            const civilianTarget = Math.ceil(populationBase * 1.3);
+            for (let i = 0; i < civilianTarget; i++) {
+                spawnCivilian();
+            }
+            generateBackgroundAssets();
+        }
+
+        function executeSectorWarp() {
+            currentSector++;
+            gameAudio.playWarp();
+            player.bank = 0; 
+            player.wallet = 0;
+            player.cargo = { gold: 0, uranium: 0, eridium: 0 };
+            
+            player.x = WORLD_SIZE / 2;
+            player.y = WORLD_SIZE / 2;
+            player.vx = 0;
+            player.vy = 0;
+            player.shield = player.maxShield;
+
+            const nextTheme = SECTOR_THEMES[Math.min(4, currentSector)] || { name: `Unknown Sector ${currentSector}`, primary: "#00ffff" };
+
+            showAlert(`WARP SUCCESSFUL. ENTERING SYSTEM: ${nextTheme.name.toUpperCase()}`);
+            addLog(`Warp drive disengaged. System configuration shifts updated to match node coordinates.`);
+            
+            initWorld();
+            saveGame();
+        }
+
+        function update() {
+            const asteroidTarget = 30 + ((currentSector - 1) * 3);
+            if (asteroids.length < asteroidTarget) {
+                let keysArr = Object.keys(ASTEROID_TYPES);
+                let type = keysArr[Math.floor(Math.random() * keysArr.length)];
+                let edge = Math.random() > 0.5 ? 50 : WORLD_SIZE - 50;
+                spawnAsteroid(Math.random() * WORLD_SIZE, edge, 3, type);
+            }
+            const populationBase = 8 + Math.floor((currentSector - 1) / 2);
+            const enemyTarget = Math.ceil(populationBase * 1.2);
+            if (enemies.length === 0) {
+                for (let i = 0; i < enemyTarget; i++) spawnEnemy();
+            } else if (enemies.length < enemyTarget && Math.random() < 0.007) {
+                spawnEnemy();
+            }
+            const civilianTarget = Math.ceil(populationBase * 1.75);
+            while (civilianShips.length < civilianTarget) {
+                spawnCivilian();
+            }
+
+            let baseDx = SPACEPORT.x - player.x;
+            let baseDy = SPACEPORT.y - player.y;
+
+            let baseDist = Math.hypot(baseDx, baseDy);
+            
+            if (baseDist > SPACEPORT.radius && baseDist < 750) {
+                let gravityIntensity = 0.022 * (1 - baseDist / 750);
+                player.vx += (baseDx / baseDist) * gravityIntensity;
+                player.vy += (baseDy / baseDist) * gravityIntensity;
+            }
+
+            let pointerThrust = false;
+            let pointerFire = false;
+            if (pointerControls.active) {
+                const pointerDx = pointerControls.x - canvas.width / 2;
+                const pointerDy = pointerControls.y - canvas.height / 2;
+                const pointerDistance = Math.hypot(pointerDx, pointerDy);
+
+                if (pointerDistance > 0) {
+                    player.angle = Math.atan2(pointerDy, pointerDx);
+                }
+
+                if (pointerControls.fireOnly || pointerDistance <= POINTER_AIM_RADIUS) {
+                    pointerFire = true;
+                } else {
+                    pointerThrust = true;
+                }
+            }
+
+            if (keys['ArrowLeft'] || keys['KeyA'] || touchControls.left) {
+                player.angle -= player.rotationSpeed;
+            }
+            if (keys['ArrowRight'] || keys['KeyD'] || touchControls.right) {
+                player.angle += player.rotationSpeed;
+            }
+            if (keys['ArrowUp'] || keys['KeyW'] || touchControls.thrust || pointerThrust) {
+                player.vx += Math.cos(player.angle) * player.thrust;
+                player.vy += Math.sin(player.angle) * player.thrust;
+                
+                if (Math.random() < 0.35) {
+
+                    particles.push({
+                        x: player.x - Math.cos(player.angle) * player.radius,
+                        y: player.y - Math.sin(player.angle) * player.radius,
+                        vx: -Math.cos(player.angle) * 1.8 + (Math.random() * 0.4 - 0.2),
+                        vy: -Math.sin(player.angle) * 1.8 + (Math.random() * 0.4 - 0.2),
+                        life: 0.5,
+                        decay: 0.045,
+                        color: '#ff7700',
+                        size: 2.2
+                    });
+                }
+            }
+
+            player.vx *= player.friction;
+            player.vy *= player.friction;
+            player.x += player.vx;
+            player.y += player.vy;
+
+            wrapEntity(player);
+
+            if (player.invulnerable > 0) player.invulnerable--;
+
+            if ((keys['Space'] || touchControls.fire || pointerFire) && Date.now() - player.lastShot > player.shootDelay) {
+                bullets.push({
+                    x: player.x + Math.cos(player.angle) * player.radius,
+                    y: player.y + Math.sin(player.angle) * player.radius,
+                    vx: Math.cos(player.angle) * 7.5 + player.vx,
+                    vy: Math.sin(player.angle) * 7.5 + player.vy,
+                    life: 65
+                });
+                player.lastShot = Date.now();
+                gameAudio.playMining();
+            }
+
+            bullets.forEach((b) => {
+                b.x += b.vx; b.y += b.vy; b.life--;
+                wrapEntity(b);
+            });
+
+            bullets = bullets.filter(b => b.life > 0);
+
+            enemyBullets.forEach((eb) => {
+                eb.x += eb.vx; eb.y += eb.vy; eb.life--;
+                wrapEntity(eb);
+            });
+            enemyBullets = enemyBullets.filter(eb => eb.life > 0);
+
+            asteroids.forEach(a => {
+                a.x += a.vx; a.y += a.vy; a.angle += a.rotSpeed;
+                wrapEntity(a);
+            });
+
+            enemies.forEach(e => {
+                let dx = wrappedDelta(e.x, player.x);
+                let dy = wrappedDelta(e.y, player.y);
+                let d = Math.hypot(dx, dy);
+
+                if (d < 550) { 
+
+                    e.vx += (dx / d) * 0.055;
+                    e.vy += (dy / d) * 0.055;
+                    
+                    let spd = Math.hypot(e.vx, e.vy);
+                    if (spd > e.speed) {
+                        e.vx = (e.vx / spd) * e.speed;
+                        e.vy = (e.vy / spd) * e.speed;
+                    }
+
+                    if (Date.now() - e.lastShot > e.shootDelay && Math.random() < 0.22) {
+                        let bAngle = Math.atan2(dy, dx) + (Math.random() * 0.16 - 0.08);
+                        enemyBullets.push({
+                            x: e.x, y: e.y,
+                            vx: Math.cos(bAngle) * 4.8,
+                            vy: Math.sin(bAngle) * 4.8,
+                            life: 130
+                        });
+                        e.lastShot = Date.now();
+                    }
+
+                } else {
+                    if(Math.random() < 0.015) {
+                        let randA = Math.random() * Math.PI*2;
+                        e.vx = Math.cos(randA) * 0.5;
+                        e.vy = Math.sin(randA) * 0.5;
+                    }
+                }
+                e.x += e.vx; e.y += e.vy;
+                wrapEntity(e);
+            });
+
+            merchants.forEach(m => {
+                m.x += m.vx; m.y += m.vy;
+                wrapEntity(m);
+            });
+
+            civilianShips.forEach(ship => {
+                if (Date.now() >= ship.nextReversal) {
+                    ship.routeAngle += Math.PI;
+                    ship.nextReversal = Date.now() + 20000 + Math.random() * 15000;
+                }
+
+                if (Date.now() >= ship.nextMeander) {
+                    ship.meanderTarget = (Math.random() * 50 - 25) * Math.PI / 180;
+                    ship.nextMeander = Date.now() + 2500 + Math.random() * 4500;
+                }
+
+                ship.meanderAngle += (ship.meanderTarget - ship.meanderAngle) * 0.02;
+                ship.angle = ship.routeAngle + ship.meanderAngle;
+                const desiredVx = Math.cos(ship.angle) * 1.4;
+                const desiredVy = Math.sin(ship.angle) * 1.4;
+                ship.vx += (desiredVx - ship.vx) * 0.035;
+                ship.vy += (desiredVy - ship.vy) * 0.035;
+
+                for (const asteroid of asteroids) {
+                    if (Date.now() >= ship.asteroidAvoidUntil && distanceBetween(ship, asteroid) < ship.radius + asteroid.radius + 12) {
+                        ship.routeAngle += Math.PI;
+                        ship.nextReversal = Date.now() + 20000 + Math.random() * 15000;
+                        ship.meanderTarget = (Math.random() * 50 - 25) * Math.PI / 180;
+                        ship.asteroidAvoidUntil = Date.now() + 1200;
+                        break;
+                    }
+                }
+
+                ship.x += ship.vx;
+                ship.y += ship.vy;
+                wrapEntity(ship);
+
+                if (Math.random() < 0.35) {
+                    particles.push({
+                        x: ship.x - Math.cos(ship.angle) * ship.radius,
+                        y: ship.y - Math.sin(ship.angle) * ship.radius,
+                        vx: -Math.cos(ship.angle) * 1.2 + (Math.random() * 0.3 - 0.15),
+                        vy: -Math.sin(ship.angle) * 1.2 + (Math.random() * 0.3 - 0.15),
+                        life: 0.45,
+                        decay: 0.05,
+                        color: '#00ffff',
+                        size: 1.8
+                    });
+                }
+            });
+
+            particles.forEach(p => {
+                p.x += p.vx; p.y += p.vy; p.life -= p.decay;
+                wrapEntity(p);
+            });
+
+            particles = particles.filter(p => p.life > 0);
+
+            minerals.forEach(m => {
+                let dx = wrappedDelta(m.x, player.x);
+                let dy = wrappedDelta(m.y, player.y);
+                let dist = Math.hypot(dx, dy);
+                if (dist < 120) { 
+                    m.vx += (dx / dist) * 0.18;
+                    m.vy += (dy / dist) * 0.18;
+                }
+                m.vx *= 0.94; m.vy *= 0.94;
+                m.x += m.vx; m.y += m.vy;
+                wrapEntity(m);
+            });
+
+            handleCollisions();
+            updateUI();
+        }
+
+        function handleCollisions() {
+
+            bullets.forEach(b => {
+                asteroids.forEach((a, aIdx) => {
+                    if (distanceBetween(b, a) < a.radius) {
+                        b.life = 0; 
+                        gameAudio.playFire();
+                        spawnBurst(a.x, a.y, a.type.color, a.size * 6);
+                        
+                        if (a.type.mineral) {
+                            let dropsCount = a.size === 3 ? 3 : a.size === 2 ? 2 : 1;
+                            for(let k=0; k < dropsCount; k++) {
+                                minerals.push({
+                                    x: a.x + (Math.random()*20 - 10),
+                                    y: a.y + (Math.random()*20 - 10),
+                                    vx: a.vx + (Math.random() * 2 - 1),
+                                    vy: a.vy + (Math.random() * 2 - 1),
+                                    type: a.type.mineral,
+                                    radius: 5
+                                });
+                            }
+                        }
+
+
+                        if (a.size > 1) {
+                            let nextSize = a.size - 1;
+                            spawnAsteroid(a.x, a.y, nextSize, a.typeKey);
+                            spawnAsteroid(a.x, a.y, nextSize, a.typeKey);
+                        }
+                        
+                        asteroids.splice(aIdx, 1);
+                        addLog(`Mined ${a.type.name} fragment overlay.`);
+                    }
+                });
+
+                enemies.forEach((e, eIdx) => {
+                    if (distanceBetween(b, e) < e.radius) {
+                        b.life = 0; e.hp--;
+                        spawnBurst(e.x, e.y, '#ff3333', 6);
+                        if (e.hp <= 0) {
+                            enemies.splice(eIdx, 1);
+                            player.wallet += 100;
+                            let mTypes = ['gold', 'uranium', 'eridium'];
+                            let dropped = mTypes[Math.floor(Math.random() * mTypes.length)];
+
+                            minerals.push({
+                                x: e.x, y: e.y,
+                                vx: (Math.random() * 2 - 1), vy: (Math.random() * 2 - 1),
+                                type: dropped, radius: 5
+                            });
+                            gameAudio.playDamage();
+                            addLog(`Raider cargo hull cracked. Dropped [${dropped.toUpperCase()}] crystal core.`);
+                            saveGame();
+                        }
+                    }
+                });
+
+                civilianShips.forEach((ship, shipIdx) => {
+                    if (distanceBetween(b, ship) < ship.radius) {
+                        b.life = 0;
+                        civilianShips.splice(shipIdx, 1);
+                        pirateStatusUntil = Date.now() + 60000;
+
+                        for (const type of ['gold', 'uranium', 'eridium']) {
+                            for (let drop = 0; drop < 8; drop++) {
+                                minerals.push({
+                                    x: ship.x + (Math.random() * 24 - 12),
+                                    y: ship.y + (Math.random() * 24 - 12),
+                                    vx: Math.random() * 2 - 1,
+                                    vy: Math.random() * 2 - 1,
+                                    type,
+                                    radius: 5
+                                });
+                            }
+                        }
+
+                        spawnPirateWave(3);
+                        spawnBurst(ship.x, ship.y, '#00ffff', 20);
+                        gameAudio.playDamage();
+                        addLog('Civilian vessel destroyed. PIRATE STATUS ACTIVE for 60 seconds.');
+                        showAlert('PIRATE STATUS: SPACEPORT SERVICES LOCKED');
+                    }
+                });
+            });
+
+            minerals.forEach((m, idx) => {
+                if (distanceBetween(player, m) < player.radius + m.radius) {
+                    player.cargo[m.type]++;
+                    gameAudio.playPickup();
+                    spawnBurst(m.x, m.y, MINERAL_COLORS[m.type], 8);
+                    addLog(`Cargo expanded: [${m.type.toUpperCase()}] captured`);
+                    saveGame();
+                    minerals.splice(idx, 1);
+                }
+            });
+
+
+            if (player.invulnerable <= 0) {
+                asteroids.forEach(a => {
+                    if (distanceBetween(player, a) < player.radius + a.radius) {
+                        damagePlayer(a.size * 10);
+                        player.vx = -player.vx * 0.4 + (player.x - a.x) * 0.08;
+                        player.vy = -player.vy * 0.4 + (player.y - a.y) * 0.08;
+                    }
+                });
+
+                enemyBullets.forEach(eb => {
+                    if (distanceBetween(player, eb) < player.radius) {
+                        eb.life = 0; damagePlayer(12);
+                        spawnBurst(player.x, player.y, '#ff3333', 5);
+                    }
+                });
+            }
+        }
+
+        function damagePlayer(amount) {
+
+            player.shield -= amount;
+            gameAudio.playDamage();
+            player.invulnerable = 35; 
+            if (player.shield <= 0) {
+                player.shield = 0;
+                player.cargo.gold = Math.floor(player.cargo.gold / 2);
+                player.cargo.uranium = Math.floor(player.cargo.uranium / 2);
+                player.cargo.eridium = Math.floor(player.cargo.eridium / 2);
+                const pirateDeath = pirateStatusUntil > Date.now();
+                const walletLost = pirateDeath ? player.wallet : Math.floor(player.wallet / 2);
+                player.wallet = pirateDeath ? 0 : walletLost;
+                
+                player.x = WORLD_SIZE / 2;
+                player.y = WORLD_SIZE / 2;
+                player.vx = 0; player.vy = 0;
+                player.shield = 40; 
+                showAlert("SYSTEM BREAKDOWN. RECOVERY SHIP TOWED CHASSIS TO CENTRAL STATION.");
+                addLog(walletLost > 0
+                    ? `Hull collapsed. Pirate status confiscated \$${walletLost} from the trade wallet.`
+                    : "Hull collapsed. Re-docked automatically at stationary middle sector base.");
+                saveGame();
+            }
+        }
+
+        let nearbyMerchant = null;
+        let nearbyMerchantCargoState = null;
+
+        function updateUI() {
+            const pirateActive = pirateStatusUntil > Date.now();
+            document.getElementById('stat-wallet').innerText = `\$${player.wallet}`;
+            document.getElementById('stat-bank').innerText = `\$${player.bank}`;
+            document.getElementById('stat-earnings').innerText = `\$${player.overallEarnings}`;
+            
+            const sectorGoal = getSectorGoal();
+            let goalPct = Math.min(100, (player.bank / sectorGoal) * 100);
+            document.getElementById('stat-goal-fill').style.width = `${goalPct}%`;
+            document.getElementById('stat-goal-text').innerText = `\$${player.bank} / \$${sectorGoal}`;
+            document.getElementById('mobile-wallet').innerText = `\$${player.wallet}`;
+            document.getElementById('mobile-bank-value').innerText = `\$${player.bank}`;
+            document.getElementById('mobile-sector').innerText = `SECTOR ${currentSector}`;
+            document.getElementById('mobile-goal-text').innerText = `\$${player.bank} / \$${sectorGoal}`;
+            document.getElementById('mobile-goal-fill').style.width = `${goalPct}%`;
+
+            const activeTheme = SECTOR_THEMES[Math.min(4, currentSector)] || { name: "Deep Space" };
+            document.getElementById('sector-title').innerText = `Sect ${currentSector}: ${activeTheme.name}`;
+
+            const shieldFill = document.getElementById('stat-shield-fill');
+            shieldFill.style.width = `${(player.shield / player.maxShield) * 100}%`;
+            shieldFill.style.backgroundColor = player.shield < 35 ? 'var(--accent-red)' : 'var(--accent-blue)';
+            document.getElementById('mobile-shield-fill').style.width = `${(player.shield / player.maxShield) * 100}%`;
+            document.getElementById('mobile-shield-fill').style.backgroundColor = player.shield < 35 ? 'var(--accent-red)' : 'var(--accent-blue)';
+
+            document.getElementById('inv-gold').innerText = player.cargo.gold;
+            document.getElementById('inv-uranium').innerText = player.cargo.uranium;
+            document.getElementById('inv-eridium').innerText = player.cargo.eridium;
+
+
+            let baseDist = Math.hypot(player.x - SPACEPORT.x, player.y - SPACEPORT.y);
+            document.getElementById('spaceport-dist').innerText = `Range: ${Math.floor(baseDist)}m`;
+            
+            const bankBtn = document.getElementById('btn-bank');
+            const pirateStatus = document.getElementById('pirate-status');
+            if (pirateActive) {
+                const secondsRemaining = Math.ceil((pirateStatusUntil - Date.now()) / 1000);
+                pirateStatus.style.display = 'block';
+                pirateStatus.innerText = `PIRATE STATUS: ${secondsRemaining}s remaining. Banking, repairs, and trade locked.`;
+            } else {
+                pirateStatus.style.display = 'none';
+            }
+
+            if (baseDist <= SPACEPORT.radius && !pirateActive) {
+                bankBtn.disabled = false;
+                bankBtn.onclick = () => {
+                    if (pirateStatusUntil > Date.now()) return;
+                    if (player.wallet > 0 || player.shield < player.maxShield) {
+                        player.bank += player.wallet;
+                        let checkedAmt = player.wallet;
+                        player.wallet = 0;
+                        player.shield = player.maxShield;
+                        player.overallEarnings += checkedAmt;
+                        saveGame();
+
+                        if (checkedAmt > 0) {
+                            gameAudio.playBank();
+                            addLog(`Vault registration accepted: \$${checkedAmt} deposited into high score record.`);
+                            showAlert(`VAULT SECURED +\$${checkedAmt}`);
+                        } else {
+                            showAlert("SHIELDS DEPLOYED FULL");
+                        }
+
+
+                        if (player.bank >= getSectorGoal()) {
+                            executeSectorWarp();
+                        }
+                    }
+                };
+            } else {
+                bankBtn.disabled = true;
+            }
+            document.getElementById('mobile-bank').disabled = bankBtn.disabled;
+
+            let closestM = null;
+            let minDist = MERCHANT_RANGE; 
+
+            merchants.forEach(m => {
+                let d = distanceBetween(player, m);
+                if (d <= MERCHANT_RANGE && d < minDist) {
+                    minDist = d; 
+                    closestM = m;
+                }
+            });
+
+
+            const merchPanel = document.getElementById('merchant-content');
+            if (closestM) {
+                const cargoState = Object.keys(closestM.reqs)
+                    .map(item => `${item}:${player.cargo[item] || 0}`)
+                    .join('|') + `|pirate:${pirateActive}`;
+
+                if (nearbyMerchant !== closestM || nearbyMerchantCargoState !== cargoState) {
+                    nearbyMerchant = closestM;
+                    nearbyMerchantCargoState = cargoState;
+                    renderMerchantPanel(closestM);
+                }
+            } else {
+                if (nearbyMerchant !== null || merchPanel.querySelector('#btn-trade')) {
+                    nearbyMerchant = null;
+                    nearbyMerchantCargoState = null;
+                    merchPanel.innerHTML = `<p class="merchant-msg">No merchant signals nearby. Search deep outer border zones for trade ships.</p>`;
+                }
+            }
+        }
+
+        // FIXED: Shifted execution completely out of rapid dynamic innerHTML injection blocks to stop DOM event listeners from breaking mid-click
+        function executeMerchantTrade(merchantId) {
+            if (pirateStatusUntil > Date.now()) {
+                addLog('Trade denied: Pirate status is active.');
+                return;
+            }
+
+            let m = merchants.find(ship => ship.id === merchantId);
+            if (!m) return;
+
+            let distanceCheck = distanceBetween(player, m);
+
+            if (distanceCheck > MERCHANT_RANGE) {
+                addLog("Comms error: Target vessel moved out of terminal link scope.");
+                return;
+            }
+
+            // Rigorous validation loop to verify inventory fits terms perfectly
+            for (let item in m.reqs) {
+                if ((player.cargo[item] || 0) < m.reqs[item]) {
+                    addLog("Trade denied: Cargo levels dropped below transaction manifest rules.");
+                    return;
+                }
+            }
+
+            // Complete cargo reduction and payout calculation steps
+            for (let item in m.reqs) { 
+                player.cargo[item] -= m.reqs[item]; 
+            }
+            player.wallet += m.reward;
+            gameAudio.playTrade();
+            saveGame();
+            
+
+            addLog(`Trade verified with ship profile ${m.id}. Received \$${m.reward} trade cash.`);
+            showAlert(`INVENTORY SOLD +\$${m.reward}`);
+            
+            // Cycle merchant positions onto border regions cleanly
+            merchants = merchants.filter(merchantShip => merchantShip.id !== m.id);
+            spawnMerchant();
+            
+            nearbyMerchant = null;
+            nearbyMerchantCargoState = null;
+            updateUI();
+        }
+
+        function renderMerchantPanel(m) {
+            const panel = document.getElementById('merchant-content');
+            let reqHtml = '';
+            let canTrade = pirateStatusUntil <= Date.now();
+
+            for (let item in m.reqs) {
+                let has = player.cargo[item] || 0;
+                let color = item === 'gold' ? 'var(--accent-gold)' : item === 'uranium' ? 'var(--accent-uranium)' : 'var(--accent-eridium)';
+
+                let statusColor = has >= m.reqs[item] ? '#55ff55' : '#ff5555';
+                if (has < m.reqs[item]) canTrade = false;
+                
+                reqHtml += `<div style="display:flex; justify-content:space-between; margin:4px 0; font-size:0.75rem;">
+                    <span style="color:${color}">${item.toUpperCase()}:</span>
+                    <span style="color:${statusColor}">${has}/${m.reqs[item]}</span>
+                </div>`;
+            }
+
+            // FIXED: Using string parameters referencing independent global window scope actions to avoid template injection click stalls
+            panel.innerHTML = `
+                <p class="merchant-msg" style="color:var(--accent-gold); font-weight:bold;">BORDER TRADER SYNDICATE: ${m.id}</p>
+                <div class="trade-reqs" style="margin:4px 0;">${reqHtml}</div>
+                <p class="merchant-msg">Wallet Payout Offer: <span style="color:#55ff55; font-weight:bold;">\$${m.reward}</span></p>
+                <button class="btn" id="btn-trade" onclick="executeMerchantTrade('${m.id}')" style="width:100%; border-color:var(--accent-gold); color:var(--accent-gold); margin-top:4px;" ${canTrade ? '' : 'disabled'}>${pirateStatusUntil > Date.now() ? 'Trade Locked' : 'Execute Trade'}</button>
+            `;
+        }
+
+        function draw() {
+
+            const activeTheme = SECTOR_THEMES[Math.min(4, currentSector)] || { background: "#020205", primary: "#00ffff" };
+            
+            ctx.fillStyle = activeTheme.background;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Parallax Ambient Star Background
+            ctx.save();
+            starfield.forEach(s => {
+                let px = (s.x - (player.x * s.depth)) % canvas.width;
+                let py = (s.y - (player.y * s.depth)) % canvas.height;
+                if (px < 0) px += canvas.width;
+                if (py < 0) py += canvas.height;
+                
+                ctx.fillStyle = activeTheme.primary;
+                ctx.globalAlpha = s.alpha;
+                ctx.fillRect(px, py, s.size, s.size);
+            });
+            ctx.restore();
+
+
+            ctx.save();
+            ctx.translate(canvas.width / 2 - player.x, canvas.height / 2 - player.y);
+
+            // Nebula Clouds
+            ctx.save();
+            nebulae.forEach(n => {
+                let grad = ctx.createRadialGradient(n.x, n.y, n.radius * 0.1, n.x, n.y, n.radius);
+                grad.addColorStop(0, activeTheme.nebula);
+                grad.addColorStop(1, 'transparent');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.restore();
+
+            // Coordinate Navigation Grid
+            ctx.strokeStyle = '#111124';
+            ctx.lineWidth = 1;
+
+            const gridSpacing = 200;
+            
+            let startX = Math.max(0, Math.floor((player.x - canvas.width) / gridSpacing) * gridSpacing);
+            let endX = Math.min(WORLD_SIZE, Math.ceil((player.x + canvas.width) / gridSpacing) * gridSpacing);
+            let startY = Math.max(0, Math.floor((player.y - canvas.height) / gridSpacing) * gridSpacing);
+            let endY = Math.min(WORLD_SIZE, Math.ceil((player.y + canvas.height) / gridSpacing) * gridSpacing);
+
+            for (let x = startX; x <= endX; x += gridSpacing) {
+                ctx.beginPath(); ctx.moveTo(x, startY); ctx.lineTo(x, endY); ctx.stroke();
+            }
+            for (let y = startY; y <= endY; y += gridSpacing) {
+                ctx.beginPath(); ctx.moveTo(startX, y); ctx.lineTo(endX, y); ctx.stroke();
+            }
+
+            // Outer World Sector Boundaries
+            ctx.strokeStyle = 'rgba(235, 60, 60, 0.35)';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(0, 0, WORLD_SIZE, WORLD_SIZE);
+
+
+            // Stationary Centered Spaceport Base
+            ctx.save();
+            ctx.translate(SPACEPORT.x, SPACEPORT.y);
+            ctx.strokeStyle = '#00ffff'; 
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = '#00ffff';
+            ctx.lineWidth = 3;
+            
+            ctx.beginPath();
+            ctx.arc(0, 0, SPACEPORT.radius, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.beginPath();
+            for (let i = 0; i < 12; i++) {
+                let a = (i / 12) * Math.PI * 2;
+                ctx.moveTo(Math.cos(a) * 40, Math.sin(a) * 40);
+                ctx.lineTo(Math.cos(a) * 70, Math.sin(a) * 70);
+            }
+            ctx.stroke();
+
+            ctx.strokeRect(-25, -25, 50, 50);
+            
+            ctx.fillStyle = '#00ffff';
+            ctx.font = 'bold 12px monospace';
+            ctx.textAlign = 'center';
+            ctx.shadowBlur = 0;
+            ctx.fillText("SPACEPORT BANKING ZONE", 0, -SPACEPORT.radius - 15);
+            ctx.restore();
+
+            // Resource Collectibles
+            minerals.forEach(m => {
+                ctx.save();
+                ctx.translate(m.x, m.y);
+                ctx.fillStyle = MINERAL_COLORS[m.type];
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = MINERAL_COLORS[m.type];
+                ctx.beginPath();
+                ctx.arc(0, 0, 3, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.restore();
+            });
+
+            // Laser Projectiles
+            ctx.strokeStyle = 'var(--accent-blue)';
+            ctx.lineWidth = 2;
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = 'var(--accent-blue)';
+            bullets.forEach(b => {
+                ctx.beginPath();
+                ctx.moveTo(b.x, b.y);
+                ctx.lineTo(b.x - b.vx * 1.6, b.y - b.vy * 1.6);
+                ctx.stroke();
+            });
+
+            // Raider Projectiles
+            ctx.strokeStyle = 'var(--accent-red)';
+            ctx.lineWidth = 2;
+            ctx.shadowBlur = 8;
+
+            ctx.shadowColor = 'var(--accent-red)';
+            enemyBullets.forEach(eb => {
+                ctx.beginPath();
+                ctx.arc(eb.x, eb.y, 2.5, 0, Math.PI * 2);
+                ctx.stroke();
+            });
+
+            // Vector Asteroids
+            asteroids.forEach(a => {
+                ctx.save();
+                ctx.translate(a.x, a.y);
+                ctx.rotate(a.angle);
+                ctx.strokeStyle = a.typeKey === 'GENERIC' ? activeTheme.generic : a.type.color;
+                ctx.shadowBlur = 6;
+                ctx.shadowColor = ctx.strokeStyle;
+                ctx.lineWidth = 1.8;
+                
+                ctx.beginPath();
+                ctx.moveTo(a.points[0].x, a.points[0].y);
+
+                for (let i = 1; i < a.points.length; i++) {
+                    ctx.lineTo(a.points[i].x, a.points[i].y);
+                }
+                ctx.closePath();
+                ctx.stroke();
+                ctx.restore();
+            });
+
+            // Merchant Vessels
+            merchants.forEach(m => {
+                ctx.save();
+                
+                ctx.strokeStyle = 'rgba(255, 215, 0, 0.4)'; 
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([6, 6]);
+                ctx.beginPath();
+                ctx.arc(m.x, m.y, MERCHANT_RANGE, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+
+                ctx.translate(m.x, m.y);
+                ctx.strokeStyle = 'var(--accent-gold)';
+                ctx.shadowBlur = 18; 
+                ctx.shadowColor = 'var(--accent-gold)';
+                ctx.lineWidth = 2.5; 
+
+                ctx.beginPath();
+                ctx.moveTo(0, -28);
+                ctx.lineTo(20, 0);
+                ctx.lineTo(0, 28);
+                ctx.lineTo(-20, 0);
+                ctx.closePath();
+                ctx.stroke();
+
+                ctx.fillStyle = 'rgba(255, 215, 0, 0.15)';
+                ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(-8, -8, 16, 16);
+
+                ctx.strokeRect(-8, -8, 16, 16);
+                
+                ctx.fillStyle = 'var(--accent-gold)';
+                ctx.font = 'bold 12px monospace';
+                ctx.textAlign = 'center';
+                ctx.shadowBlur = 0;
+                ctx.fillText(`TRADER-${m.id}`, 0, 42);
+                ctx.restore();
+            });
+
+            // Enemy Raiders
+            enemies.forEach(e => {
+                ctx.save();
+                ctx.translate(e.x, e.y);
+                ctx.strokeStyle = 'var(--accent-red)';
+                ctx.fillStyle = '#3a1111'; 
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = 'var(--accent-red)';
+                ctx.lineWidth = 1.8;
+
+
+                ctx.beginPath();
+                ctx.ellipse(0, 0, 15, 6, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(0, -2, 5, Math.PI, 0);
+                ctx.fill();
+                ctx.stroke();
+                ctx.restore();
+            });
+
+            // Civilian traffic
+            civilianShips.forEach(ship => {
+                ctx.save();
+                ctx.translate(ship.x, ship.y);
+                ctx.rotate(ship.angle);
+                ctx.strokeStyle = '#00ffff';
+                ctx.fillStyle = 'rgba(0, 255, 255, 0.22)';
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#00ffff';
+                ctx.lineWidth = 1.8;
+                ctx.beginPath();
+                ctx.moveTo(ship.radius * 1.4, 0);
+                ctx.lineTo(-ship.radius, -ship.radius * 0.95);
+                ctx.lineTo(-ship.radius * 0.45, 0);
+                ctx.lineTo(-ship.radius, ship.radius * 0.95);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+                ctx.restore();
+            });
+
+            // Burst Particles
+            particles.forEach(p => {
+                ctx.save();
+                ctx.globalAlpha = p.life;
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x - p.size/2, p.y - p.size/2, p.size, p.size);
+                ctx.restore();
+
+            });
+
+            // Player Craft Chassis
+            ctx.save();
+            ctx.translate(player.x, player.y);
+            ctx.rotate(player.angle);
+            
+            if (player.invulnerable === 0 || Math.floor(Date.now() / 60) % 2 === 0) {
+                ctx.strokeStyle = '#ffffff'; 
+                ctx.fillStyle = '#b0b0b8'; 
+                ctx.shadowBlur = 12;
+                ctx.shadowColor = '#ffffff';
+                ctx.lineWidth = 2;
+
+                ctx.beginPath();
+                ctx.moveTo(player.radius * 1.4, 0);                 
+                ctx.lineTo(-player.radius, -player.radius * 0.95);   
+                ctx.lineTo(-player.radius * 0.45, 0);                
+                ctx.lineTo(-player.radius, player.radius * 0.95);    
+
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            }
+            ctx.restore();
+
+            ctx.restore(); 
+
+            ctx.save();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([3, 4]);
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, canvas.height / 2, POINTER_AIM_RADIUS, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+
+            const spaceportAngle = Math.atan2(
+                wrappedDelta(player.y, SPACEPORT.y),
+                wrappedDelta(player.x, SPACEPORT.x)
+            );
+            const indicatorDistance = 34;
+            const indicatorX = canvas.width / 2 + Math.cos(spaceportAngle) * indicatorDistance;
+            const indicatorY = canvas.height / 2 + Math.sin(spaceportAngle) * indicatorDistance;
+
+            ctx.save();
+            ctx.translate(indicatorX, indicatorY);
+            ctx.rotate(spaceportAngle);
+            ctx.globalAlpha = 0.5;
+            ctx.fillStyle = '#ffffff';
+            ctx.shadowBlur = 6;
+            ctx.shadowColor = '#ffffff';
+            ctx.beginPath();
+            ctx.moveTo(5, 0);
+            ctx.lineTo(-4, -3);
+            ctx.lineTo(-4, 3);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+
+            let nearestMerchant = null;
+            let nearestMerchantDistance = Infinity;
+            merchants.forEach(merchant => {
+                const merchantDistance = distanceBetween(player, merchant);
+                if (merchantDistance < nearestMerchantDistance) {
+                    nearestMerchant = merchant;
+                    nearestMerchantDistance = merchantDistance;
+                }
+            });
+
+            if (nearestMerchant) {
+                const merchantAngle = Math.atan2(
+                    wrappedDelta(player.y, nearestMerchant.y),
+                    wrappedDelta(player.x, nearestMerchant.x)
+                );
+                const merchantIndicatorDistance = indicatorDistance + 10;
+                const merchantIndicatorX = canvas.width / 2 + Math.cos(merchantAngle) * merchantIndicatorDistance;
+                const merchantIndicatorY = canvas.height / 2 + Math.sin(merchantAngle) * merchantIndicatorDistance;
+
+                ctx.save();
+                ctx.translate(merchantIndicatorX, merchantIndicatorY);
+                ctx.rotate(merchantAngle);
+                ctx.globalAlpha = 0.5;
+                ctx.fillStyle = '#ffd700';
+                ctx.beginPath();
+                ctx.moveTo(5, 0);
+                ctx.lineTo(-4, -3);
+                ctx.lineTo(-4, 3);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        loadGame();
+        initWorld();
+        updateUI();
+        requestAnimationFrame(gameLoop);
+
+    </script>
+</body>
+</html>
+
+
