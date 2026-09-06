@@ -118,7 +118,7 @@
         }
 
         .section-title {
-            font-size: 1rem;
+            font-size: 0.85rem;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -180,8 +180,8 @@
         }
 
         #merchant-panel {
-            height: 200px;
-            min-height: 200px;
+            height: 210px;
+            min-height: 210px;
             overflow: hidden;
         }
 
@@ -249,6 +249,15 @@
             background: var(--accent-blue);
             color: #000;
             box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+        }
+
+        @keyframes bank-ready-pulse {
+            0%, 100% { border-color: var(--accent-blue); color: var(--accent-blue); }
+            50% { border-color: #8ffcff; color: #c7ffff; background: #172a30; }
+        }
+
+        #btn-bank.bank-ready {
+            animation: bank-ready-pulse 2.2s ease-in-out infinite;
         }
 
         #msg-log {
@@ -548,7 +557,7 @@
                 <div class="section-title" style="color: var(--accent-blue); border-color: rgba(0,255,255,0.3);">Station Central</div>
                 <div id="spaceport-content">
                     <p class="merchant-msg" id="spaceport-dist">Range: 0m</p>
-                    <button class="btn" id="btn-bank" disabled>Bank Wallet Cash & Repair</button>
+                    <button class="btn" id="btn-bank" disabled>HOMEWORLD - BANK & REPAIR SHIP</button>
                 </div>
             </div>
 
@@ -576,6 +585,7 @@
         const BASE_SECTOR_GOAL = 5000;
         const SECTOR_GOAL_INCREASE = 1200;
         const POINTER_AIM_RADIUS = 34;
+        const HOMEWORLD_TILT = 18 * Math.PI / 180;
         
         let keys = {};
         let touchControls = { left: false, right: false, thrust: false, fire: false };
@@ -588,10 +598,14 @@
 
         // Sector Environmental Palette Profiles
         const SECTOR_THEMES = {
-            1: { name: "Orion Perimeter", primary: "#00ffff", background: "#020208", nebula: "rgba(0, 120, 255, 0.05)", generic: "#88889a" },
-            2: { name: "Nebular Abyss", primary: "#da70d6", background: "#06020c", nebula: "rgba(218, 112, 214, 0.05)", generic: "#998899" },
-            3: { name: "Xenon Core Alpha", primary: "#39ff14", background: "#020603", nebula: "rgba(57, 255, 20, 0.04)", generic: "#8a998a" },
-            4: { name: "Supernova Remnant", primary: "#ff6600", background: "#090302", nebula: "rgba(255, 102, 0, 0.04)", generic: "#aa9988" }
+            1: { name: "Andromeda Perimeter", primary: "#00ffff", background: "#020208", nebula: "rgba(0, 120, 255, 0.05)", generic: "#88889a"},
+            2: { name: "Orion Expanse", primary: "#fbfbcc", background: "#08060a", nebula: "rgba(0, 120, 255, 0.05)", generic: "#828e8d"},
+            3: { name: "Nebula Abyss", primary: "#da70d6", background: "#06020c", nebula: "rgba(218, 112, 214, 0.05)", generic: "#998899" },
+            4: { name: "Zelion Territory", primary: "#39ff14", background: "#020603", nebula: "rgba(57, 255, 20, 0.04)", generic: "#8a998a" },
+            5: { name: "Supernova Remnant", primary: "#ff6600", background: "#090302", nebula: "rgba(255, 102, 0, 0.04)", generic: "#aa9988" }
+
+
+
         };
         
         let player = {
@@ -619,7 +633,14 @@
         const SPACEPORT = {
             x: WORLD_SIZE / 2,
             y: WORLD_SIZE / 2,
-            radius: 110
+            radius: 155
+        };
+
+        let homeworld = {
+            planetRadius: 115,
+            svg: '',
+            image: null,
+            rotation: 0
         };
 
         let asteroids = [];
@@ -630,9 +651,11 @@
         let merchants = [];
         let enemies = [];
         let civilianShips = [];
+        let healthPacks = [];
         let particles = [];
         let pirateStatusUntil = 0;
         const SAVE_KEY = 'starpath-save-v1';
+        let homeworldCache = {};
 
         const ASTEROID_TYPES = {
             GENERIC: { name: 'Generic', color: '#888899', mineral: null },
@@ -647,6 +670,171 @@
             eridium: '#da70d6'
         };
 
+        const HOMEWORLD_PALETTES = [
+            { base: [70, 140, 220], land: [90, 200, 150] },
+            { base: [220, 170, 90], land: [200, 120, 70] },
+            { base: [100, 190, 190], land: [155, 175, 90] },
+            { base: [120, 227, 227], land: [145, 255, 80] },
+            { base: [200, 80, 80], land: [255, 130, 40] },
+            { base: [190, 30, 35], land: [190, 125, 100] },
+            { base: [230, 230, 127], land: [255, 200, 60] },
+            { base: [180, 220, 255], land: [255, 255, 255] }
+        ];
+
+        function generatorColor(rgb) {
+            return `rgb(${Math.round(rgb[0])},${Math.round(rgb[1])},${Math.round(rgb[2])})`;
+        }
+
+        function generatorPolygon(cx, cy, radius, sides, jitter = 0.25) {
+            return Array.from({ length: sides }, (_, index) => {
+                const angle = Math.PI * 2 / sides * index;
+                const distance = radius * (1 + (Math.random() * jitter - jitter / 2));
+                return `${cx + Math.cos(angle) * distance},${cy + Math.sin(angle) * distance}`;
+            }).join(' ');
+        }
+
+        function createGeneratorPlanetSvg() {
+            const size = 900;
+            const center = size / 2;
+            const radius = 112 + Math.random() * 10;
+            const palette = HOMEWORLD_PALETTES[Math.floor(Math.random() * HOMEWORLD_PALETTES.length)];
+            const landZones = [];
+            const parts = [];
+            const clipId = `planetClip${Math.random().toString(36).slice(2)}`;
+            const ringRotation = 40 + Math.random() * 20;
+
+            const landColor = () => generatorColor(palette.land.map(value => Math.max(0, Math.min(255, value + Math.random() * 60 - 30))));
+            const ringColor = generatorColor(palette.land);
+
+            const ringClipId = `ringClip${Math.random().toString(36).slice(2)}`;
+            parts.push(`<defs><clipPath id="${clipId}"><circle cx="${center}" cy="${center}" r="${radius}"/></clipPath><linearGradient id="planetShadow" gradientUnits="userSpaceOnUse" x1="${center - radius}" y1="${center}" x2="${center + radius}" y2="${center}" gradientTransform="rotate(0 ${center} ${center})"><stop offset="0%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity=".95"/></linearGradient></defs>`);
+
+            const hasRings = Math.random() < 0.4;
+            let ringFront = '';
+            if (hasRings) {
+                const ringCount = 2 + Math.floor(Math.random() * 4);
+                let maxRingRadius = 0;
+                let maxRingHeight = 0;
+                const ringParts = [];
+                for (let index = 0; index < ringCount; index++) {
+                    const step = index * 0.2;
+                    const ringRadius = radius * (0.35 + step);
+                    const ringHeight = radius * (1.6 + step);
+                    maxRingRadius = Math.max(maxRingRadius, ringRadius);
+                    maxRingHeight = Math.max(maxRingHeight, ringHeight);
+                    ringParts.push(`<ellipse cx="${center}" cy="${center}" rx="${ringRadius}" ry="${ringHeight}" fill="none" stroke="${ringColor}" stroke-width="${0.55 + Math.random() * 7.95}" opacity="1"/>`);
+                }
+                const ringBack = `<g transform="rotate(${ringRotation} ${center} ${center})">${ringParts.join('')}</g>`;
+                const ringGroupWidth = maxRingRadius * 6;
+                const ringGroupHeight = maxRingHeight * 1.5;
+                parts.push(`<defs><clipPath id="${ringClipId}"><rect x="${center - ringGroupWidth / 2}" y="${center}" width="${ringGroupWidth}" height="${ringGroupHeight / 2}" transform="rotate(${ringRotation + 220} ${center} ${center})"/></clipPath></defs>`);
+                const ringFrontClip = `clip-path="url(#${ringClipId})"`;
+                ringFront = `<g ${ringFrontClip} transform="rotate(${ringRotation} ${center} ${center})">${ringParts.join('')}</g>`;
+                parts.push(ringBack);
+            }
+
+            parts.push(`<circle cx="${center}" cy="${center}" r="${radius}" fill="${generatorColor(palette.base)}"/>`);
+
+            for (let index = 0; index < 4 + Math.floor(Math.random() * 7); index++) {
+                const x = center + (Math.random() * 0.64 - 0.32) * radius;
+                const y = center + (Math.random() * 0.64 - 0.32) * radius;
+                const landRadius = radius * (0.08 + Math.random() * 0.42);
+                landZones.push({ x, y, radius: landRadius });
+                parts.push(`<polygon points="${generatorPolygon(x, y, landRadius, 4 + Math.floor(Math.random() * 3), .45)}" fill="${landColor()}" opacity=".9" clip-path="url(#${clipId})"/>`);
+            }
+
+            for (let index = 0; index < 10 + Math.floor(Math.random() * 11); index++) {
+                const zone = landZones[Math.floor(Math.random() * landZones.length)];
+                const x = zone.x + (Math.random() * 1.6 - 0.8) * zone.radius;
+                const y = zone.y + (Math.random() * 1.6 - 0.8) * zone.radius;
+                parts.push(`<polygon points="${generatorPolygon(x, y, 2 + Math.random() * 10, 3, .1)}" fill="#333" opacity=".5" clip-path="url(#${clipId})"/>`);
+            }
+
+            for (let index = 0; index < Math.floor(Math.random() * 13); index++) {
+                parts.push(`<ellipse cx="${center + (Math.random() * .6 - .3) * radius}" cy="${center + (Math.random() * 1.3 - .65) * radius}" rx="${20 + Math.random() * 40}" ry="${8 + Math.random() * 20}" fill="#fff" opacity="${.08 + Math.random() * .14}" clip-path="url(#${clipId})"/>`);
+            }
+
+            // Generator-style glacial polar caps, clipped to the planet surface.
+            if (Math.random() < 0.6666667) {
+                for (const poleY of [center - radius * 0.975, center + radius * 0.975]) {
+                const poleRadius = radius * (0.22 + Math.random() * 0.33);
+                const polePoints = generatorPolygon(center, poleY, poleRadius, 5 + Math.floor(Math.random() * 6), 0.25);
+                parts.push(`<g clip-path="url(#${clipId})" transform="rotate(-28 ${center} ${center})"><polygon points="${polePoints}" fill="#fff" opacity=".95" transform="translate(${center} ${poleY}) scale(1 .6) translate(${-center} ${-poleY})"/>`);
+                for (let detail = 0; detail < 2 + Math.floor(Math.random() * 4); detail++) {
+                    const detailRadius = poleRadius * (0.4 + Math.random() * 0.3);
+                    parts.push(`<polygon points="${generatorPolygon(center + (Math.random() * 2 - 1) * poleRadius * .2, poleY + (Math.random() * 2 - 1) * poleRadius * .1, detailRadius, 6 + Math.floor(Math.random() * 5), .2)}" fill="rgb(${220 + Math.random() * 20},${235 + Math.random() * 15},255)" opacity="${.8 + Math.random() * .2}"/>`);
+                }
+                parts.push('</g>');
+                }
+            }
+
+            parts.push(`<ellipse cx="${center}" cy="${center}" rx="${radius * 1.02}" ry="${radius * 1.02}" fill="url(#planetShadow)" clip-path="url(#${clipId})"/>`);
+            parts.push(ringFront);
+
+            for (let index = 0; index < Math.floor(Math.random() * 5); index++) {
+                const angle = Math.random() * Math.PI * 2;
+                const moonDistance = radius + 40 + Math.random() * 60;
+                const moonX = center + Math.cos(angle) * moonDistance;
+                const moonY = center + Math.sin(angle) * moonDistance;
+                const moonRadius = 5 + Math.random() * 9;
+                parts.push(`<circle cx="${moonX}" cy="${moonY}" r="${moonRadius}" fill="#b8c2c9" opacity=".85"/>`);
+            }
+
+            for (let index = 0; index < Math.floor(Math.random() * 29); index++) {
+                const angle = Math.random() * Math.PI * 2;
+                const asteroidDistance = radius + 30 + Math.random() * 90;
+                const x = center + Math.cos(angle) * asteroidDistance;
+                const y = center + Math.sin(angle) * asteroidDistance;
+                const gray = 80 + Math.random() * 100;
+                parts.push(`<polygon points="${generatorPolygon(x, y, 2 + Math.random() * 6, 4 + Math.floor(Math.random() * 4), 0)}" fill="rgb(${gray},${gray},${gray})" opacity=".75"/>`);
+            }
+
+            for (const zone of landZones.slice(0, 3)) {
+                for (let index = 0; index < 2 + Math.floor(Math.random() * 4); index++) {
+                    parts.push(`<circle cx="${zone.x + (Math.random() * 2 - 1) * Math.max(0, zone.radius - 3)}" cy="${zone.y + (Math.random() * 2 - 1) * Math.max(0, zone.radius - 3)}" r="${1.5 + Math.random() * 1.5}" fill="#fff" opacity="${.35 + Math.random() * .4}" clip-path="url(#${clipId})"/>`);
+                }
+            }
+
+            return {
+                radius,
+                svg: `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${parts.join('')}</svg>`
+            };
+        }
+
+        function setHomeworldFromRecord(record) {
+            const image = new Image();
+            image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(record.svg)}`;
+            homeworld = {
+                planetRadius: record.radius,
+                svg: record.svg,
+                image,
+                rotation: record.rotation
+            };
+        }
+
+        function generateHomeworld() {
+            const sectorCount = Object.keys(SECTOR_THEMES).length;
+            const sectorSlot = ((currentSector - 1) % sectorCount) + 1;
+            const sectorCycle = Math.floor((currentSector - 1) / sectorCount);
+            const cached = homeworldCache[sectorSlot];
+
+            if (cached && cached.cycle === sectorCycle && cached.svg) {
+                setHomeworldFromRecord(cached);
+                return;
+            }
+
+            const generated = createGeneratorPlanetSvg();
+            const record = {
+                cycle: sectorCycle,
+                radius: generated.radius,
+                svg: generated.svg,
+                rotation: Math.random() * Math.PI * 2
+            };
+            homeworldCache[sectorSlot] = record;
+            setHomeworldFromRecord(record);
+            saveGame();
+        }
+
         function saveGame() {
             try {
                 localStorage.setItem(SAVE_KEY, JSON.stringify({
@@ -657,7 +845,8 @@
                         overallEarnings: player.overallEarnings,
                         cargo: player.cargo,
                         shield: player.shield
-                    }
+                    },
+                    homeworldCache
                 }));
             } catch (error) {
                 console.warn('Starpath save unavailable:', error);
@@ -679,6 +868,9 @@
                     eridium: Math.max(0, Number(saved.player.cargo?.eridium) || 0)
                 };
                 player.shield = Math.max(1, Math.min(player.maxShield, Number(saved.player.shield) || player.maxShield));
+                homeworldCache = saved.homeworldCache && typeof saved.homeworldCache === 'object'
+                    ? saved.homeworldCache
+                    : {};
             } catch (error) {
                 console.warn('Starpath save could not be loaded:', error);
             }
@@ -849,8 +1041,14 @@
             }
 
             playFire() { this.playSfx(140, 0.35, 'triangle', 0.18, 30); }
+            playEnemyFire() { this.playSfx(120, 0.32, 'triangle', 0.15, 26); }
+
             playMining() { this.playSfx(260, 0.2, 'triangle', 0.12, 520); }
             playPickup() { this.playSfx(660, 0.3, 'sine', 0.12, 990); }
+            playSupplyCache() {
+                this.playSfx(880, 0.45, 'sine', 0.1, 1320);
+                setTimeout(() => this.playSfx(1320, 0.35, 'sine', 0.07, 1760), 80);
+            }
             playDamage() { this.playSfx(90, 0.45, 'sawtooth', 0.2, 35); }
             playTrade() { this.playSfx(440, 0.25, 'triangle', 0.16, 880); }
             playBank() { this.playSfx(523.25, 0.45, 'sine', 0.14, 783.99); }
@@ -1014,6 +1212,7 @@
             let angle = Math.random() * Math.PI * 2;
             let dist = 1800 + Math.random() * 1800;
             enemies.push({
+                type: 'normal',
                 x: player.x + Math.cos(angle) * dist,
                 y: player.y + Math.sin(angle) * dist,
                 vx: 0, vy: 0,
@@ -1021,6 +1220,124 @@
                 radius: 15,
                 lastShot: 0,
                 shootDelay: Math.max(900, 1700 - (currentSector * 150)),
+                hp: 2 + Math.floor(currentSector / 2)
+            });
+        }
+
+        function createPirate(x, y) {
+            const pirate = {
+                type: 'pirate',
+                x, y,
+                vx: 0,
+                vy: 0,
+                speed: 0.95 + (currentSector * 0.1),
+                radius: 22,
+                lastShot: 0,
+                shootDelay: 2100,
+                hp: (5 + currentSector) * 2,
+                alertDistance: 500,
+                alerted: false,
+                provoked: false,
+                orbitAngle: Math.random() * Math.PI * 2,
+                orbitRadius: 180 + Math.random() * 140,
+                campCenterX: x,
+                campCenterY: y,
+                campAsteroids: [],
+                stolenCargo: null
+            };
+            enemies.push(pirate);
+            return pirate;
+        }
+
+        function spawnPirateAt(pirateX, pirateY) {
+            const pirate = createPirate(pirateX, pirateY);
+            const asteroidCount = 5 + Math.floor(Math.random() * 4);
+
+            for (let i = 0; i < asteroidCount; i++) {
+                const asteroidAngle = (i / asteroidCount) * Math.PI * 2 + Math.random() * 0.4;
+                const asteroidDistance = 90 + Math.random() * 180;
+                const size = Math.random() < 0.55 ? 1 : Math.random() < 0.7 ? 2 : 3;
+                const typeKeys = Object.keys(ASTEROID_TYPES);
+                const typeKey = typeKeys[Math.floor(Math.random() * typeKeys.length)];
+                spawnAsteroid(
+                    pirate.x + Math.cos(asteroidAngle) * asteroidDistance,
+                    pirate.y + Math.sin(asteroidAngle) * asteroidDistance,
+                    size,
+                    typeKey
+                );
+                pirate.campAsteroids.push(asteroids[asteroids.length - 1]);
+            }
+            addLog(`Pirate camp detected in outer sector: ${Math.round(distanceBetween(pirate, SPACEPORT))}m from center.`);
+        }
+
+        function spawnPirate() {
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 1800 + Math.random() * 1200;
+            spawnPirateAt(
+                WORLD_SIZE / 2 + Math.cos(angle) * distance,
+                WORLD_SIZE / 2 + Math.sin(angle) * distance
+            );
+        }
+
+        function spawnCornerPirate(cornerX, cornerY) {
+            const inset = 550 + Math.random() * 250;
+            spawnPirateAt(
+                cornerX === 0 ? inset : WORLD_SIZE - inset,
+                cornerY === 0 ? inset : WORLD_SIZE - inset
+            );
+        }
+
+        function spawnHealthPack() {
+            let x;
+            let y;
+            let attempts = 0;
+            do {
+                x = Math.random() * WORLD_SIZE;
+                y = Math.random() * WORLD_SIZE;
+                attempts++;
+            } while (Math.hypot(wrappedDelta(player.x, x), wrappedDelta(player.y, y)) < 1400 && attempts < 30);
+
+            const horizontalRoute = Math.random() < 0.5;
+            const direction = Math.random() < 0.5 ? 1 : -1;
+            const routeAngle = horizontalRoute
+                ? (direction > 0 ? 0 : Math.PI)
+                : (direction > 0 ? Math.PI / 2 : -Math.PI / 2);
+            healthPacks.push({
+                x,
+                y,
+                vx: Math.cos(routeAngle) * 0.65,
+                vy: Math.sin(routeAngle) * 0.65,
+                angle: routeAngle,
+                routeAngle,
+                meanderAngle: 0,
+                meanderTarget: (Math.random() * 36 - 18) * Math.PI / 180,
+                nextMeander: Date.now() + 2500 + Math.random() * 5000,
+                radius: 8,
+                pulse: Math.random() * Math.PI * 2,
+                beaconAngle: Math.random() * Math.PI * 2
+            });
+        }
+
+        function spawnSeeker() {
+            const horizontalRoute = Math.random() < 0.5;
+            const direction = Math.random() < 0.5 ? 1 : -1;
+            const speed = 1.25 + Math.random() * 0.65;
+            enemies.push({
+                type: 'seeker',
+                x: horizontalRoute ? (direction > 0 ? 0 : WORLD_SIZE) : Math.random() * WORLD_SIZE,
+                y: horizontalRoute ? Math.random() * WORLD_SIZE : (direction > 0 ? 0 : WORLD_SIZE),
+                vx: horizontalRoute ? speed * direction : 0,
+                vy: horizontalRoute ? 0 : speed * direction,
+                radius: 11,
+                angle: horizontalRoute ? (direction > 0 ? 0 : Math.PI) : (direction > 0 ? Math.PI / 2 : -Math.PI / 2),
+                routeAngle: horizontalRoute ? (direction > 0 ? 0 : Math.PI) : (direction > 0 ? Math.PI / 2 : -Math.PI / 2),
+                meanderAngle: 0,
+                alertDistance: 480,
+                alerted: false,
+                repositionAt: 0,
+                movingUntil: 0,
+                lastShot: 0,
+                shootDelay: 1700,
                 hp: 2 + Math.floor(currentSector / 2)
             });
         }
@@ -1084,12 +1401,29 @@
             }
         }
 
+        function spawnMineralDrops(x, y, cargo) {
+            Object.keys(cargo).forEach(type => {
+                for (let drop = 0; drop < cargo[type]; drop++) {
+                    minerals.push({
+                        x: x + (Math.random() * 50 - 25),
+                        y: y + (Math.random() * 50 - 25),
+                        vx: Math.random() * 2 - 1,
+                        vy: Math.random() * 2 - 1,
+                        type,
+                        radius: 5
+                    });
+                }
+            });
+        }
+
         function initWorld() {
             asteroids = [];
             merchants = [];
             enemies = [];
             civilianShips = [];
+            healthPacks = [];
             minerals = [];
+            generateHomeworld();
 
             bullets = [];
             enemyBullets = [];
@@ -1120,7 +1454,20 @@
             for (let i = 0; i < civilianTarget; i++) {
                 spawnCivilian();
             }
-            generateBackgroundAssets();
+                for (let i = 0; i < 2; i++) {
+                    spawnPirate();
+                }
+                spawnCornerPirate(0, 0);
+                spawnCornerPirate(WORLD_SIZE, 0);
+                spawnCornerPirate(0, WORLD_SIZE);
+                spawnCornerPirate(WORLD_SIZE, WORLD_SIZE);
+                for (let i = 0; i < 8; i++) {
+                    spawnHealthPack();
+                }
+                for (let i = 0; i < Math.max(1, Math.floor(currentSector / 2)); i++) {
+                    spawnSeeker();
+                }
+                generateBackgroundAssets();
         }
 
         function executeSectorWarp() {
@@ -1164,6 +1511,9 @@
             while (civilianShips.length < civilianTarget) {
                 spawnCivilian();
             }
+            while (healthPacks.length < 8) {
+                spawnHealthPack();
+            }
 
             let baseDx = SPACEPORT.x - player.x;
             let baseDy = SPACEPORT.y - player.y;
@@ -1200,11 +1550,12 @@
             if (keys['ArrowRight'] || keys['KeyD'] || touchControls.right) {
                 player.angle += player.rotationSpeed;
             }
-            if (keys['ArrowUp'] || keys['KeyW'] || touchControls.thrust || pointerThrust) {
+            const playerThrusting = keys['ArrowUp'] || keys['KeyW'] || touchControls.thrust || pointerThrust;
+            if (playerThrusting) {
                 player.vx += Math.cos(player.angle) * player.thrust;
                 player.vy += Math.sin(player.angle) * player.thrust;
                 
-                if (Math.random() < 0.35) {
+                if (Math.random() < 0.55) {
 
                     particles.push({
                         x: player.x - Math.cos(player.angle) * player.radius,
@@ -1214,7 +1565,7 @@
                         life: 0.5,
                         decay: 0.045,
                         color: '#ff7700',
-                        size: 2.2
+                        size: 3.2
                     });
                 }
             }
@@ -1263,11 +1614,92 @@
                 let dy = wrappedDelta(e.y, player.y);
                 let d = Math.hypot(dx, dy);
 
-                if (d < 550) { 
+                if (e.type === 'pirate') {
+                    if (pirateStatusUntil > Date.now() && !e.provoked) e.alerted = false;
+                    if (d > 600) e.alerted = false;
+                    if (d < e.alertDistance && (!pirateStatusUntil || pirateStatusUntil <= Date.now() || e.provoked)) {
+                        e.alerted = true;
+                    }
 
-                    e.vx += (dx / d) * 0.055;
-                    e.vy += (dy / d) * 0.055;
-                    
+                    if (!e.alerted) {
+                        e.vx *= 0.92;
+                        e.vy *= 0.92;
+                        e.orbitAngle += 0.002;
+                        const targetX = e.campCenterX + Math.cos(e.orbitAngle) * e.orbitRadius;
+                        const targetY = e.campCenterY + Math.sin(e.orbitAngle) * e.orbitRadius;
+                        const campDx = wrappedDelta(e.x, targetX);
+                        const campDy = wrappedDelta(e.y, targetY);
+                        e.vx += campDx * 0.0008;
+                        e.vy += campDy * 0.0008;
+                    } else {
+                        const playerAngle = Math.atan2(-dy, -dx) + Math.PI / 2 + Math.sin(Date.now() / 700) * 0.25;
+                        const desiredDistance = 520;
+                        const targetX = player.x + Math.cos(playerAngle) * desiredDistance;
+                        const targetY = player.y + Math.sin(playerAngle) * desiredDistance;
+                        e.vx += wrappedDelta(e.x, targetX) * 0.0012;
+                        e.vy += wrappedDelta(e.y, targetY) * 0.0012;
+                        const pirateSpeed = Math.hypot(e.vx, e.vy);
+                        if (pirateSpeed > e.speed) {
+                            e.vx = (e.vx / pirateSpeed) * e.speed;
+                            e.vy = (e.vy / pirateSpeed) * e.speed;
+                        }
+
+                        if (Date.now() - e.lastShot > e.shootDelay && Math.random() < 0.18) {
+                            const baseAngle = Math.atan2(dy, dx);
+                            const bulletCount = 3 + Math.floor(Math.random() * 3);
+                            for (let i = 0; i < bulletCount; i++) {
+                                const spread = (Math.random() - 0.5) * 0.7;
+                                const bulletAngle = baseAngle + spread;
+                                enemyBullets.push({
+                                    x: e.x, y: e.y,
+                                    vx: Math.cos(bulletAngle) * 4.8,
+                                    vy: Math.sin(bulletAngle) * 4.8,
+                                    life: 130,
+                                    owner: e
+                                });
+                            }
+                            gameAudio.playEnemyFire();
+                            e.lastShot = Date.now();
+                        }
+                    }
+                } else if (e.type === 'seeker') {
+                    if (d > 600) e.alerted = false;
+                    if (d < e.alertDistance) e.alerted = true;
+
+                    if (!e.alerted) {
+                        e.angle = e.routeAngle;
+                        e.vx += (Math.cos(e.angle) * 1.35 - e.vx) * 0.035;
+                        e.vy += (Math.sin(e.angle) * 1.35 - e.vy) * 0.035;
+                    } else {
+                        e.angle = Math.atan2(dy, dx);
+                        if (Date.now() >= e.repositionAt) {
+                            const repositionAngle = e.angle + (Math.random() - 0.5) * 1.2;
+                            e.vx = Math.cos(repositionAngle) * 1.8;
+                            e.vy = Math.sin(repositionAngle) * 1.8;
+                            e.repositionAt = Date.now() + 2600 + Math.random() * 2200;
+                            e.movingUntil = Date.now() + 500 + Math.random() * 700;
+                        }
+
+                        if (Date.now() >= e.movingUntil) {
+                            e.vx *= 0.82;
+                            e.vy *= 0.82;
+                            if (Date.now() - e.lastShot > e.shootDelay && Math.random() < 0.16) {
+                                enemyBullets.push({
+                                    x: e.x, y: e.y,
+                                    vx: Math.cos(e.angle) * 4.8,
+                                    vy: Math.sin(e.angle) * 4.8,
+                                    life: 130,
+                                    owner: e
+                                });
+                                gameAudio.playEnemyFire();
+                                e.lastShot = Date.now();
+                            }
+                        }
+                    }
+                } else if (d < 550) {
+                    e.vx += (dx / Math.max(d, 1)) * 0.055;
+                    e.vy += (dy / Math.max(d, 1)) * 0.055;
+
                     let spd = Math.hypot(e.vx, e.vy);
                     if (spd > e.speed) {
                         e.vx = (e.vx / spd) * e.speed;
@@ -1280,11 +1712,12 @@
                             x: e.x, y: e.y,
                             vx: Math.cos(bAngle) * 4.8,
                             vy: Math.sin(bAngle) * 4.8,
-                            life: 130
+                            life: 130,
+                            owner: e
                         });
+                        gameAudio.playEnemyFire();
                         e.lastShot = Date.now();
                     }
-
                 } else {
                     if(Math.random() < 0.015) {
                         let randA = Math.random() * Math.PI*2;
@@ -1333,7 +1766,7 @@
                 ship.y += ship.vy;
                 wrapEntity(ship);
 
-                if (Math.random() < 0.35) {
+                if (Math.random() < 0.5) {
                     particles.push({
                         x: ship.x - Math.cos(ship.angle) * ship.radius,
                         y: ship.y - Math.sin(ship.angle) * ship.radius,
@@ -1342,9 +1775,28 @@
                         life: 0.45,
                         decay: 0.05,
                         color: '#00ffff',
-                        size: 1.8
+                        size: 2.5
                     });
                 }
+            });
+
+            healthPacks.forEach(pack => {
+                if (Date.now() >= pack.nextMeander) {
+                    pack.meanderTarget = (Math.random() * 36 - 18) * Math.PI / 180;
+                    pack.nextMeander = Date.now() + 2500 + Math.random() * 5000;
+                }
+
+                pack.meanderAngle += (pack.meanderTarget - pack.meanderAngle) * 0.02;
+                pack.angle = pack.routeAngle + pack.meanderAngle;
+                const targetVx = Math.cos(pack.angle) * 0.65;
+                const targetVy = Math.sin(pack.angle) * 0.65;
+                pack.vx += (targetVx - pack.vx) * 0.02;
+                pack.vy += (targetVy - pack.vy) * 0.02;
+                pack.x += pack.vx;
+                pack.y += pack.vy;
+                pack.pulse += 0.08;
+                pack.beaconAngle += 0.06;
+                wrapEntity(pack);
             });
 
             particles.forEach(p => {
@@ -1408,21 +1860,39 @@
 
                 enemies.forEach((e, eIdx) => {
                     if (distanceBetween(b, e) < e.radius) {
-                        b.life = 0; e.hp--;
+                        b.life = 0;
+                        if (e.type === 'pirate') e.provoked = true;
+                        e.hp--;
                         spawnBurst(e.x, e.y, '#ff3333', 6);
                         if (e.hp <= 0) {
                             enemies.splice(eIdx, 1);
-                            player.wallet += 100;
-                            let mTypes = ['gold', 'uranium', 'eridium'];
-                            let dropped = mTypes[Math.floor(Math.random() * mTypes.length)];
+                            if (e.type === 'pirate') {
+                                if (e.stolenCargo) {
+                                    spawnMineralDrops(e.x, e.y, e.stolenCargo);
+                                    addLog('Pirate defeated. Confiscated cargo dropped for recovery.');
+                                } else {
+                                    const salvage = {
+                                        gold: 1 + Math.floor(Math.random() * 3),
+                                        uranium: 1 + Math.floor(Math.random() * 3),
+                                        eridium: 1 + Math.floor(Math.random() * 3)
+                                    };
+                                    spawnMineralDrops(e.x, e.y, salvage);
+                                    player.wallet += 300;
+                                    addLog('Pirate defeated. Salvage bonus: resources recovered and \$300 paid.');
+                                }
+                            } else {
+                                player.wallet += 100;
+                                let mTypes = ['gold', 'uranium', 'eridium'];
+                                let dropped = mTypes[Math.floor(Math.random() * mTypes.length)];
 
-                            minerals.push({
-                                x: e.x, y: e.y,
-                                vx: (Math.random() * 2 - 1), vy: (Math.random() * 2 - 1),
-                                type: dropped, radius: 5
-                            });
+                                minerals.push({
+                                    x: e.x, y: e.y,
+                                    vx: (Math.random() * 2 - 1), vy: (Math.random() * 2 - 1),
+                                    type: dropped, radius: 5
+                                });
+                            }
                             gameAudio.playDamage();
-                            addLog(`Raider cargo hull cracked. Dropped [${dropped.toUpperCase()}] crystal core.`);
+                            if (e.type !== 'pirate') addLog(`Raider cargo hull cracked. Enemy bounty paid: \$100.`);
                             saveGame();
                         }
                     }
@@ -1454,6 +1924,21 @@
                         showAlert('PIRATE STATUS: SPACEPORT SERVICES LOCKED');
                     }
                 });
+
+            });
+
+            healthPacks.forEach((pack, packIdx) => {
+                if (distanceBetween(player, pack) < player.radius + pack.radius) {
+                    const recovery = player.maxShield * (0.25 + Math.random() * 0.15);
+                    const cacheReward = 100 + Math.floor(Math.random() * 201);
+                    player.shield = Math.min(player.maxShield, player.shield + recovery);
+                    player.wallet += cacheReward;
+                    spawnBurst(pack.x, pack.y, '#00ffff', 12);
+                    gameAudio.playSupplyCache();
+                    addLog(`Supply cache collected. Shield recovery +${Math.round(recovery)}. Wallet +\$${cacheReward}.`);
+                    saveGame();
+                    healthPacks.splice(packIdx, 1);
+                }
             });
 
             minerals.forEach((m, idx) => {
@@ -1471,31 +1956,49 @@
             if (player.invulnerable <= 0) {
                 asteroids.forEach(a => {
                     if (distanceBetween(player, a) < player.radius + a.radius) {
-                        damagePlayer(a.size * 10);
-                        player.vx = -player.vx * 0.4 + (player.x - a.x) * 0.08;
-                        player.vy = -player.vy * 0.4 + (player.y - a.y) * 0.08;
+                        const collisionDx = wrappedDelta(a.x, player.x);
+                        const collisionDy = wrappedDelta(a.y, player.y);
+                        const collisionDistance = Math.max(Math.hypot(collisionDx, collisionDy), 1);
+                        const collisionNormalX = collisionDx / collisionDistance;
+                        const collisionNormalY = collisionDy / collisionDistance;
+                        const overlap = player.radius + a.radius - collisionDistance;
+                        const separation = Math.min(overlap + 3, 24);
+                        player.x += collisionNormalX * separation;
+                        player.y += collisionNormalY * separation;
+                        wrapEntity(player);
+
+                        damagePlayer(a.size * 8);
+                        const collisionForce = Math.min(1.75, 0.6 + a.size * 0.24);
+                        player.vx = player.vx * 0.3 + collisionNormalX * collisionForce;
+                        player.vy = player.vy * 0.3 + collisionNormalY * collisionForce;
                     }
                 });
 
                 enemyBullets.forEach(eb => {
                     if (distanceBetween(player, eb) < player.radius) {
-                        eb.life = 0; damagePlayer(12);
+                        eb.life = 0; damagePlayer(12, eb.owner || null);
                         spawnBurst(player.x, player.y, '#ff3333', 5);
                     }
                 });
             }
         }
 
-        function damagePlayer(amount) {
+        function damagePlayer(amount, source = null) {
 
             player.shield -= amount;
             gameAudio.playDamage();
             player.invulnerable = 35; 
             if (player.shield <= 0) {
                 player.shield = 0;
-                player.cargo.gold = Math.floor(player.cargo.gold / 2);
-                player.cargo.uranium = Math.floor(player.cargo.uranium / 2);
-                player.cargo.eridium = Math.floor(player.cargo.eridium / 2);
+                if (source && source.type === 'pirate') {
+                    source.stolenCargo = { ...player.cargo };
+                    player.cargo = { gold: 0, uranium: 0, eridium: 0 };
+                    addLog('Killed by pirate. Cargo confiscated and stored aboard the attacker.');
+                } else {
+                    player.cargo.gold = Math.floor(player.cargo.gold / 2);
+                    player.cargo.uranium = Math.floor(player.cargo.uranium / 2);
+                    player.cargo.eridium = Math.floor(player.cargo.eridium / 2);
+                }
                 const pirateDeath = pirateStatusUntil > Date.now();
                 const walletLost = pirateDeath ? player.wallet : Math.floor(player.wallet / 2);
                 player.wallet = pirateDeath ? 0 : walletLost;
@@ -1560,6 +2063,7 @@
 
             if (baseDist <= SPACEPORT.radius && !pirateActive) {
                 bankBtn.disabled = false;
+                bankBtn.classList.add('bank-ready');
                 bankBtn.onclick = () => {
                     if (pirateStatusUntil > Date.now()) return;
                     if (player.wallet > 0 || player.shield < player.maxShield) {
@@ -1586,6 +2090,7 @@
                 };
             } else {
                 bankBtn.disabled = true;
+                bankBtn.classList.remove('bank-ready');
             }
             document.getElementById('mobile-bank').disabled = bankBtn.disabled;
 
@@ -1756,33 +2261,35 @@
             ctx.strokeRect(0, 0, WORLD_SIZE, WORLD_SIZE);
 
 
-            // Stationary Centered Spaceport Base
+            // Procedural sector homeworld and rotating banking perimeter
             ctx.save();
             ctx.translate(SPACEPORT.x, SPACEPORT.y);
-            ctx.strokeStyle = '#00ffff'; 
-            ctx.shadowBlur = 20;
-            ctx.shadowColor = '#00ffff';
-            ctx.lineWidth = 3;
-            
+            const bankingPulse = (Math.sin(Date.now() / 700) + 1) / 2;
+            ctx.globalAlpha = 0.4;
+            ctx.strokeStyle = '#00ffff';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([3, 7]);
             ctx.beginPath();
             ctx.arc(0, 0, SPACEPORT.radius, 0, Math.PI * 2);
             ctx.stroke();
+            ctx.setLineDash([]);
 
-            ctx.beginPath();
-            for (let i = 0; i < 12; i++) {
-                let a = (i / 12) * Math.PI * 2;
-                ctx.moveTo(Math.cos(a) * 40, Math.sin(a) * 40);
-                ctx.lineTo(Math.cos(a) * 70, Math.sin(a) * 70);
+            ctx.globalAlpha = 1;
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = '#7ffcff';
+            if (homeworld.image && homeworld.image.complete) {
+                ctx.save();
+                ctx.rotate(HOMEWORLD_TILT);
+                ctx.drawImage(homeworld.image, -450, -450, 900, 900);
+                ctx.restore();
             }
-            ctx.stroke();
-
-            ctx.strokeRect(-25, -25, 50, 50);
-            
-            ctx.fillStyle = '#00ffff';
-            ctx.font = 'bold 12px monospace';
-            ctx.textAlign = 'center';
+            ctx.globalAlpha = 1;
             ctx.shadowBlur = 0;
-            ctx.fillText("SPACEPORT BANKING ZONE", 0, -SPACEPORT.radius - 15);
+            ctx.fillStyle = '#d8ffff';
+            ctx.font = 'bold 11px monospace';
+            ctx.textAlign = 'center';
+            const homeworldLabel = 'HOMEWORLD - BANK WALLET - REPAIR SHIP';
+            ctx.fillText(homeworldLabel, 0, -SPACEPORT.radius - 18);
             ctx.restore();
 
             // Resource Collectibles
@@ -1799,17 +2306,53 @@
                 ctx.restore();
             });
 
+            // Floating health beacons
+            healthPacks.forEach(pack => {
+                const pulse = (Math.sin(pack.pulse) + 1) / 2;
+                ctx.save();
+                ctx.translate(pack.x, pack.y);
+                ctx.globalAlpha = 0.25 + pulse * 0.35;
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(0, 0, pack.radius + 7 + pulse * 5, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.globalAlpha = 0.3 + pulse * 0.4;
+                ctx.strokeStyle = '#00ffff';
+                ctx.beginPath();
+                ctx.arc(0, 0, pack.radius + 12 + pulse * 7, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.globalAlpha = 0.3;
+                ctx.strokeStyle = '#00ffff';
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = '#00ffff';
+                ctx.beginPath();
+                ctx.arc(0, 0, pack.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                ctx.save();
+                ctx.globalAlpha = 0.95;
+                ctx.rotate(pack.beaconAngle);
+                ctx.fillStyle = '#00ffff';
+                ctx.fillRect(-3, -3, 6, 6);
+                ctx.restore();
+                ctx.restore();
+            });
+
             // Laser Projectiles
             ctx.strokeStyle = 'var(--accent-blue)';
-            ctx.lineWidth = 2;
-            ctx.shadowBlur = 8;
+            ctx.lineWidth = 3;
+            ctx.shadowBlur = 12;
             ctx.shadowColor = 'var(--accent-blue)';
+            ctx.globalAlpha = 0.95;
             bullets.forEach(b => {
                 ctx.beginPath();
                 ctx.moveTo(b.x, b.y);
                 ctx.lineTo(b.x - b.vx * 1.6, b.y - b.vy * 1.6);
                 ctx.stroke();
             });
+            ctx.globalAlpha = 1;
 
             // Raider Projectiles
             ctx.strokeStyle = 'var(--accent-red)';
@@ -1891,22 +2434,55 @@
             enemies.forEach(e => {
                 ctx.save();
                 ctx.translate(e.x, e.y);
-                ctx.strokeStyle = 'var(--accent-red)';
-                ctx.fillStyle = '#3a1111'; 
+                ctx.strokeStyle = '#ff3333';
+                ctx.fillStyle = '#52151b';
                 ctx.shadowBlur = 8;
-                ctx.shadowColor = 'var(--accent-red)';
+                ctx.shadowColor = '#ff3333';
                 ctx.lineWidth = 1.8;
 
+                if (e.type === 'pirate') {
+                    ctx.fillStyle = '#8f1d2c';
+                    ctx.beginPath();
+                    ctx.moveTo(0, -14);
+                    ctx.lineTo(14, 0);
+                    ctx.lineTo(0, 14);
+                    ctx.lineTo(-14, 0);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
 
-                ctx.beginPath();
-                ctx.ellipse(0, 0, 15, 6, 0, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.stroke();
+                    for (const rotation of [Date.now() * 0.005, -Date.now() * 0.005]) {
+                        ctx.save();
+                        ctx.rotate(rotation);
+                        ctx.beginPath();
+                        ctx.moveTo(-17, 0);
+                        ctx.lineTo(17, 0);
+                        ctx.moveTo(0, -17);
+                        ctx.lineTo(0, 17);
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                } else if (e.type === 'seeker') {
+                    ctx.rotate(e.angle || 0);
+                    ctx.beginPath();
+                    ctx.moveTo(e.radius * 1.4, 0);
+                    ctx.lineTo(-e.radius, -e.radius * 0.95);
+                    ctx.lineTo(-e.radius * 0.45, 0);
+                    ctx.lineTo(-e.radius, e.radius * 0.95);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                } else {
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, 15, 6, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
 
-                ctx.beginPath();
-                ctx.arc(0, -2, 5, Math.PI, 0);
-                ctx.fill();
-                ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(0, -2, 5, Math.PI, 0);
+                    ctx.fill();
+                    ctx.stroke();
+                }
                 ctx.restore();
             });
 
@@ -2029,6 +2605,33 @@
                 ctx.lineTo(-4, 3);
                 ctx.closePath();
                 ctx.fill();
+                ctx.restore();
+            }
+
+            const cargoPirate = enemies.find(enemy => enemy.type === 'pirate' && enemy.stolenCargo);
+            if (cargoPirate) {
+                const pirateAngle = Math.atan2(
+                    wrappedDelta(player.y, cargoPirate.y),
+                    wrappedDelta(player.x, cargoPirate.x)
+                );
+                const pirateIndicatorDistance = indicatorDistance + 21;
+                const pirateIndicatorX = canvas.width / 2 + Math.cos(pirateAngle) * pirateIndicatorDistance;
+                const pirateIndicatorY = canvas.height / 2 + Math.sin(pirateAngle) * pirateIndicatorDistance;
+
+                ctx.save();
+                ctx.translate(pirateIndicatorX, pirateIndicatorY);
+                ctx.rotate(pirateAngle);
+                ctx.globalAlpha = 0.7;
+                ctx.fillStyle = '#ff4f5e';
+                ctx.strokeStyle = '#ffd4d8';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(6, 0);
+                ctx.lineTo(-5, -4);
+                ctx.lineTo(-5, 4);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
                 ctx.restore();
             }
         }
