@@ -1387,12 +1387,19 @@ const SHIP_SKINS = {
 
 
     // Modular Random Custom Component Mixer - REPAIRING INVULNERABILITY STATE LOCK
-       'RANDOM': function(ctx, player) {
-        // Generates structural parts list only when spawning or when explicitly wiped out
+          'RANDOM': function(ctx, player) {
         if (!window.proceduralShipCache) {
             const pallets = ['#e1c6e5', '#e5e3e7', '#e4e8e3', '#ffd700', '#ff9d42', '#77cc99', '#00e5ff', '#ff3d00'];
             const accents = ['#d4b0db', '#ff9d42', '#77cc99', '#fff200', '#ffffff', '#00e5ff'];
             
+            // NEW RANDOM WEAPON ATTRIBUTE MATRIX:
+            // Rolls a random number to lock down a premium or standard trait modifier layout
+            const traitRoll = Math.random();
+            let chosenTrait = 'STANDARD';
+            if (traitRoll < 0.22) chosenTrait = 'HOMING';      // 22% Chance for Tracking Projectiles
+            else if (traitRoll < 0.44) chosenTrait = 'SPREAD'; // 22% Chance for Triple Scattershot
+            else if (traitRoll < 0.66) chosenTrait = 'DOUBLE'; // 22% Chance for Double-Barrel cannons
+
             window.proceduralShipCache = {
                 wingStyle: Math.floor(Math.random() * 5) + 1,      
                 decalStyle: Math.floor(Math.random() * 3) + 1,     
@@ -1405,13 +1412,18 @@ const SHIP_SKINS = {
                 podLengthMult: 0.85 + Math.random() * 0.3,   
                 engineScale: 0.9 + Math.random() * 0.25,     
                 hullColor: pallets[Math.floor(Math.random() * pallets.length)],
-                trimColor: accents[Math.floor(Math.random() * accents.length)]
+                trimColor: accents[Math.floor(Math.random() * accents.length)],
+                
+                // LOCK TRAIT: Anchors the rolled trait modifier directly into the persistent cache frame
+                weaponTrait: chosenTrait
             };
             
-            // FIXED UNLOCK: Wipes out the tow lock flag immediately once the new body
-            // is successfully compiled, letting you take damage cleanly on your next sector runs!
             player.needsNewShip = false; 
             
+            // Re-apply live performance metrics right away to sync delays with the rolled trait
+            if (typeof applyShipModifiers === 'function') {
+                applyShipModifiers('RANDOM');
+            }
             if (typeof saveGame === 'function') saveGame();
         }
         ctx.rotate(Math.PI / 2); // 90-degree vector orientation correction
@@ -2955,22 +2967,31 @@ generateBackgroundAssets();
 
             if (player.invulnerable > 0) player.invulnerable--;
 
-            // =========================================================================
-            // UPGRADED PLAYER FIRING LOOP SYSTEM
+             // =========================================================================
+            // UPGRADED PLAYER MULTI-TRAIT FIRING LOOP SYSTEM
             // =========================================================================
             if ((keys['Space'] || touchControls.fire || pointerFire) && Date.now() - player.lastShot > player.shootDelay) {
                 
                 const baseBulletX = player.x + Math.cos(player.angle) * player.radius;
                 const baseBulletY = player.y + Math.sin(player.angle) * player.radius;
 
-                if (ACTIVE_SHIP_SKIN === 'SCIENCE') {
-                    // 🔬 SCIENCE Craft - Triple stream scattershot system
+                // Determine the active weapon trait based on the ship class or procedural random cache
+                let activeTrait = 'STANDARD';
+                if (ACTIVE_SHIP_SKIN === 'SCIENCE') activeTrait = 'SPREAD';
+                else if (ACTIVE_SHIP_SKIN === 'INTERCEPTOR') activeTrait = 'DOUBLE';
+                else if (ACTIVE_SHIP_SKIN === 'SLICKBACK') activeTrait = 'HOMING';
+                else if (ACTIVE_SHIP_SKIN === 'RANDOM' && window.proceduralShipCache && window.proceduralShipCache.weaponTrait) {
+                    activeTrait = window.proceduralShipCache.weaponTrait;
+                }
+
+                // Execute the layout calculation loop matching the active weapon modifier trait
+                if (activeTrait === 'SPREAD') {
+                    // 🔬 SPREADFIRE / SCIENCE MODIFIER
                     const spreadAngles = [-0.26, 0, 0.26]; 
                     for (let i = 0; i < spreadAngles.length; i++) {
                         const finalAngle = player.angle + spreadAngles[i];
                         bullets.push({
-                            x: baseBulletX,
-                            y: baseBulletY,
+                            x: baseBulletX, y: baseBulletY,
                             vx: Math.cos(finalAngle) * 7.5 + player.vx,
                             vy: Math.sin(finalAngle) * 7.5 + player.vy,
                             life: 74,
@@ -2979,53 +3000,37 @@ generateBackgroundAssets();
                     }
                     if (typeof spawnBurst === 'function') spawnBurst(baseBulletX, baseBulletY, '#77cc99', 8);
 
-                } else if (ACTIVE_SHIP_SKIN === 'INTERCEPTOR') {
-                    // =========================================================================
-                    // 🚀 INTERCEPTOR CHASSIS - DOUBLE BARREL PARALLEL CANNONS
-                    // =========================================================================
-                    // Calculates a 90-degree angle to get side-to-side positions
+                } else if (activeTrait === 'DOUBLE') {
+                    // 🚀 DOUBLE BARREL / INTERCEPTOR MODIFIER
                     const sideAngle = player.angle + Math.PI / 2;
-                    const barrelOffset = 6; // Spacing distance between the two parallel laser lines in pixels
+                    const barrelOffset = 6; 
 
-                    // Barrel A (Left Side)
                     const leftBarrelX = baseBulletX + Math.cos(sideAngle) * barrelOffset;
                     const leftBarrelY = baseBulletY + Math.sin(sideAngle) * barrelOffset;
-                    
-                    // Barrel B (Right Side)
                     const rightBarrelX = baseBulletX - Math.cos(sideAngle) * barrelOffset;
                     const rightBarrelY = baseBulletY - Math.sin(sideAngle) * barrelOffset;
 
-                    // Push both bullets straight forward at the exact same forward velocity!
                     bullets.push({
-                        x: leftBarrelX,
-                        y: leftBarrelY,
+                        x: leftBarrelX, y: leftBarrelY,
                         vx: Math.cos(player.angle) * 7.5 + player.vx,
                         vy: Math.sin(player.angle) * 7.5 + player.vy,
-                        life: 74,
-                        color: '#ffffff' // Standard bullet color to ensure it renders perfectly
+                        life: 74, color: '#ffffff'
                     });
-
                     bullets.push({
-                        x: rightBarrelX,
-                        y: rightBarrelY,
+                        x: rightBarrelX, y: rightBarrelY,
                         vx: Math.cos(player.angle) * 7.5 + player.vx,
                         vy: Math.sin(player.angle) * 7.5 + player.vy,
-                        life: 74,
-                        color: '#ffffff'
+                        life: 74, color: '#ffffff'
                     });
-
                     if (typeof spawnBurst === 'function') {
                         spawnBurst(leftBarrelX, leftBarrelY, '#ffffff', 4);
                         spawnBurst(rightBarrelX, rightBarrelY, '#ffffff', 4);
                     }
 
                 } else {
-                    // =========================================================================
-                    // STANDARD SINGLE BULLET ENGINE (SLICKBACK, ORIGINAL, MOSQUITO, RANDOM)
-                    // =========================================================================
+                    //  STANDARD LINEAR FIRE / SLICKBACK BASELINE
                     bullets.push({
-                        x: baseBulletX,
-                        y: baseBulletY,
+                        x: baseBulletX, y: baseBulletY,
                         vx: Math.cos(player.angle) * 7.5 + player.vx,
                         vy: Math.sin(player.angle) * 7.5 + player.vy,
                         life: 74,
@@ -3039,17 +3044,44 @@ generateBackgroundAssets();
             }
 
 
-
              // =========================================================================
-            // PLAYER PROJECTILE TRACKING & PHYSICS MOVEMENT ENGINE
+            // PLAYER PROJECTILE TRACKING & PHYSICS MOVEMENT ENGINE WITH BULLET TRAILS
             // =========================================================================
             bullets.forEach((b) => {
-                // FIXED PRIVILEGES GATE: Restricts tracking exclusively to when flying the SLICKBACK!
-                if (ACTIVE_SHIP_SKIN === 'SLICKBACK') { 
-                    let closestTarget = null;
-                    let maxTrackingDist = 280; // Homing lock radar range in pixels
+                const isSlickbackHoming = (ACTIVE_SHIP_SKIN === 'SLICKBACK');
+                const isRandomHoming = (ACTIVE_SHIP_SKIN === 'RANDOM' && window.proceduralShipCache && window.proceduralShipCache.weaponTrait === 'HOMING');
+                const isHoming = isSlickbackHoming || isRandomHoming;
 
-                    // Scan the sector grid for the nearest hostile target
+                if (isHoming) { 
+                    // =============================================================
+                    // NEW: ENGINE PLUME PARTICLE TRAIL GENERATION
+                    // =============================================================
+                    // Spawns a small engine trail behind the homing projectile on every frame
+                    if (Math.random() < 1.0) {
+                        const bulletVelocityAngle = Math.atan2(b.vy, b.vx);
+                        const perpAngle = bulletVelocityAngle + Math.PI / 2;
+                        const spreadOffset = (Math.random() * 3 - 1.5); // Tight spread for the bullet trail
+
+                        particles.push({
+                            // Places the particles slightly behind the leading front tip
+                            x: b.x - (b.vx * 0.4) + Math.cos(perpAngle) * spreadOffset,
+                            y: b.y - (b.vy * 0.4) + Math.sin(perpAngle) * spreadOffset,
+                            
+                            // Blows the smoke backwards against the direction the bullet is flying
+                            vx: -Math.cos(bulletVelocityAngle) * 0.8 + (Math.random() * 0.2 - 0.1),
+                            vy: -Math.sin(bulletVelocityAngle) * 0.8 + (Math.random() * 0.2 - 0.1),
+                            
+                            life: 0.5,
+                            decay: 0.04, // Fades out relatively quickly to stay clean
+                            color: '#ff4400', // Crimson red/orange fire trail
+                            size: 2.2 + Math.random() * 1.5 // Small, tight engine embers
+                        });
+                    }
+
+                    // Standard homing radar target acquisition scan
+                    let closestTarget = null;
+                    let maxTrackingDist = 280; 
+
                     enemies.forEach(e => {
                         let dx = wrappedDelta(b.x, e.x);
                         let dy = wrappedDelta(b.y, e.y);
@@ -3060,32 +3092,28 @@ generateBackgroundAssets();
                         }
                     });
 
-                    // If a valid enemy drone is detected, steer the velocity vectors toward them
                     if (closestTarget) {
                         let targetDx = wrappedDelta(b.x, closestTarget.x);
                         let targetDy = wrappedDelta(b.y, closestTarget.y);
                         let targetDist = Math.max(Math.hypot(targetDx, targetDy), 1);
 
-                        // Capture current speed magnitude to maintain constant velocity
                         const bulletCurrentSpeed = Math.hypot(b.vx, b.vy);
                         const idealVx = (targetDx / targetDist) * bulletCurrentSpeed;
                         const idealVy = (targetDy / targetDist) * bulletCurrentSpeed;
 
-                        // Steer adjustment factor (0.05 handles clean 5% heat-seeking curves per frame)
                         b.vx += (idealVx - b.vx) * 0.05;
                         b.vy += (idealVy - b.vy) * 0.05;
                         
-                        // Hard-capped max ceiling limit of 141 total tracking frames (2.35s)
                         if (b.life > 141) {
                             b.life = 141;
                         }
                     }
                 }
 
-                // Standard displacement positioning mechanics executed normally
                 b.x += b.vx; b.y += b.vy; b.life--;
                 wrapEntity(b);
             });
+
 
             bullets = bullets.filter(b => b.life > 0);
 
@@ -3504,32 +3532,49 @@ generateBackgroundAssets();
 // =========================================================================
 // UNIVERSAL SHIP MODIFIER SYNCRONIZATION SYSTEM
 // =========================================================================
-
 function applyShipModifiers(skinKey) {
     if (!skinKey) return;
 
-    // 1. Recalculate and apply core thrust and drag metrics on the spot
     const mods = SHIP_STAT_MODIFIERS[skinKey] || SHIP_STAT_MODIFIERS['SLICKBACK'];
     player.thrust = mods.thrust;
     player.friction = mods.friction;
 
-    // 2. Lock down weapon cool-down parameters cleanly
     if (skinKey === 'INTERCEPTOR') {
-        player.shootDelay = 120; // Blinding fast fire rate
+        player.shootDelay = 120; 
     } else if (skinKey === 'SCIENCE') {
-        // FIXED FOR SCATTERSHOT BALANCE: Increases your shot delay to 300ms 
-        // to balance out the raw power of the triple-projectile fan spread
-        player.shootDelay = 450; 
+        player.shootDelay = 300; 
     } else if (skinKey === 'RANDOM') {
-        if (!player.randomShootDelay) {
-            player.randomShootDelay = 120 + Math.floor(Math.random() * (210 - 120 + 1));
+        if (window.proceduralShipCache && window.proceduralShipCache.weaponTrait) {
+            const trait = window.proceduralShipCache.weaponTrait;
+            
+            if (trait === 'HOMING') {
+                // FIXED CAP: Reduced shot cooldown down to 188ms for a faster firing rate!
+                player.shootDelay = 188; 
+                player.randomShootDelay = 188;
+            } 
+            else if (trait === 'SPREAD') {
+                if (!player.randomShootDelay || player.randomShootDelay < 400 || player.randomShootDelay > 520) {
+                    player.randomShootDelay = 400 + Math.floor(Math.random() * (520 - 400 + 1));
+                }
+                player.shootDelay = player.randomShootDelay;
+            } 
+            else if (trait === 'DOUBLE') {
+                if (!player.randomShootDelay || player.randomShootDelay < 180 || player.randomShootDelay > 200) {
+                    player.randomShootDelay = 180 + Math.floor(Math.random() * (200 - 180 + 1));
+                }
+                player.shootDelay = player.randomShootDelay;
+            } 
+            else {
+                player.shootDelay = 210;
+                player.randomShootDelay = 210;
+            }
+        } else {
+            player.shootDelay = 210;
         }
-        player.shootDelay = player.randomShootDelay;
     } else {
-        player.shootDelay = 210; // Default baseline standard cooldown for all other hulls
+        player.shootDelay = 188; // FIXED FOR SLICKBACK: Sets your standard homing fighter to 188ms as well!
     }
     
-    // Only wipe out the data registry when swapping completely away from random
     if (skinKey !== 'RANDOM') {
         player.randomShootDelay = null;
     }
@@ -4101,32 +4146,172 @@ ctx.strokeRect(0, 0, 12000, 12000);
             ctx.shadowBlur = 12;
             ctx.shadowColor = 'var(--accent-blue)';
             ctx.globalAlpha = 0.95;
-            bullets.forEach(b => {
-                ctx.beginPath();
-                ctx.moveTo(b.x, b.y);
-                ctx.lineTo(b.x - b.vx * 3, b.y - b.vy * 3);
-                ctx.stroke();
+                       // =========================================================================
+            // CORE WEAPON GRAPHICS & RENDER PIPELINE (CUSTOM CONICAL TAPERED LASERS)
+            // =========================================================================
+            bullets.forEach((b) => {
+                // 1. Identify the active weapon profile class
+                const isSlickbackHoming = (ACTIVE_SHIP_SKIN === 'SLICKBACK');
+                const isRandomHoming = (ACTIVE_SHIP_SKIN === 'RANDOM' && window.proceduralShipCache && window.proceduralShipCache.weaponTrait === 'HOMING');
+                const isHoming = isSlickbackHoming || isRandomHoming;
+
+                const isScienceSpread = (ACTIVE_SHIP_SKIN === 'SCIENCE');
+                const isRandomSpread = (ACTIVE_SHIP_SKIN === 'RANDOM' && window.proceduralShipCache && window.proceduralShipCache.weaponTrait === 'SPREAD');
+                const isSpread = isScienceSpread || isRandomSpread;
+
+                const isInterceptorDouble = (ACTIVE_SHIP_SKIN === 'INTERCEPTOR');
+                const isRandomDouble = (ACTIVE_SHIP_SKIN === 'RANDOM' && window.proceduralShipCache && window.proceduralShipCache.weaponTrait === 'DOUBLE');
+                const isDouble = isInterceptorDouble || isRandomDouble;
+
+                ctx.save();
+
+                                // -----------------------------------------------------------------
+                // WEAPON STYLE A: HOMING PROJECTILE RENDERER (CIRCLE WITH WHITE STROKE)
+                // -----------------------------------------------------------------
+                if (isHoming) {
+                    const tailLength = 1.8; 
+                    const tailX = b.x - b.vx * tailLength;
+                    const tailY = b.y - b.vy * tailLength;
+
+                    // 1. Draw the gradient flame trail fade stretching behind the hull
+                    let particleGrd = ctx.createLinearGradient(b.x, b.y, tailX, tailY);
+                    particleGrd.addColorStop(0, 'rgba(255, 34, 34, 1.0)');  
+                    particleGrd.addColorStop(1, 'rgba(255, 51, 51, 0.0)');  
+
+                    ctx.strokeStyle = particleGrd;
+                    ctx.lineWidth = 2.0;
+                    ctx.shadowBlur = 4;
+                    ctx.shadowColor = '#ff3333';
+
+                    ctx.beginPath();
+                    ctx.moveTo(b.x, b.y);
+                    ctx.lineTo(tailX, tailY);
+                    ctx.stroke();
+
+                    // 2. FIXED: Draw the core circle in tracking red, then add the thin white stroke rim
+                    const bulletRadius = 2.8;
+
+                    // Draw the core red center body
+                    ctx.fillStyle = '#ff2222';
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = '#ff2222';
+                    
+                    ctx.beginPath();
+                    ctx.arc(b.x, b.y, bulletRadius, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Layer the ultra-thin high-contrast white offset stroke ring around it
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 0.75; // Ultra-thin clean accent line stroke
+                    ctx.shadowBlur = 4;
+                    ctx.shadowColor = '#ffffff'; // Adds a bright sparking bloom around the white rim
+                    ctx.stroke();
+                }
+
+                // -----------------------------------------------------------------
+                // WEAPON STYLE B: ADVANCED CONICAL BEAM LAYOUTS (REGULAR, SPREAD, DOUBLE)
+                // -----------------------------------------------------------------
+                else {
+                    const tailLength = 3;
+                    const tailX = b.x - b.vx * tailLength;
+                    const tailY = b.y - b.vy * tailLength;
+
+                    // Calculate perpendicular vectors to dynamically draw the wedge/triangle thickness width
+                    const velocityAngle = Math.atan2(b.vy, b.vx);
+                    const perpAngle = velocityAngle + Math.PI / 2;
+
+                    // Set custom color templates and glow indicators based on the weapon class
+                    let baseColor, glowColor;
+                    if (isSpread) {
+                        baseColor = '#77cc99'; // Science / Spread Green
+                        glowColor = '#5cd693';
+                    } else if (isDouble) {
+                        baseColor = '#b3f5ff'; // Interceptor Light Cyan
+                        glowColor = '#00ffff';
+                    } else {
+                        baseColor = '#ffd1e8'; // Regular Laser Slightly Pinkish
+                        glowColor = '#ffb3d9';
+                    }
+
+                    // Tapered Gradient: Front is solid neon, tail fades completely out
+                    let beamGrd = ctx.createLinearGradient(b.x, b.y, tailX, tailY);
+                    beamGrd.addColorStop(0, baseColor);
+                    beamGrd.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
+
+                    ctx.fillStyle = beamGrd;
+                    ctx.shadowBlur = 6;
+                    ctx.shadowColor = glowColor;
+
+                    // Compile the conical triangle polygon shape path (Wide tip tapering down to zero at tail)
+                    const tipWidth = 2.2; // Width thickness dimension at the laser head tip
+                    ctx.beginPath();
+                    // Left tip corner
+                    ctx.moveTo(b.x + Math.cos(perpAngle) * tipWidth, b.y + Math.sin(perpAngle) * tipWidth);
+                    // Right tip corner
+                    ctx.lineTo(b.x - Math.cos(perpAngle) * tipWidth, b.y - Math.sin(perpAngle) * tipWidth);
+                    // Closes perfectly at the sharp rear point coordinates
+                    ctx.lineTo(tailX, tailY);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+
+                ctx.restore();
             });
             ctx.globalAlpha = 1;
 
-            // Raider Projectiles
-            ctx.strokeStyle = 'var(--accent-red)';
-            ctx.lineWidth = 3;
-            ctx.shadowBlur = 8;
+            // =========================================================================
+            // HOSTILE PROJECTILE DRAWING RENDER PIPELINE (LARGE RED CONICAL BEAM + WHITE SPARK CORE)
+            // =========================================================================
+            enemyBullets.forEach((eb) => {
+                const tailLength = 3.2; 
+                const tailX = eb.x - eb.vx * tailLength;
+                const tailY = eb.y - eb.vy * tailLength;
 
-            ctx.shadowColor = 'var(--accent-red)';
-            enemyBullets.forEach(eb => {
+                const velocityAngle = Math.atan2(eb.vy, eb.vx);
+                const perpAngle = velocityAngle + Math.PI / 2;
+
+                ctx.save(); // Locks down bullet state independently!
+
+                const baseColor = '#ff3333'; 
+                const glowColor = '#ff0000'; 
+
+                let enemyBeamGrd = ctx.createLinearGradient(eb.x, eb.y, tailX, tailY);
+                enemyBeamGrd.addColorStop(0, baseColor);
+                enemyBeamGrd.addColorStop(1, 'rgba(255, 51, 51, 0.0)');
+
+                ctx.fillStyle = enemyBeamGrd;
+                ctx.shadowBlur = 8; 
+                ctx.shadowColor = glowColor;
+
+                const tipWidth = 3.8; 
                 ctx.beginPath();
-                ctx.arc(eb.x, eb.y, 3, 0, Math.PI * 2);
-                ctx.stroke();
+                ctx.moveTo(eb.x + Math.cos(perpAngle) * tipWidth, eb.y + Math.sin(perpAngle) * tipWidth);
+                ctx.lineTo(eb.x - Math.cos(perpAngle) * tipWidth, eb.y - Math.sin(perpAngle) * tipWidth);
+                ctx.lineTo(tailX, tailY);
+                ctx.closePath();
+                ctx.fill();
+
+                // High-intensity white core spark indicator dot layout
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#ffffff'; 
+                
+                ctx.beginPath();
+                ctx.arc(eb.x, eb.y, 2.2, 0, Math.PI * 2); 
+                ctx.fill();
+
+                ctx.restore(); // Safely closes state, freeing context for subsequent rendering loops!
             });
-            // Vector Asteroids
+
+            // =========================================================================
+            // VECTOR ASTEROIDS DRAWING LOOP (ISOLATED & BALANCED)
+            // =========================================================================
             asteroids.forEach(a => {
-                ctx.save();
+                ctx.save(); // Clean open mapping tracking coordinate space bounds
                 ctx.translate(a.x, a.y);
                 ctx.rotate(a.angle);
                 
-                // Determine color and apply to stroke
+                // Determine color and apply to stroke template lines
                 const strokeColor = a.typeKey === 'GENERIC' ? activeTheme.generic : a.type.color;
                 ctx.strokeStyle = strokeColor;
                 ctx.shadowBlur = 6;
@@ -4141,16 +4326,16 @@ ctx.strokeRect(0, 0, 12000, 12000);
                 }
                 ctx.closePath();
                 
-                // Fill with 72% opacity
+                // Fill with native transparency layouts
                 ctx.fillStyle = strokeColor;
                 ctx.globalAlpha = 0.12;
                 ctx.fill();
                 
-                // Reset alpha back to full opacity for the stroke outline
+                // Reset alpha parameters securely back to standard full visibility for outlines
                 ctx.globalAlpha = 1.0; 
                 ctx.stroke();
                 
-                ctx.restore();
+                ctx.restore(); // Clean execution layer lock down
             });
 
                     
@@ -4392,10 +4577,36 @@ enemies.forEach(e => {
         ctx.beginPath(); ctx.arc(armLength, -armLength, terminusRadius, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
         ctx.beginPath(); ctx.arc(-armLength, armLength, terminusRadius, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
 
-    } else if (e.type === 'seeker') {
+       } else if (e.type === 'seeker') {
+        // =========================================================================
+        // FIXED FEATURE: HOSTILE SEEKER DRONE PLASMA PLUME GENERATION
+        // =========================================================================
+        // Spawns a fierce tracking combustion plume behind active seeker drones
+        if (Math.random() < 0.65) {
+            const perpAngle = (e.angle || 0) + Math.PI / 2;
+            const exhaustSpreadOffset = (Math.random() * 5 - 2.5);
+
+            particles.push({
+                // Anchors particles cleanly to the tail end of the seeker drone frame boundaries
+                x: e.x - Math.cos(e.angle || 0) * e.radius + Math.cos(perpAngle) * exhaustSpreadOffset,
+                y: e.y - Math.sin(e.angle || 0) * e.radius + Math.sin(perpAngle) * exhaustSpreadOffset,
+                
+                // Ejects plasma smoke backward relative to the drone's intercept angle heading
+                vx: -Math.cos(e.angle || 0) * 1.4 + (Math.random() * 0.4 - 0.2),
+                vy: -Math.sin(e.angle || 0) * 1.4 + (Math.random() * 0.4 - 0.2),
+                
+                life: 0.6,
+                decay: 0.04,
+                color: '#ff3333', // Deep plasma accent red matching the hostile weapon profile color tint
+                size: 3.5 + Math.random() * 2.0
+            });
+        }
+
+        // =========================================================================
+        // NATIVE SEEKER CHASSIS VECTOR GEOMETRY PATH DRAWING
+        // =========================================================================
         ctx.rotate(e.angle || 0);
         ctx.beginPath();
-
         ctx.moveTo(e.radius * 1.4, 0);
         ctx.lineTo(-e.radius, -e.radius * 0.95);
         ctx.lineTo(-e.radius * 0.45, 0);
@@ -4403,6 +4614,7 @@ enemies.forEach(e => {
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
+
     } else {
         // Basic UFO enemy type
         ctx.beginPath();
@@ -4427,9 +4639,32 @@ enemies.forEach(e => {
 
 
 
-
-            // Civilian traffic
+            // =========================================================================
+            // CIVILIAN TRAFFIC DRAWING ENGINE (10% LARGER + NEON CYAN EMBER PLUME TRAILS)
+            // =========================================================================
             civilianShips.forEach(ship => {
+                // 1. DYNAMIC COMPONENT: Spawn engine particles straight into the world thread
+                if (Math.random() < 0.65) {
+                    const perpAngle = ship.angle + Math.PI / 2;
+                    const exhaustSpreadOffset = (Math.random() * 6 - 3); // Spreads the exhaust trail evenly
+                    
+                    particles.push({
+                        // Anchors coordinates perfectly to the tail end of the civilian chassis frame
+                        x: ship.x - Math.cos(ship.angle) * ship.radius + Math.cos(perpAngle) * exhaustSpreadOffset,
+                        y: ship.y - Math.sin(ship.angle) * ship.radius + Math.sin(perpAngle) * exhaustSpreadOffset,
+                        
+                        // Expels smoke backward relative to the transport's cruise speed
+                        vx: -Math.cos(ship.angle) * 1.5 + (Math.random() * 0.4 - 0.2),
+                        vy: -Math.sin(ship.angle) * 1.5 + (Math.random() * 0.4 - 0.2),
+                        
+                        life: 0.6,
+                        decay: 0.04, 
+                        color: '#00ffff', // Custom cyan flame trail to match its hull lights
+                        size: 3.5 + Math.random() * 2.0
+                    });
+                }
+
+                // 2. VECTOR DRAWING ROUTINE: Up-scaled by 10%
                 ctx.save();
                 ctx.translate(ship.x, ship.y);
                 ctx.rotate(ship.angle);
@@ -4438,16 +4673,20 @@ enemies.forEach(e => {
                 ctx.shadowBlur = 10;
                 ctx.shadowColor = '#00ffff';
                 ctx.lineWidth = 1.8;
+                
+                // FIXED SCALE: Multiplied all vertex coordinates by 1.1 to make the ship 10% larger
+                const scaledRadius = ship.radius * 1.1; 
                 ctx.beginPath();
-                ctx.moveTo(ship.radius * 1.4, 0);
-                ctx.lineTo(-ship.radius, -ship.radius * 0.95);
-                ctx.lineTo(-ship.radius * 0.45, 0);
-                ctx.lineTo(-ship.radius, ship.radius * 0.95);
+                ctx.moveTo(scaledRadius * 1.4, 0);
+                ctx.lineTo(-scaledRadius, -scaledRadius * 0.95);
+                ctx.lineTo(-scaledRadius * 0.45, 0);
+                ctx.lineTo(-scaledRadius, scaledRadius * 0.95);
                 ctx.closePath();
                 ctx.fill();
                 ctx.stroke();
                 ctx.restore();
             });
+
 
             // Burst Particles
             particles.forEach(p => {
@@ -4664,16 +4903,17 @@ document.addEventListener('click', function(event) {
     if (skinKey === 'RANDOM') {
         if (window.proceduralShipCache) {
             player.lastRandomBackup = { ...window.proceduralShipCache };
-            player.lastRandomBackup.savedShootDelay = player.randomShootDelay || 210;
+            player.lastRandomBackup.savedShootDelay = player.shootDelay;
         }
         
+        // Wipes out old cache settings to allow the compiler loop to assign a new trait AND fresh speeds!
         window.proceduralShipCache = null; 
-        player.randomShootDelay = 180 + Math.floor(Math.random() * (210 - 180 + 1));
+        player.randomShootDelay = null; // Clears the previous rolled speed to allow a fresh calculation!
     } else {
         player.randomShootDelay = null;
     }
 
-    // Synchronize engine thrust and weapon fire cooldown metrics immediately AFTER rolling the stats
+    // Synchronize engine thrust and weapon fire cooldown metrics immediately AFTER resetting the properties above
     applyShipModifiers(skinKey);
 
     // FIXED FOR COMFORT: Instantly updates player health indicators to max capacity on checkout!
