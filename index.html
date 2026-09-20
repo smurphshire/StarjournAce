@@ -1659,10 +1659,10 @@ let ACTIVE_SHIP_SKIN = 'RANDOM'; // Changed from 'const' to 'let' so it can be s
 
 const SHIP_SHOP_PRICES = {
     'ORIGINAL': 0,               // RETRO Starter Model
-    'SLICKBACK': 300,           // SLICKBACK Fighter
-    'MOSQUITO': 250,         // MOSQUITO Long-Range Escort
-    'SCIENCE': 300,  // SCIENCE Research Vessel
-    'INTERCEPTOR': 500, // INTERCEPT Tri-Core Fighter
+    'SLICKBACK': 100,           // SLICKBACK Fighter
+    'MOSQUITO': 100,         // MOSQUITO Long-Range Escort
+    'SCIENCE': 100,  // SCIENCE Research Vessel
+    'INTERCEPTOR': 250, // INTERCEPT Tri-Core Fighter
     'RANDOM': 500               // PROCEDURAL RANDOM Hull Mixer
 };
 
@@ -1681,15 +1681,15 @@ const SHIP_STAT_MODIFIERS = {
         friction: 0.990      // Default drag
     },
     'MOSQUITO': { // MOSQUITO Default
-        thrust: 0.15,
+        thrust: 0.32,
         friction: 0.970
     },
     'SCIENCE': { // SCIENCE Default
-        thrust: 0.10,
-        friction: 0.995
+        thrust: 0.20,
+        friction: 0.982
     },
     'INTERCEPTOR': { // INTERCEPT Flight Profile
-        thrust: 0.14,
+        thrust: 0.15,
         friction: 0.992
     },
     'RANDOM': { // Baseline values for procedural rigs
@@ -2924,20 +2924,27 @@ generateBackgroundAssets();
                 player.vx += Math.cos(player.angle) * player.thrust;
                 player.vy += Math.sin(player.angle) * player.thrust;
                 
-                if (Math.random() < 0.55) {
+                if (Math.random() < 1.0) {
+                    const perpAngle = player.angle + Math.PI / 2;
+                    const exhaustSpreadOffset = (Math.random() * 8 - 4); 
 
                     particles.push({
-                        x: player.x - Math.cos(player.angle) * player.radius,
-                        y: player.y - Math.sin(player.angle) * player.radius,
-                        vx: -Math.cos(player.angle) * 1.8 + (Math.random() * 0.4 - 0.2),
-                        vy: -Math.sin(player.angle) * 1.8 + (Math.random() * 0.4 - 0.2),
-                        life: 0.5,
-                        decay: 0.045,
+                        x: player.x - Math.cos(player.angle) * player.radius + Math.cos(perpAngle) * exhaustSpreadOffset,
+                        y: player.y - Math.sin(player.angle) * player.radius + Math.sin(perpAngle) * exhaustSpreadOffset,
+                        
+                        vx: -Math.cos(player.angle) * 2.4 + (Math.random() * 0.6 - 0.3),
+                        vy: -Math.sin(player.angle) * 2.4 + (Math.random() * 0.6 - 0.3),
+                        
+                        life: 0.8,
+                        decay: 0.035,
                         color: '#ff7700',
-                        size: 3.2
+                        
+                        // ADJUSTED SCALE: Trimmed down a tad for the perfect visual balance
+                        size: 4.5 + Math.random() * 2.5
                     });
                 }
             }
+
 
             player.vx *= player.friction;
             player.vy *= player.friction;
@@ -2948,19 +2955,134 @@ generateBackgroundAssets();
 
             if (player.invulnerable > 0) player.invulnerable--;
 
+            // =========================================================================
+            // UPGRADED PLAYER FIRING LOOP SYSTEM
+            // =========================================================================
             if ((keys['Space'] || touchControls.fire || pointerFire) && Date.now() - player.lastShot > player.shootDelay) {
-                bullets.push({
-                    x: player.x + Math.cos(player.angle) * player.radius,
-                    y: player.y + Math.sin(player.angle) * player.radius,
-                    vx: Math.cos(player.angle) * 7.5 + player.vx,
-                    vy: Math.sin(player.angle) * 7.5 + player.vy,
-                    life: 74 // bullet distance for player bullet
-                });
+                
+                const baseBulletX = player.x + Math.cos(player.angle) * player.radius;
+                const baseBulletY = player.y + Math.sin(player.angle) * player.radius;
+
+                if (ACTIVE_SHIP_SKIN === 'SCIENCE') {
+                    // 🔬 SCIENCE Craft - Triple stream scattershot system
+                    const spreadAngles = [-0.26, 0, 0.26]; 
+                    for (let i = 0; i < spreadAngles.length; i++) {
+                        const finalAngle = player.angle + spreadAngles[i];
+                        bullets.push({
+                            x: baseBulletX,
+                            y: baseBulletY,
+                            vx: Math.cos(finalAngle) * 7.5 + player.vx,
+                            vy: Math.sin(finalAngle) * 7.5 + player.vy,
+                            life: 74,
+                            color: '#77cc99' 
+                        });
+                    }
+                    if (typeof spawnBurst === 'function') spawnBurst(baseBulletX, baseBulletY, '#77cc99', 8);
+
+                } else if (ACTIVE_SHIP_SKIN === 'INTERCEPTOR') {
+                    // =========================================================================
+                    // 🚀 INTERCEPTOR CHASSIS - DOUBLE BARREL PARALLEL CANNONS
+                    // =========================================================================
+                    // Calculates a 90-degree angle to get side-to-side positions
+                    const sideAngle = player.angle + Math.PI / 2;
+                    const barrelOffset = 6; // Spacing distance between the two parallel laser lines in pixels
+
+                    // Barrel A (Left Side)
+                    const leftBarrelX = baseBulletX + Math.cos(sideAngle) * barrelOffset;
+                    const leftBarrelY = baseBulletY + Math.sin(sideAngle) * barrelOffset;
+                    
+                    // Barrel B (Right Side)
+                    const rightBarrelX = baseBulletX - Math.cos(sideAngle) * barrelOffset;
+                    const rightBarrelY = baseBulletY - Math.sin(sideAngle) * barrelOffset;
+
+                    // Push both bullets straight forward at the exact same forward velocity!
+                    bullets.push({
+                        x: leftBarrelX,
+                        y: leftBarrelY,
+                        vx: Math.cos(player.angle) * 7.5 + player.vx,
+                        vy: Math.sin(player.angle) * 7.5 + player.vy,
+                        life: 74,
+                        color: '#ffffff' // Standard bullet color to ensure it renders perfectly
+                    });
+
+                    bullets.push({
+                        x: rightBarrelX,
+                        y: rightBarrelY,
+                        vx: Math.cos(player.angle) * 7.5 + player.vx,
+                        vy: Math.sin(player.angle) * 7.5 + player.vy,
+                        life: 74,
+                        color: '#ffffff'
+                    });
+
+                    if (typeof spawnBurst === 'function') {
+                        spawnBurst(leftBarrelX, leftBarrelY, '#ffffff', 4);
+                        spawnBurst(rightBarrelX, rightBarrelY, '#ffffff', 4);
+                    }
+
+                } else {
+                    // =========================================================================
+                    // STANDARD SINGLE BULLET ENGINE (SLICKBACK, ORIGINAL, MOSQUITO, RANDOM)
+                    // =========================================================================
+                    bullets.push({
+                        x: baseBulletX,
+                        y: baseBulletY,
+                        vx: Math.cos(player.angle) * 7.5 + player.vx,
+                        vy: Math.sin(player.angle) * 7.5 + player.vy,
+                        life: 74,
+                        color: ACTIVE_SHIP_SKIN === 'SLICKBACK' ? '#d4b0db' : '#ffffff' 
+                    });
+                    if (typeof spawnBurst === 'function') spawnBurst(baseBulletX, baseBulletY, '#ffffff', 5);
+                }
+
                 player.lastShot = Date.now();
                 gameAudio.playMining();
             }
 
+
+
+             // =========================================================================
+            // PLAYER PROJECTILE TRACKING & PHYSICS MOVEMENT ENGINE
+            // =========================================================================
             bullets.forEach((b) => {
+                // FIXED PRIVILEGES GATE: Restricts tracking exclusively to when flying the SLICKBACK!
+                if (ACTIVE_SHIP_SKIN === 'SLICKBACK') { 
+                    let closestTarget = null;
+                    let maxTrackingDist = 280; // Homing lock radar range in pixels
+
+                    // Scan the sector grid for the nearest hostile target
+                    enemies.forEach(e => {
+                        let dx = wrappedDelta(b.x, e.x);
+                        let dy = wrappedDelta(b.y, e.y);
+                        let dist = Math.hypot(dx, dy);
+                        if (dist < maxTrackingDist) {
+                            maxTrackingDist = dist;
+                            closestTarget = e;
+                        }
+                    });
+
+                    // If a valid enemy drone is detected, steer the velocity vectors toward them
+                    if (closestTarget) {
+                        let targetDx = wrappedDelta(b.x, closestTarget.x);
+                        let targetDy = wrappedDelta(b.y, closestTarget.y);
+                        let targetDist = Math.max(Math.hypot(targetDx, targetDy), 1);
+
+                        // Capture current speed magnitude to maintain constant velocity
+                        const bulletCurrentSpeed = Math.hypot(b.vx, b.vy);
+                        const idealVx = (targetDx / targetDist) * bulletCurrentSpeed;
+                        const idealVy = (targetDy / targetDist) * bulletCurrentSpeed;
+
+                        // Steer adjustment factor (0.05 handles clean 5% heat-seeking curves per frame)
+                        b.vx += (idealVx - b.vx) * 0.05;
+                        b.vy += (idealVy - b.vy) * 0.05;
+                        
+                        // Hard-capped max ceiling limit of 141 total tracking frames (2.35s)
+                        if (b.life > 141) {
+                            b.life = 141;
+                        }
+                    }
+                }
+
+                // Standard displacement positioning mechanics executed normally
                 b.x += b.vx; b.y += b.vy; b.life--;
                 wrapEntity(b);
             });
@@ -3382,6 +3504,7 @@ generateBackgroundAssets();
 // =========================================================================
 // UNIVERSAL SHIP MODIFIER SYNCRONIZATION SYSTEM
 // =========================================================================
+
 function applyShipModifiers(skinKey) {
     if (!skinKey) return;
 
@@ -3391,16 +3514,19 @@ function applyShipModifiers(skinKey) {
     player.friction = mods.friction;
 
     // 2. Lock down weapon cool-down parameters cleanly
-    // MATCHED KEY: Changed from STINGER_INTERCEPTOR to INTERCEPTOR
     if (skinKey === 'INTERCEPTOR') {
         player.shootDelay = 120; // Blinding fast fire rate
+    } else if (skinKey === 'SCIENCE') {
+        // FIXED FOR SCATTERSHOT BALANCE: Increases your shot delay to 300ms 
+        // to balance out the raw power of the triple-projectile fan spread
+        player.shootDelay = 450; 
     } else if (skinKey === 'RANDOM') {
         if (!player.randomShootDelay) {
             player.randomShootDelay = 120 + Math.floor(Math.random() * (210 - 120 + 1));
         }
         player.shootDelay = player.randomShootDelay;
     } else {
-        player.shootDelay = 210; // Default baseline cooldown
+        player.shootDelay = 210; // Default baseline standard cooldown for all other hulls
     }
     
     // Only wipe out the data registry when swapping completely away from random
@@ -3410,7 +3536,7 @@ function applyShipModifiers(skinKey) {
 }
 
 
-          function damagePlayer(amount, source = null) {
+         function damagePlayer(amount, source = null) {
             if (player.needsNewShip) return;
 
             player.shield -= amount;
@@ -3439,19 +3565,29 @@ function applyShipModifiers(skinKey) {
                 player.invulnerable = 35;
 
                 // =============================================================
-                // CRITICAL FOR DEATH DESTRUCTION UPGRADE RESETS & MOD PACKS
+                // FIXED FOR BACKUP ISOLATION: SAFE STAT PACKING
                 // =============================================================
-                // BACKUP: Cache the exact procedural ship model AND its fire rate stats before clearing it
                 if (window.proceduralShipCache) {
                     player.lastRandomBackup = { ...window.proceduralShipCache };
-                    player.lastRandomBackup.savedShootDelay = player.shootDelay; 
+                    
+                    // FIXED STAT LEAK: Only carry over the rolled gun speed IF you were 
+                    // actively flying a RANDOM ship model when you took terminal damage.
+                    if (ACTIVE_SHIP_SKIN === 'RANDOM' && player.randomShootDelay) {
+                        player.lastRandomBackup.savedShootDelay = player.randomShootDelay; 
+                    } else {
+                        player.lastRandomBackup.savedShootDelay = 210; // Reset to default base standard delay rate
+                    }
+                } else {
+                    // Safety protection if you died while piloting a normal ship class variant layout option
+                    player.lastRandomBackup = null;
                 }
 
                 // Forcefully assign the baseline 'RANDOM' hull designation upon death
                 window.proceduralShipCache = null; 
                 ACTIVE_SHIP_SKIN = 'RANDOM'; 
+                player.randomShootDelay = null; // Clear out current dynamic variable slots
 
-                // INSTANTLY SYNCHRONIZE STATS FOR RESPONDING RANDOM CHASSIS
+                // Instantly update current live environment parameters back to default random values
                 if (typeof applyShipModifiers === 'function') {
                     applyShipModifiers('RANDOM');
                 }
@@ -3462,8 +3598,6 @@ function applyShipModifiers(skinKey) {
                 saveGame();
             }
         }
-
-
 
 
 
@@ -4460,7 +4594,7 @@ enemies.forEach(e => {
 
 
 // =========================================================================
-// MODULE-SAFE CLICK LISTENER ROUTINE WITH MANUALLY INJECTED BACKUPS (Absolute end of script)
+// MODULE-SAFE CLICK LISTENER ROUTINE WITH AUTO-SHIELD RECHARGE (Absolute end of script)
 // =========================================================================
 document.addEventListener('click', function(event) {
     const btn = event.target.closest('.ship-shop-btn');
@@ -4483,12 +4617,9 @@ document.addEventListener('click', function(event) {
             return;
         }
 
-        // Bill recovery fee and unpack exact procedural seed layout dimensions
         player.wallet -= buybackCost;
         
-        // Before replacing the active cache, backup the current random ship in case they change their mind again
         const currentActiveCache = window.proceduralShipCache ? { ...window.proceduralShipCache, savedShootDelay: player.shootDelay } : null;
-        
         window.proceduralShipCache = { ...player.lastRandomBackup };
         
         if (player.lastRandomBackup.savedShootDelay) {
@@ -4498,14 +4629,16 @@ document.addEventListener('click', function(event) {
         ACTIVE_SHIP_SKIN = 'RANDOM';
         applyShipModifiers('RANDOM');
         
-        // Swap the backup slots so they can toggle back and forth between their last two setups if they want!
+        // FIXED FOR COMFORT: Automatically fully restores shield arrays upon recovery checkout
+        player.shield = player.maxShield;
+
         player.lastRandomBackup = currentActiveCache;
 
         if (typeof gameAudio !== 'undefined' && gameAudio.playSupplyCache) {
             gameAudio.playSupplyCache(); 
         }
         if (typeof showAlert === 'function') {
-            showAlert(`🔄 MODULE RESTORED: Configuration recovery complete!`);
+            showAlert(`🔄 MODULE RECOVERED: Configuration restored & shields fully charged!`);
         }
         if (typeof saveGame === 'function') saveGame();
         return;
@@ -4528,15 +4661,14 @@ document.addEventListener('click', function(event) {
     player.wallet -= cost;
     ACTIVE_SHIP_SKIN = skinKey; 
 
-    // FIXED: Save manual player selections to backup memory BEFORE wiping them out on a reroll!
     if (skinKey === 'RANDOM') {
         if (window.proceduralShipCache) {
             player.lastRandomBackup = { ...window.proceduralShipCache };
-            player.lastRandomBackup.savedShootDelay = player.shootDelay;
+            player.lastRandomBackup.savedShootDelay = player.randomShootDelay || 210;
         }
         
-        window.proceduralShipCache = null; // Clears old parts seed, forcing canvas to redraw a new variant instantly!
-        player.randomShootDelay = 120 + Math.floor(Math.random() * (210 - 120 + 1));
+        window.proceduralShipCache = null; 
+        player.randomShootDelay = 180 + Math.floor(Math.random() * (210 - 180 + 1));
     } else {
         player.randomShootDelay = null;
     }
@@ -4544,14 +4676,17 @@ document.addEventListener('click', function(event) {
     // Synchronize engine thrust and weapon fire cooldown metrics immediately AFTER rolling the stats
     applyShipModifiers(skinKey);
 
+    // FIXED FOR COMFORT: Instantly updates player health indicators to max capacity on checkout!
+    player.shield = player.maxShield;
+
     if (typeof gameAudio !== 'undefined' && gameAudio.playSupplyCache) {
         gameAudio.playSupplyCache(); 
     }
     
     if (typeof showAlert === 'function') {
         showAlert(skinKey === 'RANDOM' 
-            ? `🎲 NEW SHIP REROLLED: Configuration randomized and old ship backed up!` 
-            : `STARSHIP RECONFIGURED ${skinKey}!`
+            ? `🎲 NEW SHIP REROLLED: Configuration randomized and shields fully charged!` 
+            : `🚀 CHASSIS RECONFIGURED: Swapped hull profile to ${skinKey} & shield arrays filled!`
         );
     }
     
