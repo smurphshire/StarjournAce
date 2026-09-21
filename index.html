@@ -1387,21 +1387,20 @@ const SHIP_SKINS = {
 
 
     // Modular Random Custom Component Mixer - REPAIRING INVULNERABILITY STATE LOCK
-          'RANDOM': function(ctx, player) {
+    'RANDOM': function(ctx, player) {
         if (!window.proceduralShipCache) {
             const pallets = ['#e1c6e5', '#e5e3e7', '#e4e8e3', '#ffd700', '#ff9d42', '#77cc99', '#00e5ff', '#ff3d00'];
             const accents = ['#d4b0db', '#ff9d42', '#77cc99', '#fff200', '#ffffff', '#00e5ff'];
             
-            // NEW RANDOM WEAPON ATTRIBUTE MATRIX:
-            // Rolls a random number to lock down a premium or standard trait modifier layout
             const traitRoll = Math.random();
             let chosenTrait = 'STANDARD';
-            if (traitRoll < 0.22) chosenTrait = 'HOMING';      // 22% Chance for Tracking Projectiles
-            else if (traitRoll < 0.44) chosenTrait = 'SPREAD'; // 22% Chance for Triple Scattershot
-            else if (traitRoll < 0.66) chosenTrait = 'DOUBLE'; // 22% Chance for Double-Barrel cannons
+            if (traitRoll < 0.22) chosenTrait = 'HOMING';      
+            else if (traitRoll < 0.44) chosenTrait = 'SPREAD'; 
+            else if (traitRoll < 0.66) chosenTrait = 'DOUBLE'; 
 
             window.proceduralShipCache = {
-                wingStyle: Math.floor(Math.random() * 5) + 1,      
+                // FIXED FOR SEVEN OPTIONS: Bumped style picker from 5 up to 7!
+                wingStyle: Math.floor(Math.random() * 7) + 1,      
                 decalStyle: Math.floor(Math.random() * 3) + 1,     
                 noseStyle: Math.floor(Math.random() * 2) + 1,      
                 engineLayout: Math.floor(Math.random() * 4) + 1,   
@@ -1413,20 +1412,20 @@ const SHIP_SKINS = {
                 engineScale: 0.9 + Math.random() * 0.25,     
                 hullColor: pallets[Math.floor(Math.random() * pallets.length)],
                 trimColor: accents[Math.floor(Math.random() * accents.length)],
-                
-                // LOCK TRAIT: Anchors the rolled trait modifier directly into the persistent cache frame
+                podLengthRandom: 0.35 + Math.random() * 0.45,
+                podWidthRandom: 1.0 + Math.random() * 2.0,
+                podStyle: Math.floor(Math.random() * 3) + 1,
                 weaponTrait: chosenTrait
             };
             
             player.needsNewShip = false; 
             
-            // Re-apply live performance metrics right away to sync delays with the rolled trait
             if (typeof applyShipModifiers === 'function') {
                 applyShipModifiers('RANDOM');
             }
             if (typeof saveGame === 'function') saveGame();
         }
-        ctx.rotate(Math.PI / 2); // 90-degree vector orientation correction
+        ctx.rotate(Math.PI / 2); 
         const baseScale = (player.radius / 24) * window.proceduralShipCache.sizeMult;
         ctx.scale(baseScale, baseScale);
         
@@ -1452,12 +1451,10 @@ const SHIP_SKINS = {
                 ctx.lineWidth = 1.5;
             }
 
-            // Apply the dynamic width and height factors
             const wM = window.proceduralShipCache.wingWidthMult;
             const pM = window.proceduralShipCache.podLengthMult;
 
             if (type === 1) {
-                // Type 1: Slickback Razor Wing Geometry
                 ctx.beginPath();
                 ctx.moveTo(10, -20 * pM);
                 if (invert) {
@@ -1469,27 +1466,35 @@ const SHIP_SKINS = {
                 ctx.lineTo(10, 42 * pM); ctx.lineTo(0, 44 * pM);
                 ctx.fill(); ctx.stroke();
             } else if (type === 2) {
-                // Type 2: Heavy Quad-Pods
                 ctx.beginPath();
-                ctx.arc(22 * wM, -4 * pM, 21 * pM, -Math.PI / 2, Math.PI / 2, false);
-                ctx.arc(16 * wM, 22 * pM, 17 * pM, -Math.PI * 0.3, Math.PI / 2, false);
-                ctx.lineTo(0, 44 * pM);
+                ctx.arc(16 * wM, 22 * pM, 17 * pM, 0, Math.PI * 2);
+                ctx.fill(); ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(22 * wM, -4 * pM, 21 * pM, 0, Math.PI * 2);
                 ctx.fill(); ctx.stroke();
             } else if (type === 3) {
-                // Type 3: Stinger Forward Dagger Wing Geometry
                 ctx.beginPath();
                 ctx.moveTo(10, -20 * pM); ctx.lineTo(38 * wM, 4 * pM); ctx.lineTo(38 * wM, -32 * pM); ctx.lineTo(44 * wM, 26 * pM); ctx.lineTo(32 * wM, 22 * pM); ctx.lineTo(0, 44 * pM);
                 ctx.fill(); ctx.stroke();
             } else if (type === 4) {
-                // Type 4: Triple Stacked Pods
                 ctx.beginPath();
-                ctx.arc(20 * wM, -14 * pM, 13 * pM, -Math.PI / 2, Math.PI / 2, false); 
-                ctx.arc(22 * wM, 6 * pM, 16 * pM, -Math.PI / 2, Math.PI / 2, false);  
-                ctx.arc(20 * wM, 24 * pM, 13 * pM, -Math.PI / 2, Math.PI / 2, false); 
-                ctx.lineTo(0, 44 * pM);
+                ctx.arc(20 * wM, -14 * pM, 13 * pM, 0, Math.PI * 2); 
                 ctx.fill(); ctx.stroke();
-            } else if (type === 5) {
-                // Type 5: Minimalist Pod-Wing Variant
+
+                ctx.beginPath();
+                ctx.arc(20 * wM, 24 * pM, 13 * pM, 0, Math.PI * 2); 
+                ctx.fill(); ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(22 * wM, 6 * pM, 16 * pM, 0, Math.PI * 2);  
+                ctx.fill(); ctx.stroke();
+                       } else if (type === 5) {
+                // =========================================================================
+                // IN-GAME TYPE 5 Blueprints: SNUB WING PANEL BASE (INHERITS PRIMARY MAIN COLOR)
+                // =========================================================================
+                // By drawing a clean vector path loop here, it automatically uses the global
+                // main hull color defined at the top of your function—never hollow black!
                 ctx.beginPath();
                 ctx.moveTo(10, -18 * pM);
                 ctx.lineTo(22 * wM, -18 * pM);
@@ -1499,6 +1504,80 @@ const SHIP_SKINS = {
                 ctx.lineTo(0, 44 * pM);
                 ctx.closePath();
                 ctx.fill(); ctx.stroke();
+            }
+
+            // =========================================================================
+            // NEW IN-GAME TYPE 6: RECTANGULAR INDUSTRIAL ASSEMBLY + FORCED DISC INSERT
+            // =========================================================================
+            else if (type === 6) {
+                ctx.beginPath();
+                const innerX = 6;        
+                const outerX = 42 * wM;
+                const topY = -10 * pM;    
+                const bottomY = 32 * pM;
+                const cornerRadius = 3.5; 
+                const biteSize = 15 * wM; 
+                
+                ctx.moveTo(innerX, topY);
+                ctx.lineTo(outerX - biteSize, topY);
+                ctx.arcTo(outerX - biteSize, topY + biteSize, outerX, topY + biteSize, biteSize);
+                ctx.lineTo(outerX, topY + biteSize);
+                ctx.arcTo(outerX, bottomY, innerX, bottomY, cornerRadius);
+                ctx.arcTo(innerX, bottomY, innerX, topY, cornerRadius);
+                ctx.lineTo(innerX, bottomY);
+                ctx.lineTo(0, 44 * pM);
+                ctx.closePath();
+                ctx.fill(); ctx.stroke();
+
+                // FORCE TOP LAYER DRAW: Ensures the center mechanics disk stamps down over the wing colors
+                ctx.save();
+                ctx.fillStyle = isSilhouette ? '#ffffff' : '#1e1b18'; 
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 1.5;
+                
+                const circleX = (innerX + outerX) / 2 + 2;
+                const circleY = (topY + bottomY) / 2 + 4;
+                const circleRadius = 10 * wM; 
+                
+                ctx.beginPath();
+                ctx.arc(circleX, circleY, circleRadius, 0, Math.PI * 2);
+                ctx.fill(); ctx.stroke();
+                ctx.restore();
+            }
+
+            // =========================================================================
+            // NEW IN-GAME TYPE 7: SHARP V-CHEVRON SHIELD + INNER CHASSIS CORE INSERT
+            // =========================================================================
+            else if (type === 7) {
+                const y1 = -16 * pM; 
+                const y2 = 24 * pM;  
+                const y3 = 30 * pM;  
+                const y4 = 12 * pM;  
+                const yTail = -36 * pM; 
+
+                ctx.beginPath();
+                ctx.moveTo(4, y1);                         
+                ctx.lineTo(52 * wM, y2);                    
+                ctx.lineTo(44 * wM, y3);                    
+                ctx.lineTo(4, y4);                          
+                ctx.lineTo(0, yTail);                          
+                ctx.closePath();
+                ctx.fill(); ctx.stroke();
+
+                if (!isSilhouette) {
+                    ctx.save();
+                    ctx.fillStyle = '#1e1b18';
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.moveTo(12, y1 + 10);
+                    ctx.lineTo(44 * wM, y2 + 2);
+                    ctx.lineTo(40 * wM, y3 - 4);
+                    ctx.lineTo(12, y4 - 4);
+                    ctx.closePath();
+                    ctx.fill(); ctx.stroke();
+                    ctx.restore();
+                }
             }
             ctx.restore();
         }
@@ -1511,15 +1590,12 @@ const SHIP_SKINS = {
         ctx.lineWidth = 3;
         ctx.fillRect(-22 * window.proceduralShipCache.wingWidthMult, -18, 44 * window.proceduralShipCache.wingWidthMult, 60 * window.proceduralShipCache.podLengthMult);
 
-        // Draw Outer Wing Silhouettes
         drawComponentSide(false, window.proceduralShipCache.wingStyle, window.proceduralShipCache.invertWings, true);
         drawComponentSide(true, window.proceduralShipCache.wingStyle, window.proceduralShipCache.invertWings, true);
 
-        // Core central nose frame underlay
         let noseY = (window.proceduralShipCache.noseStyle === 2) ? -66 : -44;
         ctx.beginPath(); ctx.moveTo(0, noseY); ctx.lineTo(5, noseY + 4); ctx.lineTo(5, 44); ctx.lineTo(-5, 44); ctx.lineTo(-5, noseY + 4); ctx.closePath(); ctx.fill(); ctx.stroke();
-
-        ctx.shadowBlur = 0; // Disable shadows for sharp inside graphic cuts
+        ctx.shadowBlur = 0; 
 
         // ==========================================
         // 2. INNER MECHANICAL BASE LAYER (Charcoal Black)
@@ -1528,8 +1604,9 @@ const SHIP_SKINS = {
         ctx.fillRect(-20 * window.proceduralShipCache.wingWidthMult, -16, 40 * window.proceduralShipCache.wingWidthMult, 56 * window.proceduralShipCache.podLengthMult);
 
         // ==========================================
-        // 3. MAIN INNER ACCENT HULL PLATES
+        // 3. FIXED: MAIN INNER ACCENT HULL PLATES (COLOR RECOVERY)
         // ==========================================
+        // Re-injecting these lines paints your dynamic neon hull palettes back on top of the black plate!
         drawComponentSide(false, window.proceduralShipCache.wingStyle, window.proceduralShipCache.invertWings, false);
         drawComponentSide(true, window.proceduralShipCache.wingStyle, window.proceduralShipCache.invertWings, false);
 
@@ -1538,86 +1615,107 @@ const SHIP_SKINS = {
         // ==========================================
         ctx.fillStyle = '#1e1b18'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.moveTo(0, noseY + 12); ctx.bezierCurveTo(5, noseY + 12, 7, -20, 7, -10); ctx.lineTo(7, 32); ctx.bezierCurveTo(3, 36, -3, 36, -7, 32); ctx.lineTo(-7, -10); ctx.bezierCurveTo(-7, -20, -5, noseY + 12, 0, noseY + 12);
-        ctx.closePath(); ctx.fill(); ctx.stroke();
-
-        // Draw structural dark core plates over wing systems dynamically
-        function drawInteriorMechanics(isLeft, type, invert) {
-            ctx.save();
-            if (isLeft) ctx.scale(-1, 1);
-            if (invert) ctx.scale(1, -1);
-            ctx.fillStyle = '#1e1b18'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
-            const wM = window.proceduralShipCache.wingWidthMult;
-            const pM = window.proceduralShipCache.podLengthMult;
-            if (type === 1) {
-                ctx.fillRect(12, -14 * pM, 8 * wM, 44 * pM);
-            } else if (type === 2 || type === 4 || type === 5) {
-                ctx.fillRect(5, 12 * pM, 8 * wM, 20 * pM);
-            } else if (type === 3) {
-                ctx.beginPath(); ctx.moveTo(14, 6 * pM); ctx.lineTo(34 * wM, 6 * pM); ctx.lineTo(34 * wM, 20 * pM); ctx.lineTo(14, 26 * pM); ctx.closePath(); ctx.fill(); ctx.stroke();
-            }
-            ctx.restore();
-        }
-        drawInteriorMechanics(false, window.proceduralShipCache.wingStyle, window.proceduralShipCache.invertWings);
-        drawInteriorMechanics(true, window.proceduralShipCache.wingStyle, window.proceduralShipCache.invertWings);
-
-        // ==========================================
-        // 5. PROCEDURAL FUEL POD DECAL ACCENTS
-        // ==========================================
-        function drawPodDecals(isLeft, type, invert, decalMode) {
-            ctx.save();
-            if (isLeft) ctx.scale(-1, 1);
-            if (invert) ctx.scale(1, -1);
-            ctx.fillStyle = window.proceduralShipCache.trimColor;
-            ctx.strokeStyle = window.proceduralShipCache.trimColor;
-            ctx.lineWidth = 2;
-
-            const wM = window.proceduralShipCache.wingWidthMult;
-            const pM = window.proceduralShipCache.podLengthMult;
-
-            if (type === 2) {
-                if (decalMode === 1) {
-                    ctx.beginPath(); ctx.arc(22 * wM, -4 * pM, 15 * pM, Math.PI * 0.9, Math.PI * 1.9, false); ctx.bezierCurveTo(26 * wM, -21 * pM, 13 * wM, -13 * pM, 10 * wM, 4 * pM); ctx.closePath(); ctx.fill();
-ctx.beginPath(); ctx.arc(31 * wM, 5 * pM, 3.5, 0, Math.PI * 2); ctx.fill();
-ctx.beginPath(); ctx.arc(16 * wM, 22 * pM, 12 * pM, Math.PI * 0.9, Math.PI * 1.9, false); ctx.bezierCurveTo(19 * wM, 9 * pM, 9 * wM, 15 * pM, 7 * wM, 28 * pM); ctx.closePath(); ctx.fill();
-} else if (decalMode === 2) {
-ctx.beginPath(); ctx.moveTo(22 * wM, -12 * pM); ctx.lineTo(30 * wM, 0); ctx.lineTo(22 * wM, 12 * pM); ctx.lineTo(14 * wM, 0); ctx.closePath(); ctx.fill();
-ctx.beginPath(); ctx.moveTo(16 * wM, 16 * pM); ctx.lineTo(22 * wM, 26 * pM); ctx.lineTo(16 * wM, 36 * pM); ctx.lineTo(10 * wM, 26 * pM); ctx.closePath(); ctx.fill();
-} else {
-ctx.fillRect(10 * wM, -8 * pM, 14 * wM, 3); ctx.fillRect(10 * wM, 0, 14 * wM, 3);
-ctx.fillRect(6 * wM, 16 * pM, 12 * wM, 3); ctx.fillRect(6 * wM, 24 * pM, 12 * wM, 3);
-}
-} else if (type === 4) {
-if (decalMode === 1) {
-ctx.beginPath(); ctx.arc(20 * wM, -14 * pM, 5 * pM, 0, Math.PI * 2); ctx.fill();
-ctx.beginPath(); ctx.arc(22 * wM, 6 * pM, 7 * pM, 0, Math.PI * 2); ctx.fill();
-ctx.beginPath(); ctx.arc(20 * wM, 24 * pM, 5 * pM, 0, Math.PI * 2); ctx.fill();
-} else if (decalMode === 2) {
-ctx.beginPath(); ctx.moveTo(20 * wM, -20 * pM); ctx.lineTo(24 * wM, -14 * pM); ctx.lineTo(20 * wM, -8 * pM); ctx.closePath(); ctx.fill();
-ctx.beginPath(); ctx.moveTo(22 * wM, -2 * pM); ctx.lineTo(28 * wM, 6 * pM); ctx.lineTo(22 * wM, 14 * pM); ctx.closePath(); ctx.fill();
-ctx.beginPath(); ctx.moveTo(20 * wM, 18 * pM); ctx.lineTo(24 * wM, 24 * pM); ctx.lineTo(20 * wM, 30 * pM); ctx.closePath(); ctx.fill();
-} else {
-ctx.fillRect(12 * wM, -16 * pM, 10 * wM, 2);
-ctx.fillRect(10 * wM, 4 * pM, 14 * wM, 2); ctx.fillRect(10 * wM, 8 * pM, 14 * wM, 2);
-ctx.fillRect(12 * wM, 22 * pM, 10 * wM, 2);
-}
-} else if (type === 5) {
-if (decalMode === 1) {
-ctx.beginPath(); ctx.arc(16 * wM, 6 * pM, 4 * pM, 0, Math.PI * 2); ctx.fill();
-} else if (decalMode === 2) {
-ctx.beginPath(); ctx.moveTo(16 * wM, -4 * pM); ctx.lineTo(20 * wM, 6 * pM); ctx.lineTo(16 * wM, 16 * pM); ctx.lineTo(12 * wM, 6 * pM); ctx.closePath(); ctx.fill();
-} else {
-ctx.fillRect(13 * wM, -4 * pM, 6 * wM, 3);
-ctx.fillRect(13 * wM, 14 * pM, 6 * wM, 3);
-}
+ctx.moveTo(0, noseY + 12); ctx.bezierCurveTo(5, noseY + 12, 7, -20, 7, -10); ctx.lineTo(7, 32); ctx.bezierCurveTo(3, 36, -3, 36, -7, 32); ctx.lineTo(-7, -10); ctx.bezierCurveTo(-7, -20, -5, noseY + 12, 0, noseY + 12);
+ctx.closePath(); ctx.fill(); ctx.stroke();
+// Draw structural dark core plates over wing systems dynamically
+function drawInteriorMechanics(isLeft, type, invert) {
+ctx.save();
+if (isLeft) ctx.scale(-1, 1);
+if (invert) ctx.scale(1, -1);
+ctx.fillStyle = '#1e1b18'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
+const wM = window.proceduralShipCache.wingWidthMult;
+const pM = window.proceduralShipCache.podLengthMult;
+if (type === 1) {
+ctx.fillRect(12, -14 * pM, 8 * wM, 44 * pM);
+} else if (type === 2 || type === 4 || type === 5) {
+ctx.fillRect(5, 12 * pM, 8 * wM, 20 * pM);
+} else if (type === 3) {
+ctx.beginPath(); ctx.moveTo(14, 6 * pM); ctx.lineTo(34 * wM, 6 * pM); ctx.lineTo(34 * wM, 20 * pM); ctx.lineTo(14, 26 * pM); ctx.closePath(); ctx.fill(); ctx.stroke();
 }
 ctx.restore();
 }
+drawInteriorMechanics(false, window.proceduralShipCache.wingStyle, window.proceduralShipCache.invertWings);
+drawInteriorMechanics(true, window.proceduralShipCache.wingStyle, window.proceduralShipCache.invertWings);
+// ==========================================
+// 5. PROCEDURAL FUEL POD DECAL ACCENTS
+// ==========================================
+function drawPodDecals(isLeft, type, invert, decalMode) {
+    ctx.save();
+    if (isLeft) ctx.scale(-1, 1);
+    if (invert) ctx.scale(1, -1);
+    ctx.fillStyle = window.proceduralShipCache.trimColor;
+    ctx.strokeStyle = window.proceduralShipCache.trimColor;
+    ctx.lineWidth = 2;
+    const wM = window.proceduralShipCache.wingWidthMult;
+    const pM = window.proceduralShipCache.podLengthMult;
+    
+    if (type === 2) {
+        if (decalMode === 1) {
+            ctx.beginPath(); ctx.arc(22 * wM, -4 * pM, 15 * pM, Math.PI * 0.9, Math.PI * 1.9, false); ctx.bezierCurveTo(26 * wM, -21 * pM, 13 * wM, -13 * pM, 10 * wM, 4 * pM); ctx.closePath(); ctx.fill();
+            ctx.beginPath(); ctx.arc(31 * wM, 5 * pM, 3.5, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(16 * wM, 22 * pM, 12 * pM, Math.PI * 0.9, Math.PI * 1.9, false); ctx.bezierCurveTo(19 * wM, 9 * pM, 9 * wM, 15 * pM, 7 * wM, 28 * pM); ctx.closePath(); ctx.fill();
+        } else if (decalMode === 2) {
+            ctx.beginPath(); ctx.moveTo(22 * wM, -12 * pM); ctx.lineTo(30 * wM, 0); ctx.lineTo(22 * wM, 12 * pM); ctx.lineTo(14 * wM, 0); ctx.closePath(); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(16 * wM, 16 * pM); ctx.lineTo(22 * wM, 26 * pM); ctx.lineTo(16 * wM, 36 * pM); ctx.lineTo(10 * wM, 26 * pM); ctx.closePath(); ctx.fill();
+        } else {
+            ctx.fillRect(10 * wM, -8 * pM, 14 * wM, 3); ctx.fillRect(10 * wM, 0, 14 * wM, 3);
+            ctx.fillRect(6 * wM, 16 * pM, 12 * wM, 3); ctx.fillRect(6 * wM, 24 * pM, 12 * wM, 3);
+        }
+    } else if (type === 4) {
+        if (decalMode === 1) {
+            ctx.beginPath(); ctx.arc(20 * wM, -14 * pM, 5 * pM, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(22 * wM, 6 * pM, 7 * pM, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(20 * wM, 24 * pM, 5 * pM, 0, Math.PI * 2); ctx.fill();
+        } else if (decalMode === 2) {
+            ctx.beginPath(); ctx.moveTo(20 * wM, -20 * pM); ctx.lineTo(24 * wM, -14 * pM); ctx.lineTo(20 * wM, -8 * pM); ctx.closePath(); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(22 * wM, -2 * pM); ctx.lineTo(28 * wM, 6 * pM); ctx.lineTo(22 * wM, 14 * pM); ctx.closePath(); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(20 * wM, 18 * pM); ctx.lineTo(24 * wM, 24 * pM); ctx.lineTo(20 * wM, 30 * pM); ctx.closePath(); ctx.fill();
+        } else {
+            ctx.fillRect(12 * wM, -16 * pM, 10 * wM, 2);
+            ctx.fillRect(10 * wM, 4 * pM, 14 * wM, 2); ctx.fillRect(10 * wM, 8 * pM, 14 * wM, 2);
+            ctx.fillRect(12 * wM, 22 * pM, 10 * wM, 2);
+        }
+        
+       } 
+    // =========================================================================
+    // IN-GAME OVERLAY FEATURE: TOP-LAYER BLACK SPHERE-ROD ENGINE INJECTOR
+    // =========================================================================
+    // Stamps your crisp, solid mechanical weapon rods right over the wing colors!
+    else if (type === 5) {
+        ctx.save();
+        
+        // Matches the white silhouette backdrop on pass 1, otherwise paints the solid charcoal black!
+        ctx.fillStyle = (typeof isSilhouette !== 'undefined' && isSilhouette) ? '#ffffff' : '#1e1b18';
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.5;
+
+        const rodX = 16 * wM; 
+        const rodWidth = 4 * wM; 
+        const startY = 30 * pM;  
+        const endY = -10 * pM;   
+        const headRadius = 8 * wM; 
+
+        // 1. Draw the vertical structural black link shaft rod
+        ctx.beginPath();
+        ctx.fillRect(rodX - (rodWidth / 2), endY, rodWidth, startY - endY);
+        ctx.strokeRect(rodX - (rodWidth / 2), endY, rodWidth, startY - endY);
+
+        // 2. Draw the heavy black forward tracking head sphere
+        ctx.beginPath();
+        ctx.arc(rodX, endY, headRadius, 0, Math.PI * 2);
+        ctx.fill(); 
+        ctx.stroke();
+        
+        ctx.restore();
+    }
+    ctx.restore();
+}
 drawPodDecals(false, window.proceduralShipCache.wingStyle, window.proceduralShipCache.invertWings, window.proceduralShipCache.decalStyle);
 drawPodDecals(true, window.proceduralShipCache.wingStyle, window.proceduralShipCache.invertWings, window.proceduralShipCache.decalStyle);
-// ==========================================
-// 6. THRUSTERS, WEAPONS, AND CANOPY WINDOWS
-// ==========================================
+
+// =========================================================================
+// 6. THRUSTERS, WEAPONS, AND CANOPY WINDOWS (UN-CLIPPED PRODUCTION RECOVERY)
+// =========================================================================
 ctx.fillStyle = '#1e1b18';
 const eS = window.proceduralShipCache.engineScale;
 if (window.proceduralShipCache.engineLayout === 1) {
@@ -1626,26 +1724,76 @@ ctx.beginPath(); ctx.moveTo(-5 * eS, 32); ctx.lineTo(5 * eS, 32); ctx.lineTo(8 *
 ctx.beginPath(); ctx.moveTo(6 * eS, 32); ctx.lineTo(14 * eS, 32); ctx.lineTo(16 * eS, 42); ctx.lineTo(4 * eS, 42); ctx.closePath(); ctx.fill(); ctx.stroke();
 ctx.beginPath(); ctx.moveTo(-6 * eS, 32); ctx.lineTo(-14 * eS, 32); ctx.lineTo(-16 * eS, 42); ctx.lineTo(-4 * eS, 42); ctx.closePath(); ctx.fill(); ctx.stroke();
 } else if (window.proceduralShipCache.engineLayout === 3) {
-for (let i = 0; i < 8; i++) ctx.fillRect((-22 + (i * 6)) * eS, 34, 4 * eS, 8);
+for (let i = 0; i < 8; i++) {
+ctx.fillRect((-22 + (i * 6)) * eS, 34, 4 * eS, 8);
+ctx.strokeRect((-22 + (i * 6)) * eS, 34, 4 * eS, 8);
+}
 } else {
 for (let i = 0; i < 8; i++) {
 ctx.fillRect((-22 + (i * 6)) * eS, 34, 4 * eS, 6);
 ctx.fillRect((-22 + (i * 6)) * eS, 40, 4 * eS, 6);
+ctx.strokeRect((-22 + (i * 6)) * eS, 34, 4 * eS, 6);
+ctx.strokeRect((-22 + (i * 6)) * eS, 40, 4 * eS, 6);
 }
-}
-
-
-if (window.proceduralShipCache.hasGunPods) {
-ctx.fillStyle = '#ffffff';
-ctx.fillRect(10, -20, 2, 24); ctx.fillRect(-12, -20, 2, 24);
 }
 // Central Canopy Visor Frame
-ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#ffffff';
-ctx.beginPath(); ctx.arc(0, -14, 4, Math.PI, 0, false); ctx.lineTo(4, -2); ctx.lineTo(-4, -2); ctx.closePath(); ctx.fill();
-ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-4, 4); ctx.lineTo(4, 4); ctx.moveTo(-4, 10); ctx.lineTo(4, 10);
-ctx.stroke(); // FIXED: Restored complete context name layout to stop tab freeze loops
-ctx.strokeStyle = window.proceduralShipCache.trimColor; ctx.strokeRect(-3, 16, 6, 8);
+ctx.fillStyle = '#ffffff';
+ctx.strokeStyle = '#ffffff';
+ctx.beginPath();
+ctx.arc(0, -14, 4, Math.PI, 0, false);
+ctx.lineTo(4, -2);
+ctx.lineTo(-4, -2);
+ctx.closePath();
+ctx.fill();
+ctx.lineWidth = 2;
+ctx.beginPath();
+ctx.moveTo(-4, 4); ctx.lineTo(4, 4);
+ctx.moveTo(-4, 10); ctx.lineTo(4, 10);
+ctx.stroke();
+ctx.strokeStyle = window.proceduralShipCache.trimColor;
+ctx.strokeRect(-3, 16, 6, 8);
+// =========================================================================
+// FIXED FEATURE: TOPMOST SYMMETRICAL RE-COLORED LONG GUN POD OVERRIDES
+// =========================================================================
+if (window.proceduralShipCache.hasGunPods) {
+ctx.save();
+const liveCache = window.proceduralShipCache;
+ctx.fillStyle = liveCache.trimColor;
+const barrelW = (liveCache.podWidthRandom !== undefined) ? liveCache.podWidthRandom : 2;
+const barrelH = 55 * ((liveCache.podLengthRandom !== undefined) ? liveCache.podLengthRandom : 0.75);
+const style = liveCache.podStyle || 1;
+ctx.lineWidth = 1;
+const strokeRoll = (style % 2 === 0) ? '#ffffff' : liveCache.trimColor;
+function drawInGameGuns(xCoord) {
+ctx.save();
+ctx.translate(xCoord, -20);
+if (style === 3) {
+ctx.beginPath();
+ctx.moveTo(-barrelW * 0.8, barrelH * 0.4);
+ctx.lineTo(barrelW * 0.8, barrelH * 0.4);
+ctx.lineTo(0, -barrelH);
+ctx.closePath();
+ctx.fill();
+ctx.strokeStyle = strokeRoll;
+ctx.stroke();
+} else {
+ctx.fillRect(-barrelW / 2, -barrelH * 0.3, barrelW, barrelH * 1.3);
+ctx.strokeRect(-barrelW / 2, -barrelH * 0.3, barrelW, barrelH * 1.3);
+if (style === 2) {
+ctx.fillStyle = liveCache.trimColor;
+ctx.strokeStyle = '#ffffff';
+ctx.beginPath();
+ctx.arc(0, barrelH, barrelW * 1.4 + 1.5, 0, Math.PI * 2);
+ctx.fill(); ctx.stroke();
 }
+}
+ctx.restore();
+}
+drawInGameGuns(10);
+drawInGameGuns(-12);
+ctx.restore();
+}
+},
 
 
 
@@ -1671,10 +1819,10 @@ let ACTIVE_SHIP_SKIN = 'RANDOM'; // Changed from 'const' to 'let' so it can be s
 
 const SHIP_SHOP_PRICES = {
     'ORIGINAL': 0,               // RETRO Starter Model
-    'SLICKBACK': 100,           // SLICKBACK Fighter
-    'MOSQUITO': 100,         // MOSQUITO Long-Range Escort
-    'SCIENCE': 100,  // SCIENCE Research Vessel
-    'INTERCEPTOR': 250, // INTERCEPT Tri-Core Fighter
+    'SLICKBACK': 900,           // SLICKBACK Fighter
+    'MOSQUITO': 500,         // MOSQUITO Long-Range Escort
+    'SCIENCE': 700,  // SCIENCE Research Vessel
+    'INTERCEPTOR': 1500, // INTERCEPT Tri-Core Fighter
     'RANDOM': 500               // PROCEDURAL RANDOM Hull Mixer
 };
 
@@ -2757,22 +2905,26 @@ function resetGame() {
             }
         }
 
-        function spawnBurst(x, y, color, count = 12) {
-            for (let i = 0; i < count; i++) {
+function spawnBurst(x, y, color, count = 12) {
+    for (let i = 0; i < count; i++) {
+        let pAngle = Math.random() * Math.PI * 2;
+        let spd = Math.random() * 3.5 + 1;
+        
+        particles.push({
+            x: x, y: y,
+            vx: Math.cos(pAngle) * spd,
+            vy: Math.sin(pAngle) * spd,
+            life: 1.0,
+            decay: Math.random() * 0.025 + 0.01,
+            color: color,
+            size: Math.random() * 2 + 1
+        });
+        
+        // FIXED FOR LAG SAFETY: Prevents explosion shards from building up and flooding memory banks!
+        if (particles.length > 250) particles.shift();
+    }
+}
 
-                let pAngle = Math.random() * Math.PI * 2;
-                let spd = Math.random() * 3.5 + 1;
-                particles.push({
-                    x: x, y: y,
-                    vx: Math.cos(pAngle) * spd,
-                    vy: Math.sin(pAngle) * spd,
-                    life: 1.0,
-                    decay: Math.random() * 0.025 + 0.01,
-                    color: color,
-                    size: Math.random() * 2 + 1
-                });
-            }
-        }
 
         function spawnMineralDrops(x, y, cargo) {
             Object.keys(cargo).forEach(type => {
@@ -2931,7 +3083,7 @@ generateBackgroundAssets();
             if (keys['ArrowRight'] || keys['KeyD'] || touchControls.right) {
                 player.angle += player.rotationSpeed;
             }
-            const playerThrusting = keys['ArrowUp'] || keys['KeyW'] || touchControls.thrust || pointerThrust;
+                       const playerThrusting = keys['ArrowUp'] || keys['KeyW'] || touchControls.thrust || pointerThrust;
             if (playerThrusting) {
                 player.vx += Math.cos(player.angle) * player.thrust;
                 player.vy += Math.sin(player.angle) * player.thrust;
@@ -2947,16 +3099,17 @@ generateBackgroundAssets();
                         vx: -Math.cos(player.angle) * 2.4 + (Math.random() * 0.6 - 0.3),
                         vy: -Math.sin(player.angle) * 2.4 + (Math.random() * 0.6 - 0.3),
                         
-                        life: 0.8,
-                        decay: 0.035,
+                        // FIXED FOR SMOOTH SMOOTH FADE: Decreased starting life and bumped decay 
+                        // so the tail ends dissolve elegantly into empty space!
+                        life: 0.65,
+                        decay: 0.048,
                         color: '#ff7700',
-                        
-                        // ADJUSTED SCALE: Trimmed down a tad for the perfect visual balance
                         size: 4.5 + Math.random() * 2.5
                     });
+                    
+                    if (particles.length > 250) particles.shift();
                 }
             }
-
 
             player.vx *= player.friction;
             player.vy *= player.friction;
@@ -3115,13 +3268,11 @@ generateBackgroundAssets();
             });
 
 
-            bullets = bullets.filter(b => b.life > 0);
 
             enemyBullets.forEach((eb) => {
                 eb.x += eb.vx; eb.y += eb.vy; eb.life--;
                 wrapEntity(eb);
             });
-            enemyBullets = enemyBullets.filter(eb => eb.life > 0);
 
             asteroids.forEach(a => {
                 a.x += a.vx; a.y += a.vy; a.angle += a.rotSpeed;
@@ -3281,7 +3432,7 @@ generateBackgroundAssets();
                     }
                 }
 
-                ship.x += ship.vx;
+               ship.x += ship.vx;
                 ship.y += ship.vy;
                 wrapEntity(ship);
 
@@ -3296,8 +3447,38 @@ generateBackgroundAssets();
                         color: '#00ffff',
                         size: 2.5
                     });
+                    
+                    // LAG SAFETY CAP: Keeps civilian exhaust plumes from overloading memory bounds
+                    if (particles.length > 250) particles.shift();
                 }
-            });
+            }); // <-- This closes your civilianShips loop!
+
+            // =========================================================================
+            // HIGH-PERFORMANCE CPU ARRAY FILTERING (FAST FILTER OVERWRITES)
+            // =========================================================================
+            let activeBCount = 0;
+            for (let i = 0; i < bullets.length; i++) {
+                if (bullets[i].life > 0) {
+                    bullets[activeBCount++] = bullets[i];
+                }
+            }
+            bullets.length = activeBCount; 
+
+            let activeEBCount = 0;
+            for (let i = 0; i < enemyBullets.length; i++) {
+                if (enemyBullets[i].life > 0) {
+                    enemyBullets[activeEBCount++] = enemyBullets[i];
+                }
+            }
+            enemyBullets.length = activeEBCount;
+
+            let activePCount = 0;
+            for (let i = 0; i < particles.length; i++) {
+                if (particles[i].life > 0) {
+                    particles[activePCount++] = particles[i];
+                }
+            }
+            particles.length = activePCount;
 
             healthPacks.forEach(pack => {
                 if (Date.now() >= pack.nextMeander) {
@@ -4720,27 +4901,43 @@ enemies.forEach(e => {
 
             // Retained secondary stack parent restore line
             ctx.restore(); 
-
-            // Targeting crosshair ring tracking line
-            ctx.save();
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
-            ctx.lineWidth = 1;
+            // =========================================================================
+            // TARGETING CROSSHAIR RING TRACKING LINE (HIGH-VISIBILITY DOTTED INNER LINE)
+            // =========================================================================
+            ctx.save(); // Opens isolated local context block layer safely
+            
+            // HIGH-VISIBILITY RESCALE: Crisp white alpha mapping for deep space tracking
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+            ctx.lineWidth = 1.2;
+            
+            // FIXED FOR THE DOTS: Sets a clean pattern of 3px dot length followed by 4px gap spacing
             if (ctx.setLineDash) {
-                ctx.setLineDash([]); // Passes empty array explicitly to clear dash safely across all browser engines
+                ctx.setLineDash([3, 4]); 
             }
+            
+            // Hardscreen monitor viewport center variables
+            const radarScreenCenterX = canvas.width / 2;
+            const radarScreenCenterY = canvas.height / 2;
+            
             ctx.beginPath();
-            ctx.arc(canvas.width / 2, canvas.height / 2, POINTER_AIM_RADIUS, 0, Math.PI * 2);
+            // FIXED GAP DISTANCE: Shrinking the ring by 6 pixels pushes your ship's 
+            // native navigation arrows to the outside edge of the dots perfectly!
+            ctx.arc(radarScreenCenterX, radarScreenCenterY, POINTER_AIM_RADIUS - 6, 0, Math.PI * 2);
             ctx.stroke();
-            ctx.restore();
-
-
+            
+            // CRITICAL SOLID RESET: Empties line dashes so subsequent UI elements draw solid
+            if (ctx.setLineDash) {
+                ctx.setLineDash([]); 
+            }
+            
+            ctx.restore(); // Closes isolated local context block layer perfectly balanced!
 
 
             const spaceportAngle = Math.atan2(
                 wrappedDelta(player.y, SPACEPORT.y),
                 wrappedDelta(player.x, SPACEPORT.x)
             );
-            const indicatorDistance = 34;
+            const indicatorDistance = 50;
             const indicatorX = canvas.width / 2 + Math.cos(spaceportAngle) * indicatorDistance;
             const indicatorY = canvas.height / 2 + Math.sin(spaceportAngle) * indicatorDistance;
 
