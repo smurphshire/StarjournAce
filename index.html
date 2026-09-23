@@ -1389,8 +1389,41 @@ const SHIP_SKINS = {
     // Modular Random Custom Component Mixer - REPAIRING INVULNERABILITY STATE LOCK
     'RANDOM': function(ctx, player) {
         if (!window.proceduralShipCache) {
-            const pallets = ['#e1c6e5', '#e5e3e7', '#e4e8e3', '#ffd700', '#ff9d42', '#77cc99', '#00e5ff', '#ff3d00'];
-            const accents = ['#d4b0db', '#ff9d42', '#77cc99', '#fff200', '#ffffff', '#00e5ff'];
+
+
+            // Custome Ship Colors
+            const pallets = [
+                '#e1c6e5',
+                '#e5e3e7',
+                '#e4e8e3', 
+                '#ffd700',
+                '#ff9d42', 
+                '#77cc99', 
+                '#00b2e3',
+                '#56c1bc',
+                '#f8d0ac',
+                '#6dcff6',
+                '#f49ac1',
+                '#fff799',
+                '#bcbec0',
+                '#ea399a',
+
+                '#ff3d00'
+            ];
+
+            // Custom ship Accent colors
+            const accents = [
+                '#d4b0db', 
+                '#ff9d42', 
+                '#77cc99', 
+                '#fff200', 
+                '#ffffff',
+                '#f06eaa',
+                '#8197cd',
+                '#8dc63f',
+                
+                '#00e5ff'
+            ];
             
             const traitRoll = Math.random();
             let chosenTrait = 'STANDARD';
@@ -1980,14 +2013,32 @@ window.closeShipyardModal = function() {
         };
 
         const HOMEWORLD_PALETTES = [
-            { base: [70, 140, 220], land: [90, 200, 150] },
-            { base: [220, 170, 90], land: [200, 120, 70] },
-            { base: [100, 190, 190], land: [155, 175, 90] },
-            { base: [120, 227, 227], land: [145, 255, 80] },
-            { base: [200, 80, 80], land: [255, 130, 40] },
-            { base: [190, 30, 35], land: [190, 125, 100] },
-            { base: [230, 230, 127], land: [255, 200, 60] },
-            { base: [180, 220, 255], land: [255, 255, 255] }
+           {base:[70,140,220], land:[90,200,150]},
+    {base:[220,170,90], land:[200,120,70]},
+    {base:[100,190,190], land:[155,175,90]},
+    {base:[120,227,227], land:[145,255,80]},
+    {base:[200,80,80], land:[255,130,40]},
+    {base:[190,30,35], land:[190,125,100]},
+    {base:[230,230,127], land:[255,200,60]},
+    {base:[60,115,190], land:[205,220,60]},
+    {base:[25,15,190], land:[70,140,65]},
+    {base:[130,205,130], land:[130,135,95]},
+    {base:[240,80,35], land:[175,125,55]},
+    {base:[255,255,255], land:[200,200,160]},
+    {base:[180,220,255], land:[255,255,255]},
+    {base:[180,220,180], land:[255,245,165]},
+    {base:[70,90,115], land:[126,145,90]},
+    {base:[125,70,90], land:[175,70,100]},
+    {base:[80,80,180], land:[190,220,145]},
+    {base:[130,140,100], land:[150,100,60]},
+    {base:[170,190,210], land:[100,150,172]},
+    {base:[50,100,80], land:[200,230,100]},
+    {base:[10,60,60], land:[90,205,120]},
+    {base:[110,70,150], land:[240,160,220]},
+    {base:[140,100,70], land:[210,200,180]},
+    {base:[45,160,130], land:[165,135,190]},
+    {base:[90,160,180], land:[190,130,80]},
+    {base:[255,160,90], land:[255,215,75]}
         ];
 
         function generatorColor(rgb) {
@@ -5132,7 +5183,7 @@ document.addEventListener('click', function(event) {
     }
 });
 
-
+//Copyright Smurphshire 2026
     </script>
 </body>
 </html>
