@@ -30,7 +30,7 @@
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
-            font-family: 'Courier New', Courier, monospace;
+            font-family: 'Century Gothic', 'Apple Gothic', 'Arial', sans-serif;
             overflow: hidden;
             height: 100vh;
             display: flex;
@@ -261,9 +261,8 @@
         }
 
         #msg-log {
-            height: 76px;
-            min-height: 76px;
-            max-height: 76px;
+            min-height: 36px;
+            max-height: 72px;
             background: rgba(0,0,0,0.5);
             border: 1px solid rgba(255,255,255,0.03);
             padding: 8px;
@@ -626,12 +625,19 @@
                             <span id="stat-goal-text">\$0 / \$5,000</span>
                         </div>
                     </div>
-                    <div class="stat-card" style="grid-column: span 2;">
-                        <div class="stat-label">Shield Integrity</div>
-                        <div id="stat-shield-bar" style="height:6px; background:#331111; margin-top:4px; border-radius:3px; overflow:hidden;">
-                            <div id="stat-shield-fill" style="width:100%; height:100%; background:var(--accent-blue);"></div>
-                        </div>
-                    </div>
+<div class="stat-card" style="grid-column: span 2;">
+    <div class="stat-label">
+        Shields: 
+        <!-- Core numbers split apart from trailing labels -->
+        <span id="stat-shield-text" style="color: #ffffff; font-family: monospace;">100/100</span>
+        <span id="stat-shield-absorb" style="font-family: monospace; font-size: 0.9em; margin-left: 4px;"></span>
+        <span id="stat-shield-rate" style="color: #ffffff; font-family: monospace; opacity: 0.7; margin-left: 4px;">(+1pt/5s)</span>
+    </div>
+    <div id="stat-shield-bar" style="height:6px; background:#331111; margin-top:4px; border-radius:3px; overflow:hidden;">
+        <div id="stat-shield-fill" style="width:100%; height:100%; background:var(--accent-blue);"></div>
+    </div>
+</div>
+
                 </div>
             </div>
 
@@ -665,10 +671,10 @@
             <div id="spaceport-panel">
                 <div class="section-title" style="color: var(--accent-blue); border-color: rgba(0,255,255,0.3);">Station Central</div>
                 <div id="spaceport-content">
-                    <p class="merchant-msg" id="spaceport-dist">Range: 0m</p>
-                    <button onclick="openShipyardModal()" class="btn" id="btn-bank" disabled>
-    HOMEWORLD - BANK & REPAIR SHIP
+<button onclick="openShipyardModal()" class="btn" id="btn-bank" disabled>
+    HOMEWORLD - Range: 0m
 </button>
+
                    
                 </div>
             </div>
@@ -712,10 +718,10 @@
 
         // Sector Environmental Palette Profiles
         const SECTOR_THEMES = {
-            1: { name: "Andromeda Perimeter", primary: "#00ffff", background: "#020208", nebula: "rgba(0, 120, 255, 0.05)", generic: "#888899", modifiers: { enemySpawn: 1.2, merchantSpawn: 1.3, asteroidSpawn: 1.1, goldYield: 0.7 } },
+            1: { name: "Andromeda Perimeter", primary: "#00ffff", background: "#020208", nebula: "rgba(0, 120, 255, 0.05)", generic: "#888899", modifiers: { enemySpawn: 1.2, merchantSpawn: 1.3, asteroidSpawn: 1.2, goldYield: 0.05 } },
             2: { name: "Orion Expanse", primary: "#fbfbcc", background: "#08060a", nebula: "rgba(0, 120, 255, 0.05)", generic: "#828e8d", modifiers: { enemySpawn: 1.35, civilianSpawn: 1.25, merchantSpawn: 1.8, asteroidSpawn: 2.5, uraniumYield: 1.3 } },
             3: { name: "The Keziah Nebula", primary: "#da70d6", background: "#06020c", nebula: "rgba(218, 112, 214, 0.05)", generic: "#998899", modifiers: { asteroidSpawn: 1.35, pirateSpawn: 2.3, goldYield: 0.4, uraniumYield: 0.4, eridiumYield: 0.9 } },
-            4: { name: "Zelion Territory", primary: "#39ff14", background: "#020603", nebula: "rgba(57, 255, 20, 0.04)", generic: "#8a998a", modifiers: { enemySpawn: 1.5, asteroidSpawn: 3.2, uraniumYield: 2.1 } },
+            4: { name: "Zelion Territory", primary: "#39ff14", background: "#020603", nebula: "rgba(57, 255, 20, 0.04)", generic: "#8a998a", modifiers: { enemySpawn: 2.2, asteroidSpawn: 3.2, uraniumYield: 2.1 } },
             5: { name: "Supernova Remnant", primary: "#ff6600", background: "#090302", nebula: "rgba(255, 102, 0, 0.06)", generic: "#aa9988", modifiers: { civilianSpawn: 1.4, pirateSpawn: 1.5, uraniumYield: 0.6, eridiumYield: 1.25 } },
             6: { name: "Empyrean Expanse", primary: "#d5f0f7", background: "#0e1016", nebula: "rgba(236, 0, 255, 0.05)", generic: "#bfe0d5", modifiers: { enemySpawn: 1.0, merchantSpawn: 1.6, civilianSpawn: 3.0, asteroidSpawn: 1.3, goldYield: 1.7, uraniumYield: 1.2, eridiumYield: 1.5 } },
             7: { name: "Solitude Pass", primary: "#7c7c7c", background: "#020208", nebula: "rgba(0, 120, 255, 0.05)", generic: "#888899", modifiers: { enemySpawn: 0.2, merchantSpawn: 0.8, civilianSpawn: 0.2, asteroidSpawn: 1.9, goldYield: 1.2, uraniumYield: 1.2, eridiumYield: 1.6 } },
@@ -730,28 +736,44 @@
 
         };
         // initialize player state, set friction here
-        let player = {
-            x: WORLD_SIZE / 2,
-            y: WORLD_SIZE / 2,
-            vx: 0,
-            vy: 0,
-            angle: -Math.PI / 2,
-            rotationSpeed: 0.06,
-            thrust: 0.13,
-            friction: 0.990,
+                        // --- DYNAMIC STARTUP SHIELD INITIALIZATION CALCULATOR ---
+            // Calculates the true, exact ceiling value based on whether a random shield boost is cached right now
+            const startupMaxShield = (window.proceduralShipCache && window.proceduralShipCache.shieldTrait === 'SHIELD_BOOST') 
+                ? (window.proceduralShipCache.shieldBoostAmount ? Math.floor(110 + window.proceduralShipCache.shieldBoostAmount * 30) : 140)
+                : 100;
 
-            radius: 13,
-            shield: 100,
-            maxShield: 100,
-            wallet: 0,
-            bank: 0,
-            overallEarnings: 0,
-            cargo: { gold: 0, uranium: 0, eridium: 0 },
-            lastShot: 0,
-            shootDelay: 210,
-            invulnerable: 0
-        };
+            let player = {
+                x: WORLD_SIZE / 2,
+                y: WORLD_SIZE / 2,
+                vx: 0,
+                vy: 0,
+                angle: -Math.PI / 2,
+                rotationSpeed: 0.06,
+                thrust: 0.13,
+                friction: 0.990,
+                radius: 13,
+                
+                // =========================================================================
+                // CRUCIAL SINK HOLE FIX: Never hardcode starting shields to a flat 100!
+                // =========================================================================
+                // Forces your spawning shield points to perfectly mirror your true max on bootup
+                shield: startupMaxShield,
+                maxShield: startupMaxShield,
+                
+                wallet: 0,
+                bank: 0,
+                overallEarnings: 0,
+                cargo: { gold: 0, uranium: 0, eridium: 0 },
+                lastShot: 0,
+                shootDelay: 182,
+                invulnerable: 0,
+                
+                shieldDamageAbsorption: (window.proceduralShipCache && window.proceduralShipCache.shieldTrait === 'FORCE_FIELD') ? 0.25 : 0.0,
+                shieldRegenInterval: (window.proceduralShipCache && window.proceduralShipCache.shieldTrait === 'REGEN_MATRIX') ? 1750 : 2500,
+                lastShieldTick: 0
+            };
 
+            player.shield = player.maxShield; 
 
 
 
@@ -852,7 +874,18 @@ const SHIP_SKINS = {
         // ==========================================
         // 3. CORE HIGHLIGHT DETAILS & CANOPY
         // ==========================================
-        ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(0, -20, 5, Math.PI, 0, false); ctx.closePath(); ctx.fill();
+        
+        ctx.save();
+        ctx.scale(1.0, 2.0); 
+
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+
+        ctx.arc(0, -5, 4.75, Math.PI, 0, false); 
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.restore(); // Reset scale back to normal for the rest of your graphics
         ctx.beginPath(); ctx.moveTo(-6, -4); ctx.lineTo(6, -4); ctx.moveTo(-6, 2); ctx.lineTo(6, 2); ctx.moveTo(-6, 8); ctx.lineTo(6, 8); ctx.stroke();
         ctx.fillStyle = '#d4b0db'; ctx.beginPath(); ctx.arc(-3, 20, 2.5, 0, Math.PI * 2); ctx.fill(); ctx.fillRect(1, 16, 4, 8);
         ctx.beginPath(); ctx.moveTo(16, -10); ctx.lineTo(20, -10); ctx.lineTo(22, 14); ctx.lineTo(16, 4); ctx.closePath(); ctx.fill();
@@ -1001,7 +1034,7 @@ const SHIP_SKINS = {
 
         // Rounded Cockpit Roof Dome
         ctx.beginPath();
-        ctx.arc(0, -12, 4, Math.PI, 0, false);
+        ctx.arc(0, -12, 2.5, Math.PI, 0, false);
         ctx.lineTo(4, -4);
         ctx.lineTo(-4, -4);
         ctx.closePath();
@@ -1057,7 +1090,7 @@ const SHIP_SKINS = {
         ctx.bezierCurveTo(-20, -22, -14, -28, 0, -28);
         
         // Large Outer Circular Ring Profile
-        ctx.arc(0, 4, 38, -Math.PI * 0.58, Math.PI * 0.1, false);
+        ctx.arc(0, 4, 38, -Math.PI * 0.78, Math.PI * 0.1, false);
         
         // Smooth, curved right side outer pill boundary
         ctx.arc(33, -12, 11, -Math.PI, 0, false); // Smooth upper dome cap
@@ -1172,7 +1205,7 @@ const SHIP_SKINS = {
 
         // Perfectly centered white circular cockpit portal lens
         ctx.beginPath();
-        ctx.arc(33, -8, 5, 0, Math.PI * 2);
+        ctx.arc(34, -10, 4, 0, Math.PI * 2);
         ctx.fill();
 
         // Center core secondary cockpit canopy slice
@@ -1366,7 +1399,7 @@ const SHIP_SKINS = {
 
         // Canopy Windshield Dome Bubble
         ctx.beginPath();
-        ctx.arc(0, -14, 4, Math.PI, 0, false);
+        ctx.arc(0, -14, 2.75, Math.PI, 0, false);
         ctx.lineTo(4, -2);
         ctx.lineTo(-4, -2);
         ctx.closePath();
@@ -1393,36 +1426,40 @@ const SHIP_SKINS = {
 
             // Custome Ship Colors
             const pallets = [
-                '#e1c6e5',
-                '#e5e3e7',
-                '#e4e8e3', 
-                '#ffd700',
-                '#ff9d42', 
-                '#77cc99', 
-                '#00b2e3',
-                '#56c1bc',
-                '#f8d0ac',
-                '#6dcff6',
-                '#f49ac1',
-                '#fff799',
-                '#bcbec0',
-                '#ea399a',
+              //  '#e1c6e5', // lavender pink
+                '#e5e3e7', // very light gray
+              //  '#e4e8e3', // near white gray
+                '#ffd700', // Bright Yellow
+                '#ff9d42',  //Bright Orange
+                '#77cc99', // Bright Mint Green
+                '#00b2e3', // Bright Blue
+                '#56c1bc', // Tealish
+              //  '#f8d0ac', // Pale Orange
+              //  '#6dcff6', // Baby Blue
+              //  '#f49ac1', //Pink
+               // '#fff799', // light/pale yellow
+                '#bcbec0', // Gray
+                '#ea399a', // Magenta
+                '#ff3d00', // red
+               // '#ffffff' // White
 
-                '#ff3d00'
             ];
 
             // Custom ship Accent colors
             const accents = [
-                '#d4b0db', 
-                '#ff9d42', 
-                '#77cc99', 
-                '#fff200', 
-                '#ffffff',
-                '#f06eaa',
-                '#8197cd',
-                '#8dc63f',
-                
-                '#00e5ff'
+                  '#e1c6e5', // lavender pink
+                '#d4b0db', // lilac purple
+                '#ff9d42', // Orange
+                '#77cc99',  // Mint Green
+                '#f8d0ac', // Pale Orange
+               '#fff200', // Bright Yellow
+              //  '#f06eaa', // Pink magenta
+                '#8197cd', // cold steel blue
+               '#8dc63f', // Green
+               '#fff799', // light/pale yellow
+                 '#6dcff6', // Baby Blue  
+              //  '#00e5ff,' // Neon Blue
+                '#ffffff' // White
             ];
             
             const traitRoll = Math.random();
@@ -1431,14 +1468,31 @@ const SHIP_SKINS = {
             else if (traitRoll < 0.44) chosenTrait = 'SPREAD'; 
             else if (traitRoll < 0.66) chosenTrait = 'DOUBLE'; 
 
+             // --- GUARANTEED SHIELD MODIFIER SELECTION ---
+            const shieldRoll = Math.random();
+            let chosenShieldTrait = 'STANDARD';
+            let randomBoostFactor = 0;
+
+            if (shieldRoll < 0.33) {
+                // ~33% Chance: Heavy Hull Buffer
+                chosenShieldTrait = 'SHIELD_BOOST';
+                randomBoostFactor = 0.10 + Math.random() * 0.40; 
+            } else if (shieldRoll < 0.66) {
+                // ~33% Chance: Fast Recharge Matrix
+                chosenShieldTrait = 'REGEN_MATRIX';
+            } else {
+                // ~34% Chance: Flat Deflection Force Field
+                chosenShieldTrait = 'FORCE_FIELD';
+            }
+
             window.proceduralShipCache = {
                 // FIXED FOR SEVEN OPTIONS: Bumped style picker from 5 up to 7!
                 wingStyle: Math.floor(Math.random() * 7) + 1,      
                 decalStyle: Math.floor(Math.random() * 3) + 1,     
                 noseStyle: Math.floor(Math.random() * 2) + 1,      
-                engineLayout: Math.floor(Math.random() * 4) + 1,   
-                hasGunPods: Math.random() > 0.4,                   
-                invertWings: Math.random() > 0.5,
+                engineLayout: Math.floor(Math.random() * 6) + 1,   
+                hasGunPods: Math.random() > 0.5,                   
+                invertWings: Math.random() > 0.75,
                 sizeMult: 0.85 + Math.random() * 0.2,
                 wingWidthMult: 0.85 + Math.random() * 0.35,  
                 podLengthMult: 0.85 + Math.random() * 0.3,   
@@ -1448,8 +1502,10 @@ const SHIP_SKINS = {
                 podLengthRandom: 0.35 + Math.random() * 0.45,
                 podWidthRandom: 1.0 + Math.random() * 2.0,
                 podStyle: Math.floor(Math.random() * 3) + 1,
-                weaponTrait: chosenTrait
+                weaponTrait: chosenTrait,
+                shieldTrait: chosenShieldTrait // Saved to cache pool for player configuration lookups!
             };
+
             
             player.needsNewShip = false; 
             
@@ -1522,22 +1578,36 @@ const SHIP_SKINS = {
                 ctx.beginPath();
                 ctx.arc(22 * wM, 6 * pM, 16 * pM, 0, Math.PI * 2);  
                 ctx.fill(); ctx.stroke();
-                       } else if (type === 5) {
+             } else if (type === 5) {
                 // =========================================================================
-                // IN-GAME TYPE 5 Blueprints: SNUB WING PANEL BASE (INHERITS PRIMARY MAIN COLOR)
+                // IN-GAME TYPE 5 Blueprints: SNUB WING PANEL BASE (CRASH-PROOF ARGUMENT BINDING)
                 // =========================================================================
-                // By drawing a clean vector path loop here, it automatically uses the global
-                // main hull color defined at the top of your function—never hollow black!
+                // FIXED IN-GAME STACK: Reads 'invert' directly from the function arguments 
+                // instead of an undefined 'cache' object to guarantee 100% stable execution!
+                const isWingInverted = invert || false;
+                let yShift = isWingInverted ? -16 * pM : 0;
+
                 ctx.beginPath();
-                ctx.moveTo(10, -18 * pM);
-                ctx.lineTo(22 * wM, -18 * pM);
-                ctx.lineTo(24 * wM, -14 * pM); 
-                ctx.lineTo(24 * wM, 34 * pM);
-                ctx.bezierCurveTo(24 * wM, 42 * pM, 14 * wM, 42 * pM, 12 * wM, 40 * pM);
-                ctx.lineTo(0, 44 * pM);
+                ctx.moveTo(10, (-18 * pM) + yShift);
+                ctx.lineTo(16 * wM, (-18 * pM) + yShift);
+                // Widen out to 32 and pulled lower down to Y=0 to match your refined profile
+                ctx.lineTo(32 * wM, (0 * pM) + yShift); 
+                ctx.lineTo(24 * wM, (34 * pM) + yShift);
+                ctx.bezierCurveTo(24 * wM, (42 * pM) + yShift, 14 * wM, (42 * pM) + yShift, 12 * wM, (40 * pM) + yShift);
+                ctx.lineTo(0, (44 * pM) + yShift);
+                ctx.closePath();
+                ctx.fill(); ctx.stroke();
+
+                // Embedded Black Triangular Inset Marking Panel (Tracks Shift Symmetrically)
+                ctx.fillStyle = '#1e1b18';
+                ctx.beginPath();
+                ctx.moveTo(14 * wM, (-8 * pM) + yShift);
+                ctx.lineTo(26 * wM, (1 * pM) + yShift); // Follows the wider, lower outer contour angle
+                ctx.lineTo(14 * wM, (18 * pM) + yShift);
                 ctx.closePath();
                 ctx.fill(); ctx.stroke();
             }
+
 
             // =========================================================================
             // NEW IN-GAME TYPE 6: RECTANGULAR INDUSTRIAL ASSEMBLY + FORCED DISC INSERT
@@ -1627,7 +1697,7 @@ const SHIP_SKINS = {
         drawComponentSide(true, window.proceduralShipCache.wingStyle, window.proceduralShipCache.invertWings, true);
 
         let noseY = (window.proceduralShipCache.noseStyle === 2) ? -66 : -44;
-        ctx.beginPath(); ctx.moveTo(0, noseY); ctx.lineTo(5, noseY + 4); ctx.lineTo(5, 44); ctx.lineTo(-5, 44); ctx.lineTo(-5, noseY + 4); ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, noseY); ctx.lineTo(5, noseY + 4); ctx.lineTo(5, 22); ctx.lineTo(-5, 22); ctx.lineTo(-5, noseY + 4); ctx.closePath(); ctx.fill(); ctx.stroke();
         ctx.shadowBlur = 0; 
 
         // ==========================================
@@ -1647,28 +1717,106 @@ const SHIP_SKINS = {
         // 4. MAIN INNER FUSELAGE CENTRAL CORE
         // ==========================================
         ctx.fillStyle = '#1e1b18'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
-        ctx.beginPath();
-ctx.moveTo(0, noseY + 12); ctx.bezierCurveTo(5, noseY + 12, 7, -20, 7, -10); ctx.lineTo(7, 32); ctx.bezierCurveTo(3, 36, -3, 36, -7, 32); ctx.lineTo(-7, -10); ctx.bezierCurveTo(-7, -20, -5, noseY + 12, 0, noseY + 12);
-ctx.closePath(); ctx.fill(); ctx.stroke();
-// Draw structural dark core plates over wing systems dynamically
-function drawInteriorMechanics(isLeft, type, invert) {
-ctx.save();
-if (isLeft) ctx.scale(-1, 1);
-if (invert) ctx.scale(1, -1);
-ctx.fillStyle = '#1e1b18'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
-const wM = window.proceduralShipCache.wingWidthMult;
-const pM = window.proceduralShipCache.podLengthMult;
-if (type === 1) {
-ctx.fillRect(12, -14 * pM, 8 * wM, 44 * pM);
-} else if (type === 2 || type === 4 || type === 5) {
-ctx.fillRect(5, 12 * pM, 8 * wM, 20 * pM);
-} else if (type === 3) {
-ctx.beginPath(); ctx.moveTo(14, 6 * pM); ctx.lineTo(34 * wM, 6 * pM); ctx.lineTo(34 * wM, 20 * pM); ctx.lineTo(14, 26 * pM); ctx.closePath(); ctx.fill(); ctx.stroke();
-}
-ctx.restore();
-}
-drawInteriorMechanics(false, window.proceduralShipCache.wingStyle, window.proceduralShipCache.invertWings);
-drawInteriorMechanics(true, window.proceduralShipCache.wingStyle, window.proceduralShipCache.invertWings);
+        
+        // Define a numeric style variable (1 = Sleek/Default, 2 = Cobra/V-Shape, 3 = Teardrop)
+        if (typeof window.proceduralShipCache.hullStyle === 'undefined') {
+            window.proceduralShipCache.hullStyle = Math.floor(Math.random() * 3) + 1;
+        }
+
+        if (window.proceduralShipCache.hullStyle === 1) {
+            // --- 1. SLEEK (Original) ---
+            ctx.beginPath();
+            ctx.moveTo(0, noseY + 12); ctx.bezierCurveTo(5, noseY + 12, 7, -20, 7, -10); ctx.lineTo(7, 32); ctx.bezierCurveTo(3, 36, -3, 36, -7, 32); ctx.lineTo(-7, -10); ctx.bezierCurveTo(-7, -20, -5, noseY + 12, 0, noseY + 12);
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+
+     
+
+        } else if (window.proceduralShipCache.hullStyle === 2) {
+            // --- 2. V-SHAPE / COBRA COWL (Aggressive Winged Fork) ---
+            const prongWidth = 18;  // Outer span width of the fork points
+            
+            ctx.beginPath();
+            // Start at the center indentation point of the front V notch
+            ctx.moveTo(0, noseY + 10); 
+            
+            // Sweep up and outward to the sharp Starboard pincer prong tip
+            ctx.lineTo(prongWidth, noseY); 
+            // Flare backward down the side to create the aggressive wing shelf
+            ctx.bezierCurveTo(prongWidth, noseY + 14, prongWidth * 0.7, noseY + 16, 7, -10); 
+            
+            // Core mid-flank line and engine alignment path (Untouched for stability)
+            ctx.lineTo(7, 32);
+            ctx.bezierCurveTo(3, 36, -3, 36, -7, 32);
+            ctx.lineTo(-7, -10);
+            
+            // Port mirror return path (Back up to the left side and prong tip)
+            ctx.bezierCurveTo(-prongWidth * 0.7, noseY + 16, -prongWidth, noseY + 14, -prongWidth, noseY);
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+
+            // Inner Chevron "V" Arrow Decal (Dynamically proportional scale matching the mockup)
+            ctx.fillStyle = window.proceduralShipCache.trimColor;
+            
+            const availableDistance = Math.abs(noseY - (-14));
+            const dynamicEndPosition = noseY + (availableDistance * 0.75);
+            const decalWidth = prongWidth * 0.45;
+
+            ctx.beginPath();
+            ctx.moveTo(0, noseY + 16);
+            ctx.lineTo(decalWidth, noseY + 8);
+            ctx.lineTo(decalWidth * 0.5, noseY + 8);
+            ctx.lineTo(0, dynamicEndPosition); // Points perfectly down right above the cockpit
+            ctx.lineTo(-decalWidth * 0.5, noseY + 8);
+            ctx.lineTo(-decalWidth, noseY + 8);
+            ctx.closePath(); ctx.fill();
+
+        } else if (window.proceduralShipCache.hullStyle === 3) {
+            // --- 3. TEARDROP ---
+            const bulbWidth = 14;   
+            
+            // Accent Color Shadow Rim Offset (+1.5px outward glow look)
+            ctx.strokeStyle = window.proceduralShipCache.trimColor; ctx.lineWidth = 5; 
+            ctx.beginPath();
+            ctx.moveTo(0, noseY); ctx.bezierCurveTo(bulbWidth, noseY, bulbWidth, -15, bulbWidth, 0); ctx.bezierCurveTo(bulbWidth * 0.5, 20, 7, 28, 7, 32); ctx.bezierCurveTo(3, 36, -3, 36, -7, 32); ctx.bezierCurveTo(-bulbWidth * 0.5, 20, -bulbWidth, -15, -bulbWidth, 0); ctx.bezierCurveTo(-bulbWidth, -15, -bulbWidth, noseY, 0, noseY);
+            ctx.closePath(); ctx.stroke();
+
+            // Main Core Fuselage Overlay
+            ctx.fillStyle = '#1e1b18'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, noseY); ctx.bezierCurveTo(bulbWidth, noseY, bulbWidth, -15, bulbWidth, 0); ctx.bezierCurveTo(bulbWidth * 0.5, 20, 7, 28, 7, 32); ctx.bezierCurveTo(3, 36, -3, 36, -7, 32); ctx.bezierCurveTo(-bulbWidth * 0.5, 20, -bulbWidth, -15, -bulbWidth, 0); ctx.bezierCurveTo(-bulbWidth, -15, -bulbWidth, noseY, 0, noseY);
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+
+            // Dynamic Proportional Triangle Pinstripe (Set to your perfected 0.75 ratio)
+            ctx.fillStyle = window.proceduralShipCache.trimColor;
+            const availableDistance = Math.abs(noseY - (-14));
+            const dynamicEndPosition = noseY + (availableDistance * 0.75);
+
+            ctx.beginPath();
+            ctx.moveTo(0, noseY + 5); 
+            ctx.lineTo(3.5, dynamicEndPosition); 
+            ctx.lineTo(-3.5, dynamicEndPosition);
+            ctx.closePath(); ctx.fill();
+        }
+
+        // Draw structural dark core plates over wing systems dynamically
+        function drawInteriorMechanics(isLeft, type, invert) {
+            ctx.save();
+            if (isLeft) ctx.scale(-1, 1);
+            if (invert) ctx.scale(1, -1);
+            ctx.fillStyle = '#1e1b18'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
+            const wM = window.proceduralShipCache.wingWidthMult;
+            const pM = window.proceduralShipCache.podLengthMult;
+            if (type === 1) {
+                ctx.fillRect(12, -14 * pM, 8 * wM, 44 * pM);
+            } else if (type === 2 || type === 4 || type === 5) {
+                ctx.fillRect(5, 12 * pM, 8 * wM, 20 * pM);
+            } else if (type === 3) {
+                ctx.beginPath(); ctx.moveTo(14, 6 * pM); ctx.lineTo(34 * wM, 6 * pM); ctx.lineTo(34 * wM, 20 * pM); ctx.lineTo(14, 26 * pM); ctx.closePath(); ctx.fill(); ctx.stroke();
+            }
+            ctx.restore();
+        }
+        drawInteriorMechanics(false, window.proceduralShipCache.wingStyle, window.proceduralShipCache.invertWings);
+        drawInteriorMechanics(true, window.proceduralShipCache.wingStyle, window.proceduralShipCache.invertWings);
+
 // ==========================================
 // 5. PROCEDURAL FUEL POD DECAL ACCENTS
 // ==========================================
@@ -1710,9 +1858,7 @@ function drawPodDecals(isLeft, type, invert, decalMode) {
         }
         
        } 
-    // =========================================================================
-    // IN-GAME OVERLAY FEATURE: TOP-LAYER BLACK SPHERE-ROD ENGINE INJECTOR
-    // =========================================================================
+    
     // Stamps your crisp, solid mechanical weapon rods right over the wing colors!
     else if (type === 5) {
         ctx.save();
@@ -1722,54 +1868,173 @@ function drawPodDecals(isLeft, type, invert, decalMode) {
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 1.5;
 
+        // FIXED IN-GAME STACK: Reads the incoming structural argument passed from your loop call
+        // This maps cleanly whether it evaluates to true or false, completely avoiding undefined property drops!
+        const isWingInverted = invert || false;
+        let yShift = isWingInverted ? -16 * pM : 0;
+
         const rodX = 16 * wM; 
         const rodWidth = 4 * wM; 
-        const startY = 30 * pM;  
-        const endY = -10 * pM;   
+        const startY = (30 * pM) + yShift;  
+        const endY = (-10 * pM) + yShift;   
         const headRadius = 8 * wM; 
+
+        // --- BULLETPROOF SELF-CONTAINED MIDPOINT ---
+        const midY = (endY + startY) / 2;
 
         // 1. Draw the vertical structural black link shaft rod
         ctx.beginPath();
         ctx.fillRect(rodX - (rodWidth / 2), endY, rodWidth, startY - endY);
         ctx.strokeRect(rodX - (rodWidth / 2), endY, rodWidth, startY - endY);
 
-        // 2. Draw the heavy black forward tracking head sphere
+        // 2. Draw the heavy black sphere directly at the midpoint line
         ctx.beginPath();
-        ctx.arc(rodX, endY, headRadius, 0, Math.PI * 2);
+        ctx.arc(rodX, midY, headRadius, 0, Math.PI * 2);
         ctx.fill(); 
         ctx.stroke();
         
         ctx.restore();
     }
+
     ctx.restore();
 }
+// Balanced global invoker lines left untouched for engine execution stability
 drawPodDecals(false, window.proceduralShipCache.wingStyle, window.proceduralShipCache.invertWings, window.proceduralShipCache.decalStyle);
 drawPodDecals(true, window.proceduralShipCache.wingStyle, window.proceduralShipCache.invertWings, window.proceduralShipCache.decalStyle);
+
 
 // =========================================================================
 // 6. THRUSTERS, WEAPONS, AND CANOPY WINDOWS (UN-CLIPPED PRODUCTION RECOVERY)
 // =========================================================================
+// =========================================================================
+// --- 5. ENGINE THRUSTER CHANNELS ---
+// =========================================================================
 ctx.fillStyle = '#1e1b18';
+ctx.strokeStyle = '#ffffff';
+ctx.lineWidth = 2;
+
 const eS = window.proceduralShipCache.engineScale;
-if (window.proceduralShipCache.engineLayout === 1) {
-ctx.beginPath(); ctx.moveTo(-5 * eS, 32); ctx.lineTo(5 * eS, 32); ctx.lineTo(8 * eS, 42); ctx.lineTo(-8 * eS, 42); ctx.closePath(); ctx.fill(); ctx.stroke();
-} else if (window.proceduralShipCache.engineLayout === 2) {
-ctx.beginPath(); ctx.moveTo(6 * eS, 32); ctx.lineTo(14 * eS, 32); ctx.lineTo(16 * eS, 42); ctx.lineTo(4 * eS, 42); ctx.closePath(); ctx.fill(); ctx.stroke();
-ctx.beginPath(); ctx.moveTo(-6 * eS, 32); ctx.lineTo(-14 * eS, 32); ctx.lineTo(-16 * eS, 42); ctx.lineTo(-4 * eS, 42); ctx.closePath(); ctx.fill(); ctx.stroke();
-} else if (window.proceduralShipCache.engineLayout === 3) {
-for (let i = 0; i < 8; i++) {
-ctx.fillRect((-22 + (i * 6)) * eS, 34, 4 * eS, 8);
-ctx.strokeRect((-22 + (i * 6)) * eS, 34, 4 * eS, 8);
-}
+const layoutType = window.proceduralShipCache.engineLayout || 1;
+
+if (layoutType === 1) {
+    // --- 1. SINGLE CENTRAL NOZZLE ---
+    const nozzleScale = 1.25; const sES = eS * nozzleScale;
+    ctx.beginPath(); 
+    ctx.moveTo(-5 * sES, 34); ctx.lineTo(5 * sES, 34); ctx.lineTo(8 * sES, 48); 
+    ctx.quadraticCurveTo(0, 50 * eS, -8 * sES, 48); 
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+
+    ctx.strokeStyle = window.proceduralShipCache.trimColor;
+    ctx.beginPath(); ctx.moveTo(-7.5 * sES, 44.5); ctx.quadraticCurveTo(0, 46.5 * eS, 7.5 * sES, 44.5); ctx.stroke();
+
+} else if (layoutType === 2) {
+    // --- 2. DUAL OUTBOARD PODS ---
+    ctx.beginPath(); ctx.moveTo(6 * eS, 34); ctx.lineTo(14 * eS, 34); ctx.lineTo(16 * eS, 48); ctx.lineTo(4 * eS, 48); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-6 * eS, 34); ctx.lineTo(-14 * eS, 34); ctx.lineTo(-16 * eS, 48); ctx.lineTo(-4 * eS, 48); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.strokeStyle = window.proceduralShipCache.trimColor; ctx.beginPath(); ctx.moveTo(6.5 * eS, 37.5); ctx.lineTo(13.5 * eS, 37.5); ctx.moveTo(-6.5 * eS, 37.5); ctx.lineTo(-14.5 * eS, 37.5); ctx.stroke();
+
+} else if (layoutType === 3) {
+    // --- 3. WIDER 6-PILL ARRAY (Reverse Staggered) ---
+    const widthStretch = 1.10; 
+    const pillX = [-15, -9, -3, 3, 9, 15].map(x => x * widthStretch); 
+    const pW = 5 * eS * widthStretch; const pH = 12;
+    
+    for (let i = 0; i < 6; i++) {
+        const startX = (pillX[i] * eS) - (pW / 2);
+        let startY = 34;
+        if (i === 1 || i === 4) startY = 36;
+        if (i === 2 || i === 3) startY = 38;
+
+        ctx.fillStyle = '#1e1b18';
+        ctx.fillRect(startX, startY, pW, pH); 
+        ctx.strokeRect(startX, startY, pW, pH);
+    }
+
+} else if (layoutType === 4) {
+    // --- 4. TRIPLE ENGINE BLOCK ---
+    const baseScale = 1.15; const bES = eS * baseScale;
+    const outLeftX = 7 * bES + 2; const outRightX = 15 * bES + 2;
+
+    ctx.beginPath(); ctx.moveTo(outLeftX, 34); ctx.lineTo(outRightX, 34); ctx.lineTo(outRightX + 2 * bES, 48); ctx.lineTo(outLeftX - 2 * bES, 48); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-outLeftX, 34); ctx.lineTo(-outRightX, 34); ctx.lineTo(-outRightX - 2 * bES, 48); ctx.lineTo(-outLeftX + 2 * bES, 48); ctx.closePath(); ctx.fill(); ctx.stroke();
+    
+    const middleScale = 1.35; const mES = eS * middleScale;
+    const middleY = 37; 
+    
+    ctx.beginPath(); 
+    ctx.moveTo(-4 * mES, middleY); ctx.lineTo(4 * mES, middleY); 
+    ctx.lineTo(6.5 * mES, middleY + 14); ctx.lineTo(-6.5 * mES, middleY + 14); 
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+
+    ctx.strokeStyle = window.proceduralShipCache.trimColor; ctx.beginPath();
+    ctx.moveTo(-outRightX - 1 * bES, 44.5); ctx.lineTo(-outLeftX + 1 * bES, 44.5);
+    ctx.moveTo(outLeftX - 1 * bES, 44.5); ctx.lineTo(outRightX + 1 * bES, 44.5);
+    ctx.moveTo(-6 * mES, middleY + 10.5); ctx.lineTo(6 * mES, middleY + 10.5); 
+    ctx.stroke();
+
+} else if (layoutType === 5) {
+    // --- 5. FOUR ENGINE PILLS ---
+    const pillX = [-18, -6, 6, 18];
+    const pW = 7 * eS; const pH = 14;
+    
+    for (let i = 0; i < 4; i++) {
+        const isInner = (i === 1 || i === 2);
+        const currentScale = isInner ? 1.1 : 1.0; 
+        const currentWidth = pW * currentScale; const currentHeight = pH * currentScale;
+        const startY = isInner ? 31 : 34; 
+        const startX = (pillX[i] * eS) - (currentWidth / 2);
+        
+        ctx.fillRect(startX, startY, currentWidth, currentHeight); 
+        ctx.strokeRect(startX, startY, currentWidth, currentHeight);
+        
+        ctx.fillStyle = window.proceduralShipCache.trimColor; ctx.beginPath(); 
+        ctx.arc(pillX[i] * eS, startY + currentHeight - 2, 2.5 * eS, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#1e1b18';
+    }
+
+} else if (layoutType === 6) {
+    // --- 6. ALIEN DRIVE CAULDRON ---
+    const cW = 20 * eS; const cH = 12;
+    const alienY = 37; 
+    
+    ctx.beginPath(); 
+    ctx.moveTo(-cW / 2, alienY); ctx.lineTo(cW / 2, alienY); 
+    ctx.bezierCurveTo(cW / 2, alienY + cH * 0.8, cW / 3, alienY + cH, 0, alienY + cH); 
+    ctx.bezierCurveTo(-cW / 3, alienY + cH, -cW / 2, alienY + cH * 0.8, -cW / 2, alienY); 
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    
+    ctx.strokeStyle = window.proceduralShipCache.trimColor; ctx.lineWidth = 2;
+    const lineLength = 9;
+    const radialAngles = [Math.PI * 0.85, Math.PI * 0.68, Math.PI * 0.50, Math.PI * 0.32, Math.PI * 0.15];
+    const lineOffsets = [-7, -3.5, 0, 3.5, 7];
+
+    for (let i = 0; i < 5; i++) {
+        const angle = radialAngles[i];
+        const startX = lineOffsets[i] * eS; const startY = alienY + cH - 1.5; 
+        const endX = startX + (Math.cos(angle) * lineLength * eS * 0.7);
+        const endY = startY + (Math.sin(angle) * lineLength);
+        ctx.beginPath(); ctx.moveTo(startX, startY); ctx.lineTo(endX, endY); ctx.stroke();
+    }
+
 } else {
-for (let i = 0; i < 8; i++) {
-ctx.fillRect((-22 + (i * 6)) * eS, 34, 4 * eS, 6);
-ctx.fillRect((-22 + (i * 6)) * eS, 40, 4 * eS, 6);
-ctx.strokeRect((-22 + (i * 6)) * eS, 34, 4 * eS, 6);
-ctx.strokeRect((-22 + (i * 6)) * eS, 40, 4 * eS, 6);
+    // --- ORIGINAL RECONSTRUCTED 6-PILL BACKUP CONFIGURATION (FALLBACK STATE) ---
+    const widthStretch = 1.10;
+    const pillX = [-15, -9, -3, 3, 9, 15].map(x => x * widthStretch);
+    const pW = 5 * eS * widthStretch; const pH = 12;
+    for (let i = 0; i < 6; i++) {
+        const startX = (pillX[i] * eS) - (pW / 2);
+        let startY = 34;
+        if (i === 1 || i === 4) startY = 36;
+        if (i === 2 || i === 3) startY = 38;
+
+        ctx.fillStyle = '#1e1b18';
+        ctx.fillRect(startX, startY, pW, pH); ctx.strokeRect(startX, startY, pW, pH);
+    }
 }
-}
-// Central Canopy Visor Frame
+
+// =========================================================================
+// --- 7. CENTRAL CANOPY VISOR FRAME ---
+// =========================================================================
 ctx.fillStyle = '#ffffff';
 ctx.strokeStyle = '#ffffff';
 ctx.beginPath();
@@ -1778,13 +2043,16 @@ ctx.lineTo(4, -2);
 ctx.lineTo(-4, -2);
 ctx.closePath();
 ctx.fill();
+
 ctx.lineWidth = 2;
 ctx.beginPath();
 ctx.moveTo(-4, 4); ctx.lineTo(4, 4);
 ctx.moveTo(-4, 10); ctx.lineTo(4, 10);
 ctx.stroke();
+
 ctx.strokeStyle = window.proceduralShipCache.trimColor;
 ctx.strokeRect(-3, 16, 6, 8);
+
 // =========================================================================
 // FIXED FEATURE: TOPMOST SYMMETRICAL RE-COLORED LONG GUN POD OVERRIDES
 // =========================================================================
@@ -2001,12 +2269,14 @@ window.closeShipyardModal = function() {
 
         const ASTEROID_TYPES = {
             GENERIC: { name: 'Generic', color: '#888899', mineral: null },
+            IRON: { name: 'Metallic', color: '#8c8c8c', mineral: null },
             GOLD: { name: 'Auric', color: 'rgba(255, 215, 0, 0.9)', mineral: 'gold' },
             URANIUM: { name: 'Radiant', color: 'rgba(57, 255, 20, 0.9)', mineral: 'uranium' },
             ERIDIUM: { name: 'Nebula', color: 'rgba(218, 112, 214, 0.9)', mineral: 'eridium' }
         };
 
         const MINERAL_COLORS = {
+            iron: '#8c8c8c',
             gold: '#ffd700',
             uranium: '#39ff14',
             eridium: '#da70d6'
@@ -2182,30 +2452,30 @@ function setHomeworldFromRecord(record) {
 
 function generateHomeworldName() {
     const prefixes = [
-        "Zor", "Sun", "Kael", "Vex", "Grom",
-        "Thra", "Nix", "Crom", "Phas", "Yor",
-        "Kor", "Ai", "Bo", "Vel", "Sha",
+        "Zor", "Sun", "Kael", "Ven", "Grom", "Ump",
+        "Thra", "Nix", "Fom", "Phas", "Yor",
+        "Kor", "Ai", "Bo", "Vel", "Sha","Len", 
         "Vor", "Tyr", "Kel", "Ryn", "Oth"
     ];
 
     const roots = [
-        "ath", "ox", "ion", "or", "ur",
-        "ell", "on", "ax", "ul", "un",
+        "ath", "ox", "ion", "or", "ur", "ie",
+        "ell", "on", "ax", "ul", "un", "dro",
         "eth", "lek", "rin", "vek", "ith",
         "ara", "esh", "ok", "trek", "strin"
     ];
 
     const alienPrefixes = [
-        "Kor", "Ai", "Bo", "Sha", "Vor",
-        "Ka", "Zha", "Th", "Qor", "Xe",
-        "Ul", "Rae", "Vek", "Oth", "Sae"
+        "R", "Ai", "Bo", "Sha", "Vor", "Yt",
+        "Ka", "Zha", "Th", "Qor", "Xe", "Ugi",
+        "Ul", "Rae", "Vek", "Oth","Gr", "Sae"
     ];
 
     const alienRoots = [
         "leth", "strin", "trek", "vek",
         "thar", "qel", "rin", "vor",
         "esh", "keth", "zai", "lor",
-        "rek", "ul", "ith"
+        "rek", "ul", "ypth"
     ];
 
     const suffixes = [
@@ -2339,7 +2609,7 @@ function generateHomeworldName() {
             saveGame();
         }
 
-        function saveGame() {
+ function saveGame() {
     try {
         localStorage.setItem(SAVE_KEY, JSON.stringify({
             currentSector,
@@ -2380,7 +2650,7 @@ function loadGame() {
             uranium: Math.max(0, Number(saved.player.cargo?.uranium) || 0),
             eridium: Math.max(0, Number(saved.player.cargo?.eridium) || 0)
         };
-        player.shield = Math.max(1, Math.min(player.maxShield, Number(saved.player.shield) || player.maxShield));
+        
         homeworldCache = saved.homeworldCache && typeof saved.homeworldCache === 'object'
             ? saved.homeworldCache
             : {};
@@ -2402,13 +2672,20 @@ function loadGame() {
         player.lastRandomBackup = saved.player.lastRandomBackup || null;
 
         // =============================================================
-        // FIXED INITIALIZATION STAT SYNC
+        // STEP 1: INITIALIZE MODIFIER SHIELD TRAITS FIRST
         // =============================================================
         // Runs our helper to perfectly synchronize engine thrust, friction drag, 
-        // and firing cooldown rates based on whatever save file skin is loaded.
+        // maxShield ceilings, and firing rates based on the save file skin.
         if (typeof applyShipModifiers === 'function') {
             applyShipModifiers(ACTIVE_SHIP_SKIN);
         }
+
+        // =============================================================
+        // STEP 2: LOAD SHIELD VALUE SAFELY INTO THE NEW MATURED CAPACITY
+        // =============================================================
+        // Now that player.maxShield is accurately calculated (e.g. 121), loading 
+        // player.shield will never cap it down to 100 accidentally!
+        player.shield = Math.max(1, Math.min(player.maxShield, Number(saved.player.shield) || player.maxShield));
         
     } catch (error) {
         console.warn('Starpath save could not be loaded:', error);
@@ -2792,7 +3069,7 @@ function resetGame() {
                 radius: 15,
                 lastShot: 0,
                 shootDelay: Math.max(900, 1700 - (currentSector * 150)),
-                hp: 2 + Math.floor(currentSector / 2)
+                hp: 5 + Math.floor(currentSector / 2)
             });
         }
 
@@ -2805,7 +3082,7 @@ function resetGame() {
                 speed: 0.95 + (currentSector * 0.1),
                 radius: 22,
                 lastShot: 0,
-                shootDelay: 2100,
+                shootDelay: 1700,
                 hp: (5 + currentSector) * 2,
                 alertDistance: 500,
                 alerted: false,
@@ -3161,7 +3438,6 @@ generateBackgroundAssets();
                     if (particles.length > 250) particles.shift();
                 }
             }
-
             player.vx *= player.friction;
             player.vy *= player.friction;
             player.x += player.vx;
@@ -3170,6 +3446,15 @@ generateBackgroundAssets();
             wrapEntity(player);
 
             if (player.invulnerable > 0) player.invulnerable--;
+
+            // --- TIME-BASED SHIELD REGENERATION HANDLER ---
+            // If shield is damaged but alive, check if enough time has passed to add 1 point
+            if (player.shield > 0 && player.shield < player.maxShield) {
+                if (Date.now() - player.lastShieldTick > player.shieldRegenInterval) {
+                    player.shield += 1; // Add exactly 1 whole shield point
+                    player.lastShieldTick = Date.now(); // Reset the time window tracker for the next point
+                }
+            }
 
              // =========================================================================
             // UPGRADED PLAYER MULTI-TRAIT FIRING LOOP SYSTEM
@@ -3202,7 +3487,6 @@ generateBackgroundAssets();
                             color: '#77cc99' 
                         });
                     }
-                    if (typeof spawnBurst === 'function') spawnBurst(baseBulletX, baseBulletY, '#77cc99', 8);
 
                 } else if (activeTrait === 'DOUBLE') {
                     // 🚀 DOUBLE BARREL / INTERCEPTOR MODIFIER
@@ -3226,10 +3510,6 @@ generateBackgroundAssets();
                         vy: Math.sin(player.angle) * 7.5 + player.vy,
                         life: 74, color: '#ffffff'
                     });
-                    if (typeof spawnBurst === 'function') {
-                        spawnBurst(leftBarrelX, leftBarrelY, '#ffffff', 4);
-                        spawnBurst(rightBarrelX, rightBarrelY, '#ffffff', 4);
-                    }
 
                 } else {
                     //  STANDARD LINEAR FIRE / SLICKBACK BASELINE
@@ -3240,7 +3520,6 @@ generateBackgroundAssets();
                         life: 74,
                         color: ACTIVE_SHIP_SKIN === 'SLICKBACK' ? '#d4b0db' : '#ffffff' 
                     });
-                    if (typeof spawnBurst === 'function') spawnBurst(baseBulletX, baseBulletY, '#ffffff', 5);
                 }
 
                 player.lastShot = Date.now();
@@ -3744,6 +4023,7 @@ generateBackgroundAssets();
                     }
                 }
 
+                // enemy damage bullets to player
                 for (let j = enemyBullets.length - 1; j >= 0; j--) {
                     const eb = enemyBullets[j];
                     if (distanceBetween(player, eb) < player.radius) {
@@ -3761,6 +4041,7 @@ generateBackgroundAssets();
 
 
 
+
 // =========================================================================
 // UNIVERSAL SHIP MODIFIER SYNCRONIZATION SYSTEM
 // =========================================================================
@@ -3771,18 +4052,34 @@ function applyShipModifiers(skinKey) {
     player.thrust = mods.thrust;
     player.friction = mods.friction;
 
+    // --- 1. DEFAULT BASELINE SHIELD RULES (Min Boundaries) ---
+    let targetMaxShield = 100;
+    let targetRegenInterval = 5000; // 2.5s base rate
+    let targetAbsorption = 0.0;     // 0% damage blocked
+
+    // --- 2. EVALUATE WEAPONS & SHIELDS BY SKIN TYPING ---
     if (skinKey === 'INTERCEPTOR') {
         player.shootDelay = 120; 
+        targetMaxShield = 175;
+        targetRegenInterval = 1750; // Fixed fast rate for named Interceptor
+
     } else if (skinKey === 'SCIENCE') {
         player.shootDelay = 300; 
+        targetMaxShield = 200; // Fixed heavy pool for named Science
+
+    } else if (skinKey === 'MOSQUITO') {
+        player.shootDelay = 150; 
+        targetAbsorption = 0.25; // Fixed flat armor for named Mosquito
+
     } else if (skinKey === 'RANDOM') {
+        // --- PROCESS RANDOM PROCEDURAL CACHE MODIFIERS ---
+        
+        // Handle Weapon Traits
         if (window.proceduralShipCache && window.proceduralShipCache.weaponTrait) {
             const trait = window.proceduralShipCache.weaponTrait;
-            
             if (trait === 'HOMING') {
-                // FIXED CAP: Reduced shot cooldown down to 188ms for a faster firing rate!
-                player.shootDelay = 188; 
-                player.randomShootDelay = 188;
+                player.shootDelay = 200; 
+                player.randomShootDelay = 200;
             } 
             else if (trait === 'SPREAD') {
                 if (!player.randomShootDelay || player.randomShootDelay < 400 || player.randomShootDelay > 520) {
@@ -3797,14 +4094,55 @@ function applyShipModifiers(skinKey) {
                 player.shootDelay = player.randomShootDelay;
             } 
             else {
-                player.shootDelay = 210;
-                player.randomShootDelay = 210;
+                player.shootDelay = 182;
+                player.randomShootDelay = 182;
             }
         } else {
-            player.shootDelay = 210;
+            player.shootDelay = 182;
         }
+
+        // --- CONTINUOUS RANDOM SHIELD TRAIT EXTENSIONS ---
+        if (window.proceduralShipCache && window.proceduralShipCache.shieldTrait) {
+            const sTrait = window.proceduralShipCache.shieldTrait;
+            
+            if (sTrait === 'SHIELD_BOOST') {
+                // Generates a random maximum capacity anywhere between 110 and 140 points
+              targetMaxShield = Math.floor(135 + (Math.random() * 41));
+            } 
+            else if (sTrait === 'REGEN_MATRIX') {
+                // Changing the Math.random() to 1 or 0 will freeze it at a flat, non-random rate if you want later!
+                targetRegenInterval = Math.floor(2000 + (Math.random() * 1001));
+            
+            } 
+            else if (sTrait === 'FORCE_FIELD') {
+                // FIXED BINARY CAP: Set to 1 instead of Math.random() to lock it at exactly 25% (0.25)
+                // Simply change the 1 back to Math.random() if you want to restore the range later!
+                targetAbsorption = 0.10 + (1 * 0.15);
+            }
+        }
+
     } else {
-        player.shootDelay = 188; // FIXED FOR SLICKBACK: Sets your standard homing fighter to 188ms as well!
+        // SLICKBACK BASELINE
+        player.shootDelay = 188; 
+    }
+    
+    // --- 3. COMMIT SHIELD CALCULATIONS TO PLAYER OBJECT ---
+    player.maxShield = targetMaxShield;
+    player.shieldRegenInterval = targetRegenInterval;
+    player.shieldDamageAbsorption = targetAbsorption;
+
+    // =========================================================================
+    // 💥 BULLETPROOF FAIL-SAFE OVERRIDE 💥
+    // =========================================================================
+    // If the player has a bonus pool (like 121) but something else forced their 
+    // active points back down to a flat 100 placeholder, instantly top them off!
+    if (player.shield === 100 && player.maxShield > 100) {
+        player.shield = player.maxShield;
+    }
+
+    // Standard safety boundary check (Keeps shield from exceeding maxShield)
+    if (player.shield > player.maxShield) {
+        player.shield = player.maxShield;
     }
     
     if (skinKey !== 'RANDOM') {
@@ -3813,10 +4151,14 @@ function applyShipModifiers(skinKey) {
 }
 
 
-         function damagePlayer(amount, source = null) {
+        function damagePlayer(amount, source = null) {
             if (player.needsNewShip) return;
 
-            player.shield -= amount;
+            // --- FORCE FIELD DAMAGE REDUCTION MATRIX ---
+            // Reduces incoming amount by 25% if FORCE_FIELD trait is active, otherwise takes 100%
+            const finalDamage = amount * (1 - (player.shieldDamageAbsorption || 0));
+
+            player.shield -= finalDamage;
             gameAudio.playDamage();
             player.invulnerable = 35; 
             
@@ -3831,6 +4173,7 @@ function applyShipModifiers(skinKey) {
                     player.cargo.uranium = Math.floor(player.cargo.uranium / 2);
                     player.cargo.eridium = Math.floor(player.cargo.eridium / 2);
                 }
+
                 const pirateDeath = pirateStatusUntil > Date.now();
                 const walletLost = pirateDeath ? player.wallet : Math.floor(player.wallet / 2);
                 player.wallet = pirateDeath ? 0 : walletLost;
@@ -3908,6 +4251,50 @@ function updateUI() {
     document.getElementById('stat-goal-fill').style.width = `${goalPct}%`;
     document.getElementById('mobile-goal-fill').style.width = `${goalPct}%`;
 
+       // --- FULLY DYNAMIC COLOR-CODED SHIELD HUD REFRESH LOOP ---
+    const rawRate = (player.shieldRegenInterval / 1000).toFixed(1);
+    const displayRate = parseFloat(rawRate);
+    const roundedCurrentShield = Math.ceil(player.shield);
+
+    // 1. Target UI elements
+    const desktopShieldText = document.getElementById('stat-shield-text');
+    const absorbTextContainer = document.getElementById('stat-shield-absorb');
+    const rateTextContainer = document.getElementById('stat-shield-rate');
+
+    if (desktopShieldText && rateTextContainer) {
+        // --- CORE VALUES (xx/XX) COLORING RULE ---
+        desktopShieldText.innerText = `${roundedCurrentShield}/${player.maxShield}`;
+        // Turns pale greenish (#a1cca5) if max shield is modified above the 100 baseline, fallback to white
+        desktopShieldText.style.color = (player.maxShield > 100) ? '#a1cca5' : '#ffffff';
+
+        // --- ABSORPTION TEXT CONTAINER MATRIX ---
+        if (player.shieldDamageAbsorption > 0) {
+            const absorbPct = Math.round(player.shieldDamageAbsorption * 100);
+            absorbTextContainer.innerText = `[${absorbPct}% SCI BONUS]`;
+            absorbTextContainer.style.color = '#7799cc'; // Light navy blue indicator for active armor
+        } else {
+            absorbTextContainer.innerText = '';
+        }
+
+        // --- RECHARGE INTERVAL RATE COLORING RULE ---
+        rateTextContainer.innerText = `(+1pt/${displayRate}s)`;
+        // Turns a clean pale gold (#e6c687) if it recharges faster than the default 5.0 seconds
+        if (player.shieldRegenInterval < 5000) {
+            rateTextContainer.style.color = '#e6c687';
+            rateTextContainer.style.opacity = '1.0'; // Boost visibility on modification
+        } else {
+            rateTextContainer.style.color = '#ffffff';
+            rateTextContainer.style.opacity = '0.7'; // Standard dim fallback styling rules
+        }
+    }
+
+    // --- REPEAT SYNC HOOKS FOR MOBILE HUD ELEMENTS ---
+    if (document.getElementById('mobile-shield-text')) {
+        const mobileShieldText = document.getElementById('mobile-shield-text');
+        mobileShieldText.innerText = `${roundedCurrentShield}/${player.maxShield}`;
+        mobileShieldText.style.color = (player.maxShield > 100) ? '#a1cca5' : '#ffffff';
+    }
+
     // Shield Gauges
     document.getElementById('stat-shield-fill').style.width = `${shieldPct}%`;
     document.getElementById('stat-shield-fill').style.backgroundColor = shieldColor;
@@ -3920,7 +4307,20 @@ function updateUI() {
     document.getElementById('inv-eridium').innerText = player.cargo.eridium;
 
     // Spaceport Radar Range
-    document.getElementById('spaceport-dist').innerText = `Range: ${Math.floor(baseDist)}m`;
+        const calculatedDistance = Math.floor(baseDist);
+        
+        // 1. Keep your existing paragraph text updated
+       // document.getElementById('spaceport-dist').innerText = `Range: ${calculatedDistance}m`;
+
+        // 2. DYNAMIC BUTTON TEXT: Swap text based on player distance
+        const bankButton = document.getElementById('btn-bank');
+        if (calculatedDistance <= 160) { 
+            // Player is AT homeworld
+            bankButton.innerText = "HOMEWORLD - BANK & REPAIR SHIP";
+        } else {
+            // Player is away from homeworld
+            bankButton.innerText = `HOMEWORLD - Distance: ${calculatedDistance}m`;
+        }
 
     // 3. Handle Pirate Alert Status
     const pirateStatus = document.getElementById('pirate-status');
@@ -4175,10 +4575,15 @@ function updateUI() {
             // ==========================================
             // SCIENCE CHASSIS EXTRA PAYOUT ECONOMY BOOST
             // ==========================================
-            let tradePayout = m.reward;
+                let tradePayout = m.reward;
             
             if (ACTIVE_SHIP_SKIN === 'SCIENCE') {
-                tradePayout = Math.floor(tradePayout * 1.30); // 30% financial earnings boost
+                tradePayout = Math.floor(tradePayout * 1.30); // 30% static financial earnings boost
+            } 
+            else if (ACTIVE_SHIP_SKIN === 'RANDOM' && player && player.shieldDamageAbsorption > 0) {
+                // Dynamic financial boost matching the active absorption trait (e.g., 0.25 absorption = 25% earnings boost)
+                const absorbBonusMultiplier = 1 + player.shieldDamageAbsorption;
+                tradePayout = Math.floor(tradePayout * absorbBonusMultiplier); 
             }
 
             player.wallet += tradePayout;
@@ -4757,6 +5162,7 @@ merchants.forEach(m => {
     ctx.shadowBlur = 0;
     ctx.fillText(`MERCHANT - '${merchantName}'`, 0, 58);
     ctx.restore();
+   
 });
 // Enemy Raiders
 enemies.forEach(e => {
@@ -5166,6 +5572,7 @@ document.addEventListener('click', function(event) {
 
     // FIXED FOR COMFORT: Instantly updates player health indicators to max capacity on checkout!
     player.shield = player.maxShield;
+    
 
     if (typeof gameAudio !== 'undefined' && gameAudio.playSupplyCache) {
         gameAudio.playSupplyCache(); 
@@ -5182,8 +5589,8 @@ document.addEventListener('click', function(event) {
         saveGame();
     }
 });
+//COPYRIGHT SPM 2026
 
-//Copyright Smurphshire 2026
     </script>
 </body>
 </html>
