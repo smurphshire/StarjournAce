@@ -630,8 +630,8 @@
         Shields: 
         <!-- Core numbers split apart from trailing labels -->
         <span id="stat-shield-text" style="color: #ffffff; font-family: monospace;">100/100</span>
-        <span id="stat-shield-absorb" style="font-family: monospace; font-size: 0.9em; margin-left: 4px;"></span>
-        <span id="stat-shield-rate" style="color: #ffffff; font-family: monospace; opacity: 0.7; margin-left: 4px;">(+1pt/5s)</span>
+      <!--Shield Mod Disabled  <span id="stat-shield-absorb" style="font-family: monospace; font-size: 0.9em; margin-left: 4px;"></span>  -->
+      <!--Shield Mod Disabled  <span id="stat-shield-rate" style="color: #ffffff; font-family: monospace; opacity: 0.7; margin-left: 4px;">(+1pt/5s)</span>  -->
     </div>
     <div id="stat-shield-bar" style="height:6px; background:#331111; margin-top:4px; border-radius:3px; overflow:hidden;">
         <div id="stat-shield-fill" style="width:100%; height:100%; background:var(--accent-blue);"></div>
@@ -723,7 +723,7 @@
             3: { name: "The Keziah Nebula", primary: "#da70d6", background: "#06020c", nebula: "rgba(218, 112, 214, 0.05)", generic: "#998899", modifiers: { asteroidSpawn: 1.35, pirateSpawn: 2.3, goldYield: 0.4, uraniumYield: 0.4, eridiumYield: 0.9 } },
             4: { name: "Zelion Territory", primary: "#39ff14", background: "#020603", nebula: "rgba(57, 255, 20, 0.04)", generic: "#8a998a", modifiers: { enemySpawn: 2.2, asteroidSpawn: 3.2, uraniumYield: 2.1 } },
             5: { name: "Supernova Remnant", primary: "#ff6600", background: "#090302", nebula: "rgba(255, 102, 0, 0.06)", generic: "#aa9988", modifiers: { civilianSpawn: 1.4, pirateSpawn: 1.5, uraniumYield: 0.6, eridiumYield: 1.25 } },
-            6: { name: "Empyrean Expanse", primary: "#d5f0f7", background: "#0e1016", nebula: "rgba(236, 0, 255, 0.05)", generic: "#bfe0d5", modifiers: { enemySpawn: 1.0, merchantSpawn: 1.6, civilianSpawn: 3.0, asteroidSpawn: 1.3, goldYield: 1.7, uraniumYield: 1.2, eridiumYield: 1.5 } },
+            6: { name: "Empyrean Expanse", primary: "#d5f0f7", background: "#0b0b0b", nebula: "rgba(236, 0, 255, 0.05)", generic: "#bfe0d5", modifiers: { enemySpawn: 1.0, merchantSpawn: 1.6, civilianSpawn: 3.0, asteroidSpawn: 1.3, goldYield: 1.7, uraniumYield: 1.2, eridiumYield: 1.5 } },
             7: { name: "Solitude Pass", primary: "#7c7c7c", background: "#020208", nebula: "rgba(0, 120, 255, 0.05)", generic: "#888899", modifiers: { enemySpawn: 0.2, merchantSpawn: 0.8, civilianSpawn: 0.2, asteroidSpawn: 1.9, goldYield: 1.2, uraniumYield: 1.2, eridiumYield: 1.6 } },
             8: { name: "Daxus Quadrant", primary: "#fbfbcc", background: "#08060a", nebula: "rgba(0, 120, 255, 0.05)", generic: "#828e8d", modifiers: { enemySpawn: 1.9, civilianSpawn: 1.25, merchantSpawn: 1.8, asteroidSpawn: 2.5, uraniumYield: 1.3 } },
             9: { name: "Nebula Abyss", primary: "#7f77ed", background: "#09070a", nebula: "rgba(218, 112, 214, 0.08)", generic: "#998899", modifiers: { asteroidSpawn: 1.35, pirateSpawn: 2.3, goldYield: 1.4, uraniumYield: 0.4, eridiumYield: 1.9 } },
@@ -789,6 +789,126 @@
 
 // Caches procedural components so the random ship layout doesn't change color every single frame
 let proceduralShipCache = null;
+
+
+// ============================================================================
+// PROCEDURAL RANDOM SHIP CACHE GENERATOR
+// Creates one complete random ship configuration and locks it into the cache.
+// This is used by initial generation, shop rerolls, and ship recovery.
+// ============================================================================
+function generateProceduralShipCache() {
+
+    // Custom Ship Colors
+    const pallets = [
+        '#e5e3e7',
+        '#ffd700',
+        '#ff9d42',
+        '#77cc99',
+        '#00b2e3',
+        '#56c1bc',
+        '#bcbec0',
+        '#ea399a',
+        '#ff3d00'
+    ];
+
+    // Custom ship Accent colors
+    const accents = [
+        '#e1c6e5',
+        '#d4b0db',
+        '#ff9d42',
+        '#77cc99',
+        '#f8d0ac',
+        '#fff200',
+        '#8197cd',
+        '#8dc63f',
+        '#fff799',
+        '#6dcff6',
+        '#ffffff'
+    ];
+
+    // Weapon trait
+    const traitRoll = Math.random();
+    let chosenTrait = 'STANDARD';
+
+    if (traitRoll < 0.22) {
+        chosenTrait = 'HOMING';
+    } else if (traitRoll < 0.44) {
+        chosenTrait = 'SPREAD';
+    } else if (traitRoll < 0.66) {
+        chosenTrait = 'DOUBLE';
+    }
+
+    // Shield trait
+            /*
+        const shieldRoll = Math.random();
+        let chosenShieldTrait = 'STANDARD';
+        let randomBoostFactor = 0;
+
+        if (shieldRoll < 0.33) {
+            chosenShieldTrait = 'SHIELD_BOOST';
+            randomBoostFactor = 0.10 + Math.random() * 0.40; 
+        } else if (shieldRoll < 0.66) {
+            chosenShieldTrait = 'REGEN_MATRIX';
+        } else {
+            chosenShieldTrait = 'FORCE_FIELD';
+        }
+        */
+
+        // MAIN IS SHIELD BOOST ONLY: only enabled shield trait
+        let chosenShieldTrait = 'SHIELD_BOOST';
+        let randomBoostFactor = 0.10 + Math.random() * 0.40;
+
+
+    // Create the complete locked procedural ship configuration.
+    window.proceduralShipCache = {
+
+        wingStyle: Math.floor(Math.random() * 7) + 1,
+
+        decalStyle: Math.floor(Math.random() * 3) + 1,
+
+        noseStyle: Math.floor(Math.random() * 4) + 1,
+
+        hullStyle: Math.floor(Math.random() * 3) + 1,
+
+        engineLayout: Math.floor(Math.random() * 6) + 1,
+
+        hasGunPods: Math.random() > 0.5,
+
+        invertWings: Math.random() > 0.75,
+
+        sizeMult: 0.85 + Math.random() * 0.2,
+
+        wingWidthMult: 0.85 + Math.random() * 0.35,
+
+        podLengthMult: 0.85 + Math.random() * 0.3,
+
+        engineScale: 0.9 + Math.random() * 0.25,
+
+        hullColor:
+            pallets[Math.floor(Math.random() * pallets.length)],
+
+        trimColor:
+            accents[Math.floor(Math.random() * accents.length)],
+
+        podLengthRandom: 0.35 + Math.random() * 0.45,
+
+        podWidthRandom: 1.0 + Math.random() * 2.0,
+
+        podStyle: Math.floor(Math.random() * 3) + 1,
+
+        weaponTrait: chosenTrait,
+
+        shieldTrait: chosenShieldTrait,
+
+        // IMPORTANT:
+        // This is the persistent random factor used to calculate
+        // this ship's maximum shield capacity.
+        shieldBoostAmount: randomBoostFactor
+    };
+
+    return window.proceduralShipCache;
+}
+
 
 const SHIP_SKINS = {
     // Original Arcade Wireframe / Vector Style
@@ -1420,100 +1540,24 @@ const SHIP_SKINS = {
 
 
     // Modular Random Custom Component Mixer - REPAIRING INVULNERABILITY STATE LOCK
-    'RANDOM': function(ctx, player) {
-        if (!window.proceduralShipCache) {
+'RANDOM': function(ctx, player) {
 
+    if (!window.proceduralShipCache) {
 
-            // Custome Ship Colors
-            const pallets = [
-              //  '#e1c6e5', // lavender pink
-                '#e5e3e7', // very light gray
-              //  '#e4e8e3', // near white gray
-                '#ffd700', // Bright Yellow
-                '#ff9d42',  //Bright Orange
-                '#77cc99', // Bright Mint Green
-                '#00b2e3', // Bright Blue
-                '#56c1bc', // Tealish
-              //  '#f8d0ac', // Pale Orange
-              //  '#6dcff6', // Baby Blue
-              //  '#f49ac1', //Pink
-               // '#fff799', // light/pale yellow
-                '#bcbec0', // Gray
-                '#ea399a', // Magenta
-                '#ff3d00', // red
-               // '#ffffff' // White
+        generateProceduralShipCache();
 
-            ];
+        player.needsNewShip = false;
 
-            // Custom ship Accent colors
-            const accents = [
-                  '#e1c6e5', // lavender pink
-                '#d4b0db', // lilac purple
-                '#ff9d42', // Orange
-                '#77cc99',  // Mint Green
-                '#f8d0ac', // Pale Orange
-               '#fff200', // Bright Yellow
-              //  '#f06eaa', // Pink magenta
-                '#8197cd', // cold steel blue
-               '#8dc63f', // Green
-               '#fff799', // light/pale yellow
-                 '#6dcff6', // Baby Blue  
-              //  '#00e5ff,' // Neon Blue
-                '#ffffff' // White
-            ];
-            
-            const traitRoll = Math.random();
-            let chosenTrait = 'STANDARD';
-            if (traitRoll < 0.22) chosenTrait = 'HOMING';      
-            else if (traitRoll < 0.44) chosenTrait = 'SPREAD'; 
-            else if (traitRoll < 0.66) chosenTrait = 'DOUBLE'; 
-
-             // --- GUARANTEED SHIELD MODIFIER SELECTION ---
-            const shieldRoll = Math.random();
-            let chosenShieldTrait = 'STANDARD';
-            let randomBoostFactor = 0;
-
-            if (shieldRoll < 0.33) {
-                // ~33% Chance: Heavy Hull Buffer
-                chosenShieldTrait = 'SHIELD_BOOST';
-                randomBoostFactor = 0.10 + Math.random() * 0.40; 
-            } else if (shieldRoll < 0.66) {
-                // ~33% Chance: Fast Recharge Matrix
-                chosenShieldTrait = 'REGEN_MATRIX';
-            } else {
-                // ~34% Chance: Flat Deflection Force Field
-                chosenShieldTrait = 'FORCE_FIELD';
-            }
-
-            window.proceduralShipCache = {
-                // FIXED FOR SEVEN OPTIONS: Bumped style picker from 5 up to 7!
-                wingStyle: Math.floor(Math.random() * 7) + 1,      
-                decalStyle: Math.floor(Math.random() * 3) + 1,     
-                noseStyle: Math.floor(Math.random() * 2) + 1,      
-                engineLayout: Math.floor(Math.random() * 6) + 1,   
-                hasGunPods: Math.random() > 0.5,                   
-                invertWings: Math.random() > 0.75,
-                sizeMult: 0.85 + Math.random() * 0.2,
-                wingWidthMult: 0.85 + Math.random() * 0.35,  
-                podLengthMult: 0.85 + Math.random() * 0.3,   
-                engineScale: 0.9 + Math.random() * 0.25,     
-                hullColor: pallets[Math.floor(Math.random() * pallets.length)],
-                trimColor: accents[Math.floor(Math.random() * accents.length)],
-                podLengthRandom: 0.35 + Math.random() * 0.45,
-                podWidthRandom: 1.0 + Math.random() * 2.0,
-                podStyle: Math.floor(Math.random() * 3) + 1,
-                weaponTrait: chosenTrait,
-                shieldTrait: chosenShieldTrait // Saved to cache pool for player configuration lookups!
-            };
-
-            
-            player.needsNewShip = false; 
-            
-            if (typeof applyShipModifiers === 'function') {
-                applyShipModifiers('RANDOM');
-            }
-            if (typeof saveGame === 'function') saveGame();
+        if (typeof applyShipModifiers === 'function') {
+            applyShipModifiers('RANDOM');
         }
+
+        player.shield = player.maxShield;
+
+        if (typeof saveGame === 'function') {
+            saveGame();
+        }
+    }
         ctx.rotate(Math.PI / 2); 
         const baseScale = (player.radius / 24) * window.proceduralShipCache.sizeMult;
         ctx.scale(baseScale, baseScale);
@@ -1718,10 +1762,7 @@ const SHIP_SKINS = {
         // ==========================================
         ctx.fillStyle = '#1e1b18'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
         
-        // Define a numeric style variable (1 = Sleek/Default, 2 = Cobra/V-Shape, 3 = Teardrop)
-        if (typeof window.proceduralShipCache.hullStyle === 'undefined') {
-            window.proceduralShipCache.hullStyle = Math.floor(Math.random() * 3) + 1;
-        }
+
 
         if (window.proceduralShipCache.hullStyle === 1) {
             // --- 1. SLEEK (Original) ---
@@ -2267,20 +2308,30 @@ window.closeShipyardModal = function() {
         const SAVE_KEY = 'starpath-save-v1';
         let homeworldCache = {};
 
-        const ASTEROID_TYPES = {
-            GENERIC: { name: 'Generic', color: '#888899', mineral: null },
-            IRON: { name: 'Metallic', color: '#8c8c8c', mineral: null },
-            GOLD: { name: 'Auric', color: 'rgba(255, 215, 0, 0.9)', mineral: 'gold' },
-            URANIUM: { name: 'Radiant', color: 'rgba(57, 255, 20, 0.9)', mineral: 'uranium' },
-            ERIDIUM: { name: 'Nebula', color: 'rgba(218, 112, 214, 0.9)', mineral: 'eridium' }
-        };
+            const ASTEROID_TYPES = {
+                GENERIC: { name: 'Generic', color: '#888899', mineral: null },
+                IRON: { name: 'Metallic', color: '#8c8c8c', mineral: 'iron' },
+                GOLD: { name: 'Auric', color: 'rgba(255, 215, 0, 0.9)', mineral: 'gold' },
+                URANIUM: { name: 'Radiant', color: 'rgba(57, 255, 20, 0.9)', mineral: 'uranium' },
+                ERIDIUM: { name: 'Nebula', color: 'rgba(218, 112, 214, 0.9)', mineral: 'eridium' }
+            };
 
-        const MINERAL_COLORS = {
-            iron: '#8c8c8c',
-            gold: '#ffd700',
-            uranium: '#39ff14',
-            eridium: '#da70d6'
-        };
+            const MINERAL_COLORS = {
+                iron: '#8c8c8c',
+                gold: '#ffd700',
+                uranium: '#39ff14',
+                eridium: '#da70d6',
+                rare: '#00ffff'
+            };
+
+            // ============================================================
+            // RARE MATERIAL DROP CHANCE
+            // ============================================================
+            // 0.01 = 1% chance per material drop
+            // 0.05 = 5%
+            // 0.001 = 0.1%
+            // Increase this temporarily for testing.
+            const RARE_MATERIAL_CHANCE = 0.04; // rareReward chance
 
         const HOMEWORLD_PALETTES = [
            {base:[70,140,220], land:[90,200,150]},
@@ -2453,15 +2504,15 @@ function setHomeworldFromRecord(record) {
 function generateHomeworldName() {
     const prefixes = [
         "Zor", "Sun", "Kael", "Ven", "Grom", "Ump",
-        "Thra", "Nix", "Fom", "Phas", "Yor",
+        "Thra", "Nix", "Fom", "Phas", "Yor", "Key",
         "Kor", "Ai", "Bo", "Vel", "Sha","Len", 
         "Vor", "Tyr", "Kel", "Ryn", "Oth"
     ];
 
     const roots = [
         "ath", "ox", "ion", "or", "ur", "ie",
-        "ell", "on", "ax", "ul", "un", "dro",
-        "eth", "lek", "rin", "vek", "ith",
+        "ell", "on", "ax", "ul", "un", "dro", "hia",
+        "eth", "lek", "rin", "vek", "ith", "tomo",
         "ara", "esh", "ok", "trek", "strin"
     ];
 
@@ -3835,14 +3886,14 @@ generateBackgroundAssets();
             });
 
             particles = particles.filter(p => p.life > 0);
-
+// minerals behavior
             minerals.forEach(m => {
                 let dx = wrappedDelta(m.x, player.x);
                 let dy = wrappedDelta(m.y, player.y);
                 let dist = Math.hypot(dx, dy);
-                if (dist < 120) { 
-                    m.vx += (dx / dist) * 0.18;
-                    m.vy += (dy / dist) * 0.18;
+                if (dist < 100) { // pickup distance
+                    m.vx += (dx / dist) * 0.45;
+                    m.vy += (dy / dist) * 0.45;
                 }
                 m.vx *= 0.94; m.vy *= 0.94;
                 m.x += m.vx; m.y += m.vy;
@@ -3872,13 +3923,22 @@ generateBackgroundAssets();
                         
                         if (a.type.mineral) {
                             let dropsCount = a.size === 3 ? 3 : a.size === 2 ? 2 : 1;
-                            for(let k=0; k < dropsCount; k++) {
+
+                            for(let k = 0; k < dropsCount; k++) {
+
+                                // Normally use the asteroid's normal material.
+                                // Very rarely replace one drop with the rare material.
+                                const droppedMaterial =
+                                    Math.random() < RARE_MATERIAL_CHANCE
+                                        ? 'rare'
+                                        : a.type.mineral;
+
                                 minerals.push({
-                                    x: a.x + (Math.random()*20 - 10),
-                                    y: a.y + (Math.random()*20 - 10),
+                                    x: a.x + (Math.random() * 20 - 10),
+                                    y: a.y + (Math.random() * 20 - 10),
                                     vx: a.vx + (Math.random() * 2 - 1),
                                     vy: a.vy + (Math.random() * 2 - 1),
-                                    type: a.type.mineral,
+                                    type: droppedMaterial,
                                     radius: 5
                                 });
                             }
@@ -3984,17 +4044,55 @@ generateBackgroundAssets();
                 }
             }
 
-            for (let idx = minerals.length - 1; idx >= 0; idx--) {
-                const m = minerals[idx];
-                if (distanceBetween(player, m) < player.radius + m.radius) {
-                    player.cargo[m.type]++;
-                    gameAudio.playPickup();
-                    spawnBurst(m.x, m.y, MINERAL_COLORS[m.type], 8);
-                    addLog(`Cargo expanded: [${m.type.toUpperCase()}] captured`);
-                    saveGame();
-                    minerals.splice(idx, 1);
-                }
-            }
+
+// asteroid pickup
+
+for (let idx = minerals.length - 1; idx >= 0; idx--) {
+    const m = minerals[idx];
+
+    if (distanceBetween(player, m) < player.radius + m.radius) {
+
+        // IRON: instantly converts to wallet currency
+        if (m.type === 'iron') {
+
+            const ironReward = 3 + Math.floor(Math.random() * 7);
+
+            player.wallet += ironReward;
+
+            gameAudio.playPickup();
+            spawnBurst(m.x, m.y, MINERAL_COLORS[m.type], 13);
+
+            addLog(`IRON collected. Wallet +$${ironReward}.`);
+
+        // RARE MATERIAL: large instant wallet reward
+        } else if (m.type === 'rare') {
+
+            const sectorMultiplier = 1 + ((currentSector - 1) * 0.333);
+            const rareReward = Math.floor(
+                (200 + Math.floor(Math.random() * 101)) * sectorMultiplier
+            );
+            player.wallet += rareReward;
+
+            gameAudio.playSupplyCache();
+            spawnBurst(m.x, m.y, MINERAL_COLORS[m.type], 36);
+
+            addLog(`RARE MATERIAL recovered! Wallet +$${rareReward}.`);
+
+        // NORMAL MATERIALS: existing cargo behavior
+        } else {
+
+            player.cargo[m.type]++;
+
+            gameAudio.playPickup();
+            spawnBurst(m.x, m.y, MINERAL_COLORS[m.type], 20);
+
+            addLog(`Cargo expanded: [${m.type.toUpperCase()}] captured`);
+        }
+
+        saveGame();
+        minerals.splice(idx, 1);
+    }
+}
 
             // 3. ENVIRONMENTAL IMPACTS VS PLAYER
             if (player.invulnerable <= 0) {
@@ -4054,8 +4152,11 @@ function applyShipModifiers(skinKey) {
 
     // --- 1. DEFAULT BASELINE SHIELD RULES (Min Boundaries) ---
     let targetMaxShield = 100;
-    let targetRegenInterval = 5000; // 2.5s base rate
+    let targetRegenInterval = Infinity; // 5s base rate
     let targetAbsorption = 0.0;     // 0% damage blocked
+    // comment out the below three lines to use shield mods
+    targetRegenInterval = Infinity;
+    targetAbsorption = 0.0;
 
     // --- 2. EVALUATE WEAPONS & SHIELDS BY SKIN TYPING ---
     if (skinKey === 'INTERCEPTOR') {
@@ -4105,10 +4206,23 @@ function applyShipModifiers(skinKey) {
         if (window.proceduralShipCache && window.proceduralShipCache.shieldTrait) {
             const sTrait = window.proceduralShipCache.shieldTrait;
             
-            if (sTrait === 'SHIELD_BOOST') {
-                // Generates a random maximum capacity anywhere between 110 and 140 points
-              targetMaxShield = Math.floor(135 + (Math.random() * 41));
-            } 
+if (sTrait === 'SHIELD_BOOST') {
+    if (Number.isFinite(window.proceduralShipCache.shieldBoostAmount)) {
+        targetMaxShield = Math.floor(
+            110 +
+            window.proceduralShipCache.shieldBoostAmount * 30
+        );
+    } else {
+        // Backward compatibility for older random-ship saves
+        window.proceduralShipCache.shieldBoostAmount =
+            0.10 + Math.random() * 0.40;
+
+        targetMaxShield = Math.floor(
+            110 +
+            window.proceduralShipCache.shieldBoostAmount * 30
+        );
+    }
+}
             else if (sTrait === 'REGEN_MATRIX') {
                 // Changing the Math.random() to 1 or 0 will freeze it at a flat, non-random rate if you want later!
                 targetRegenInterval = Math.floor(2000 + (Math.random() * 1001));
@@ -4203,14 +4317,21 @@ function applyShipModifiers(skinKey) {
                 }
 
                 // Forcefully assign the baseline 'RANDOM' hull designation upon death
-                window.proceduralShipCache = null; 
-                ACTIVE_SHIP_SKIN = 'RANDOM'; 
-                player.randomShootDelay = null; // Clear out current dynamic variable slots
+                window.proceduralShipCache = null;
 
-                // Instantly update current live environment parameters back to default random values
+                ACTIVE_SHIP_SKIN = 'RANDOM';
+
+                player.randomShootDelay = null;
+
+                // Generate the replacement random ship BEFORE applying its modifiers.
+                generateProceduralShipCache();
+
                 if (typeof applyShipModifiers === 'function') {
                     applyShipModifiers('RANDOM');
                 }
+
+                // Fully charge the replacement ship to its generated capacity.
+                player.shield = player.maxShield;
 
                 showAlert("!! CRITICAL DESTRO !! Ship Towed. Reverted to RANDOM Chassis.");
                 addLog(`Hull atomized! Reverted to baseline random assembly. Previous configuration saved to shipyard backup memory bank.`);
@@ -4261,12 +4382,25 @@ function updateUI() {
     const absorbTextContainer = document.getElementById('stat-shield-absorb');
     const rateTextContainer = document.getElementById('stat-shield-rate');
 
-    if (desktopShieldText && rateTextContainer) {
+    if (desktopShieldText) {
         // --- CORE VALUES (xx/XX) COLORING RULE ---
         desktopShieldText.innerText = `${roundedCurrentShield}/${player.maxShield}`;
         // Turns pale greenish (#a1cca5) if max shield is modified above the 100 baseline, fallback to white
         desktopShieldText.style.color = (player.maxShield > 100) ? '#a1cca5' : '#ffffff';
+    }
 
+    // --- CLEAN ARCADE MODE OVERRIDES ---
+    // Clears out the old recharge interval labels since regeneration is now permanently off!
+    if (rateTextContainer) {
+        rateTextContainer.innerText = '';
+    }
+    if (absorbTextContainer) {
+        absorbTextContainer.innerText = '';
+    }
+
+        
+        // const textStyleColor = '#ffffff'; // shield mods disabled if this constant is active
+        /*
         // --- ABSORPTION TEXT CONTAINER MATRIX ---
         if (player.shieldDamageAbsorption > 0) {
             const absorbPct = Math.round(player.shieldDamageAbsorption * 100);
@@ -4286,15 +4420,15 @@ function updateUI() {
             rateTextContainer.style.color = '#ffffff';
             rateTextContainer.style.opacity = '0.7'; // Standard dim fallback styling rules
         }
-    }
-
+    } */
+    /*
     // --- REPEAT SYNC HOOKS FOR MOBILE HUD ELEMENTS ---
     if (document.getElementById('mobile-shield-text')) {
         const mobileShieldText = document.getElementById('mobile-shield-text');
         mobileShieldText.innerText = `${roundedCurrentShield}/${player.maxShield}`;
         mobileShieldText.style.color = (player.maxShield > 100) ? '#a1cca5' : '#ffffff';
     }
-
+*/ //Shields mods disabled, 
     // Shield Gauges
     document.getElementById('stat-shield-fill').style.width = `${shieldPct}%`;
     document.getElementById('stat-shield-fill').style.backgroundColor = shieldColor;
@@ -4575,8 +4709,12 @@ function updateUI() {
             // ==========================================
             // SCIENCE CHASSIS EXTRA PAYOUT ECONOMY BOOST
             // ==========================================
-                let tradePayout = m.reward;
-            
+                let tradePayout = Math.floor(
+                    m.reward * (1 + (currentSector - 1) * 0.07) // sector merchant payout scale, match in html ui
+                );
+            // ==========================================
+            // SCIENCE CHASSIS EXTRA PAYOUT ECONOMY BOOST
+            // ==========================================
             if (ACTIVE_SHIP_SKIN === 'SCIENCE') {
                 tradePayout = Math.floor(tradePayout * 1.30); // 30% static financial earnings boost
             } 
@@ -4626,7 +4764,7 @@ function updateUI() {
             panel.innerHTML = `
                 <p class="merchant-msg" style="color:var(--accent-gold); font-weight:bold;">SPACE MERCHANTS SYNDICATE: ${m.id}</p>
                 <div class="trade-reqs" style="margin:4px 0;">${reqHtml}</div>
-                <p class="merchant-msg">Wallet Payout Offer: <span style="color:#55ff55; font-weight:bold;">\$${m.reward}</span></p>
+                <p class="merchant-msg">Wallet Payout Offer: <span style="color:#55ff55; font-weight:bold;">\$${Math.floor(m.reward * (1 + (currentSector - 1) * 0.07))}</span></p>
                 <button class="btn" id="btn-trade" onclick="executeMerchantTrade('${m.id}')" style="width:100%; border-color:var(--accent-gold); color:var(--accent-gold); margin-top:4px;" ${canTrade ? '' : 'disabled'}>${pirateStatusUntil > Date.now() ? 'Locked - Piracy' : 'Execute Trade'}</button>
             `;
         }
@@ -5554,24 +5692,30 @@ document.addEventListener('click', function(event) {
     player.wallet -= cost;
     ACTIVE_SHIP_SKIN = skinKey; 
 
-    if (skinKey === 'RANDOM') {
-        if (window.proceduralShipCache) {
-            player.lastRandomBackup = { ...window.proceduralShipCache };
-            player.lastRandomBackup.savedShootDelay = player.shootDelay;
-        }
-        
-        // Wipes out old cache settings to allow the compiler loop to assign a new trait AND fresh speeds!
-        window.proceduralShipCache = null; 
-        player.randomShootDelay = null; // Clears the previous rolled speed to allow a fresh calculation!
-    } else {
-        player.randomShootDelay = null;
+if (skinKey === 'RANDOM') {
+
+    // Preserve the current random ship for buyback/recovery.
+    if (window.proceduralShipCache) {
+        player.lastRandomBackup = {
+            ...window.proceduralShipCache,
+            savedShootDelay: player.shootDelay
+        };
     }
 
-    // Synchronize engine thrust and weapon fire cooldown metrics immediately AFTER resetting the properties above
-    applyShipModifiers(skinKey);
+    // Generate a completely new locked random configuration NOW.
+    generateProceduralShipCache();
 
-    // FIXED FOR COMFORT: Instantly updates player health indicators to max capacity on checkout!
-    player.shield = player.maxShield;
+    player.randomShootDelay = null;
+
+} else {
+
+    player.randomShootDelay = null;
+}
+
+applyShipModifiers(skinKey);
+
+// Fully charge the newly generated ship at its true capacity.
+player.shield = player.maxShield;
     
 
     if (typeof gameAudio !== 'undefined' && gameAudio.playSupplyCache) {
@@ -5589,8 +5733,8 @@ document.addEventListener('click', function(event) {
         saveGame();
     }
 });
-//COPYRIGHT SPM 2026
 
+// Copyright SPM - Smurphshire 2026
     </script>
 </body>
 </html>
