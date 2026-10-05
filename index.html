@@ -4265,23 +4265,20 @@ function applyShipModifiers(skinKey) {
     player.thrust = mods.thrust;
     player.friction = mods.friction;
 
-    // --- 1. DEFAULT BASELINE SHIELD RULES (Min Boundaries) ---
     let targetMaxShield = 100;
-    let targetRegenInterval = Infinity; // 5s base rate
-    let targetAbsorption = 0.0;     // 0% damage blocked
-    // comment out the below three lines to use shield mods
+    let targetRegenInterval = Infinity; 
+    let targetAbsorption = 0.0;     
     targetRegenInterval = Infinity;
     targetAbsorption = 0.0;
 
-    // --- 2. EVALUATE WEAPONS & SHIELDS BY SKIN TYPING ---
     if (skinKey === 'INTERCEPTOR') {
         player.shootDelay = 120; 
         targetMaxShield = 160;
-        targetRegenInterval = 1750; // Fixed fast rate for named Interceptor
+        targetRegenInterval = 1750; 
 
     } else if (skinKey === 'SCIENCE') {
         player.shootDelay = 300; 
-        targetMaxShield = 200; // Fixed heavy pool for named Science
+        targetMaxShield = 200; 
 
     } else if (skinKey === 'STARJOURNER') {
         targetMaxShield = 100; 
@@ -4289,12 +4286,10 @@ function applyShipModifiers(skinKey) {
 
     } else if (skinKey === 'MOSQUITO') {
         player.shootDelay = 100; 
-        targetAbsorption = 0.25; // Fixed flat armor for named Mosquito
+        targetAbsorption = 0.25; 
 
     } else if (skinKey === 'RANDOM') {
-        // --- PROCESS RANDOM PROCEDURAL CACHE MODIFIERS ---
         
-        // Handle Weapon Traits
         if (window.proceduralShipCache && window.proceduralShipCache.weaponTrait) {
             const trait = window.proceduralShipCache.weaponTrait;
             if (trait === 'HOMING') {
@@ -4321,7 +4316,6 @@ function applyShipModifiers(skinKey) {
             player.shootDelay = 182;
         }
 
-        // --- CONTINUOUS RANDOM SHIELD TRAIT EXTENSIONS ---
         if (window.proceduralShipCache && window.proceduralShipCache.shieldTrait) {
             const sTrait = window.proceduralShipCache.shieldTrait;
             
@@ -4332,7 +4326,6 @@ if (sTrait === 'SHIELD_BOOST') {
             window.proceduralShipCache.shieldBoostAmount * 30
         );
     } else {
-        // Backward compatibility for older random-ship saves
         window.proceduralShipCache.shieldBoostAmount =
             0.10 + Math.random() * 0.40;
 
@@ -4343,13 +4336,11 @@ if (sTrait === 'SHIELD_BOOST') {
     }
 }
             else if (sTrait === 'REGEN_MATRIX') {
-                // Changing the Math.random() to 1 or 0 will freeze it at a flat, non-random rate if you want later!
                 targetRegenInterval = Math.floor(2000 + (Math.random() * 1001));
             
             } 
             else if (sTrait === 'FORCE_FIELD') {
-                // FIXED BINARY CAP: Set to 1 instead of Math.random() to lock it at exactly 25% (0.25)
-                // Simply change the 1 back to Math.random() if you want to restore the range later!
+ 
                 targetAbsorption = 0.10 + (1 * 0.15);
             }
         }
@@ -4359,21 +4350,15 @@ if (sTrait === 'SHIELD_BOOST') {
         player.shootDelay = 188; 
     }
     
-    // --- 3. COMMIT SHIELD CALCULATIONS TO PLAYER OBJECT ---
     player.maxShield = targetMaxShield;
     player.shieldRegenInterval = targetRegenInterval;
     player.shieldDamageAbsorption = targetAbsorption;
 
-    // =========================================================================
-    // 💥 BULLETPROOF FAIL-SAFE OVERRIDE 💥
-    // =========================================================================
-    // If the player has a bonus pool (like 121) but something else forced their 
-    // active points back down to a flat 100 placeholder, instantly top them off!
+
     if (player.shield === 100 && player.maxShield > 100) {
         player.shield = player.maxShield;
     }
 
-    // Standard safety boundary check (Keeps shield from exceeding maxShield)
     if (player.shield > player.maxShield) {
         player.shield = player.maxShield;
     }
@@ -4387,8 +4372,7 @@ if (sTrait === 'SHIELD_BOOST') {
         function damagePlayer(amount, source = null) {
             if (player.needsNewShip) return;
 
-            // --- FORCE FIELD DAMAGE REDUCTION MATRIX ---
-            // Reduces incoming amount by 25% if FORCE_FIELD trait is active, otherwise takes 100%
+
             const finalDamage = amount * (1 - (player.shieldDamageAbsorption || 0));
 
             player.shield -= finalDamage;
@@ -4417,39 +4401,32 @@ if (sTrait === 'SHIELD_BOOST') {
                 player.shield = player.maxShield; // Restores full health on tow respawn
                 player.invulnerable = 35;
 
-                // =============================================================
-                // FIXED FOR BACKUP ISOLATION: SAFE STAT PACKING
-                // =============================================================
+    
                 if (window.proceduralShipCache) {
                     player.lastRandomBackup = { ...window.proceduralShipCache };
                     
-                    // FIXED STAT LEAK: Only carry over the rolled gun speed IF you were 
-                    // actively flying a RANDOM ship model when you took terminal damage.
+             
                     if (ACTIVE_SHIP_SKIN === 'RANDOM' && player.randomShootDelay) {
                         player.lastRandomBackup.savedShootDelay = player.randomShootDelay; 
                     } else {
                         player.lastRandomBackup.savedShootDelay = 210; // Reset to default base standard delay rate
                     }
                 } else {
-                    // Safety protection if you died while piloting a normal ship class variant layout option
                     player.lastRandomBackup = null;
                 }
 
-                // Forcefully assign the baseline 'RANDOM' hull designation upon death
                 window.proceduralShipCache = null;
 
                 ACTIVE_SHIP_SKIN = 'RANDOM';
 
                 player.randomShootDelay = null;
 
-                // Generate the replacement random ship BEFORE applying its modifiers.
                 generateProceduralShipCache();
 
                 if (typeof applyShipModifiers === 'function') {
                     applyShipModifiers('RANDOM');
                 }
 
-                // Fully charge the replacement ship to its generated capacity.
                 player.shield = player.maxShield;
 
                 showAlert("Ship Destroyed! Resources Lost, new ship purchased.");
@@ -4475,7 +4452,6 @@ function updateUI() {
     let baseDist = Math.hypot(player.x - SPACEPORT.x, player.y - SPACEPORT.y);
     const activeTheme = SECTOR_THEMES[Math.min(12, currentSector)] || { name: "Deep Space" };
 
-    // 2. Sync Shared Stats (Desktop & Mobile)
     // Wallet & Bank
     document.getElementById('stat-wallet').innerText = `\$${player.wallet}`;
     document.getElementById('mobile-wallet').innerText = `\$${player.wallet}`;
@@ -4491,25 +4467,20 @@ function updateUI() {
     document.getElementById('stat-goal-fill').style.width = `${goalPct}%`;
     document.getElementById('mobile-goal-fill').style.width = `${goalPct}%`;
 
-       // --- FULLY DYNAMIC COLOR-CODED SHIELD HUD REFRESH LOOP ---
     const rawRate = (player.shieldRegenInterval / 1000).toFixed(1);
     const displayRate = parseFloat(rawRate);
     const roundedCurrentShield = Math.ceil(player.shield);
 
-    // 1. Target UI elements
     const desktopShieldText = document.getElementById('stat-shield-text');
     const absorbTextContainer = document.getElementById('stat-shield-absorb');
     const rateTextContainer = document.getElementById('stat-shield-rate');
 
     if (desktopShieldText) {
-        // --- CORE VALUES (xx/XX) COLORING RULE ---
         desktopShieldText.innerText = `${roundedCurrentShield}/${player.maxShield}`;
-        // Turns pale greenish (#a1cca5) if max shield is modified above the 100 baseline, fallback to white
         desktopShieldText.style.color = (player.maxShield > 100) ? '#a1cca5' : '#ffffff';
     }
 
-    // --- CLEAN ARCADE MODE OVERRIDES ---
-    // Clears out the old recharge interval labels since regeneration is now permanently off!
+
     if (rateTextContainer) {
         rateTextContainer.innerText = '';
     }
@@ -4565,17 +4536,13 @@ function updateUI() {
         // 1. Keep your existing paragraph text updated
        // document.getElementById('spaceport-dist').innerText = `Range: ${calculatedDistance}m`;
 
-        // 2. DYNAMIC BUTTON TEXT: Swap text based on player distance
         const bankButton = document.getElementById('btn-bank');
         if (calculatedDistance <= 160) { 
-            // Player is AT homeworld
             bankButton.innerText = "HOMEWORLD - BANK & REPAIR SHIP";
         } else {
-            // Player is away from homeworld
             bankButton.innerText = `HOMEWORLD - Distance: ${calculatedDistance}m`;
         }
 
-    // 3. Handle Pirate Alert Status
     const pirateStatus = document.getElementById('pirate-status');
     if (pirateActive) {
         const secondsRemaining = Math.ceil((pirateStatusUntil - Date.now()) / 1000);
@@ -4585,13 +4552,11 @@ function updateUI() {
         pirateStatus.style.display = 'none';
     }
 
-    // 4. Handle Spaceport Interaction & Banking Logic
     const bankBtn = document.getElementById('btn-bank');
     const mobileBankBtn = document.getElementById('mobile-bank');
     const isDockedAndSafe = (baseDist <= SPACEPORT.radius && !pirateActive);
 
     if (isDockedAndSafe) {
-        // Enable buttons and add visual polish
         bankBtn.disabled = false;
         bankBtn.classList.add('bank-ready');
         if (mobileBankBtn) {
@@ -4599,7 +4564,6 @@ function updateUI() {
             mobileBankBtn.classList.add('bank-ready');
         }
 
-        // Shared action handler when docking is successful
         const handleBankTransaction = () => {
             if (pirateStatusUntil > Date.now()) return;
             
@@ -4625,12 +4589,10 @@ function updateUI() {
             }
         };
 
-        // Assign action to both desktop and mobile layouts
         bankBtn.onclick = handleBankTransaction;
         if (mobileBankBtn) mobileBankBtn.onclick = handleBankTransaction;
 
     } else {
-        // Disable buttons and strip readiness styling
         bankBtn.disabled = true;
         bankBtn.classList.remove('bank-ready');
         bankBtn.onclick = null;
@@ -4642,9 +4604,7 @@ function updateUI() {
         }
     }
 
-      // =========================================================================
-    // 5. Merchant Proximity Radar & Panel Sync (STATE-SHIELDED ICON GRID SHOP)
-    // =========================================================================
+
     let closestM = null;
     let minDist = MERCHANT_RANGE; 
 
@@ -4681,7 +4641,6 @@ function updateUI() {
     if (merchPanel && !closestM) {
         if (isDockedAndSafe || (player.x === WORLD_SIZE / 2 && player.y === WORLD_SIZE / 2)) {
             
-            // Included backup token mapping directly inside the cache tracking signature string
             const backupStateToken = player.lastRandomBackup ? 'has_backup' : 'no_backup';
             const currentSystemStateKey = `shop_wallet:${player.wallet}_skin:${ACTIVE_SHIP_SKIN}_bk:${backupStateToken}`;
 
@@ -4697,10 +4656,8 @@ function updateUI() {
                     'RANDOM': 'RANDOMIZED SHIP'
                 };
 
-                            // SCALED DOWN TITLE: Compact 11px font profile to prevent clipping lines
             let shopHTML = `<h3 style="color: #ff9d42; margin: 0 0 6px 0; font-size: 11px; font-weight: bold; letter-spacing: 0.3px; border-bottom: 1px solid #333; padding-bottom: 2px; text-transform: uppercase;">Shipyard Available</h3>`;
             
-            // FIXED SIZING: Tightened gap spacing from 5px to 3px to maximize vertical clearance
             shopHTML += `<div class="shipyard-grid-wrapper" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 3px; padding: 1px 0; font-family: monospace;">`;
 
             for (const [skinKey, price] of Object.entries(SHIP_SHOP_PRICES)) {
@@ -4724,9 +4681,7 @@ function updateUI() {
             }
             shopHTML += `</div>`;
 
-            // =============================================================
-            // COMPACT RECOVERY BUY BACK OPTION STRIP
-            // =============================================================
+   
             if (player.lastRandomBackup) {
                 shopHTML += `
                     <button class="ship-shop-btn" data-skin="BUYBACK_RECOVERY" style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; background: rgba(0, 229, 255, 0.04); border: 1px dashed #00e5ff; padding: 3px 6px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 4px; font-family: monospace; box-sizing: border-box; min-height: 22px; transition: background 0.1s;">
@@ -4737,9 +4692,7 @@ function updateUI() {
 
             merchPanel.innerHTML = shopHTML;
 
-            // =============================================================
-            // ARCADE ICON PREVIEW RENDERINGS (UPDATED CANVAS CENTER TARGETS)
-            // =============================================================
+ 
             const shopCanvases = merchPanel.querySelectorAll('.shop-preview-canvas');
             shopCanvases.forEach(canv => {
                 const sCtx = canv.getContext('2d');
@@ -4749,7 +4702,6 @@ function updateUI() {
                 sCtx.clearRect(0, 0, canv.width, canv.height);
                 sCtx.lineJoin = 'miter'; sCtx.lineCap = 'square';
 
-                // FIXED CENTER TRANSFORMS: Adjusted center point to 11, 11 and radius scale to 6 to match 22x22 canvas
                 if (targetSkin === 'ORIGINAL' && SHIP_SKINS[targetSkin]) {
                     const mockPlayer = { x: 11, y: 11, radius: 6, angle: -Math.PI / 2, invulnerable: 0 };
                     sCtx.save(); sCtx.translate(mockPlayer.x, mockPlayer.y); sCtx.rotate(mockPlayer.angle);
@@ -4795,7 +4747,6 @@ function updateUI() {
 
 
 
-        // FIXED: Shifted execution completely out of rapid dynamic innerHTML injection blocks to stop DOM event listeners from breaking mid-click
         function executeMerchantTrade(merchantId) {
             if (pirateStatusUntil > Date.now()) {
                 addLog('Trade denied: Pirate status is active.');
@@ -4847,7 +4798,6 @@ function updateUI() {
             gameAudio.playTrade();
             saveGame();
 
-            // FIXED FOR THE UI: Changed m.reward to tradePayout so notifications show the boosted cash!
             addLog(`Trade of resources verified with merchant ship profile ${m.id}. Received \$${tradePayout} credits.`);
             showAlert(`RESOURCES SOLD! +\$${tradePayout}`);
 
@@ -4879,7 +4829,6 @@ function updateUI() {
                 </div>`;
             }
 
-            // FIXED: Using string parameters referencing independent global window scope actions to avoid template injection click stalls
             panel.innerHTML = `
                 <p class="merchant-msg" style="color:var(--accent-gold); font-weight:bold;">TRADE ALLIANCE ID#: ${m.id}</p>
                 <div class="trade-reqs" style="margin:4px 0;">${reqHtml}</div>
@@ -5034,17 +4983,14 @@ ctx.strokeRect(0, 0, 12000, 12000);
                 ctx.restore();
             });
 
-            // Laser Projectiles
+            // bullet styles 
             ctx.strokeStyle = 'var(--accent-blue)';
             ctx.lineWidth = 6;
             ctx.shadowBlur = 12;
             ctx.shadowColor = 'var(--accent-blue)';
             ctx.globalAlpha = 0.95;
-                       // =========================================================================
-            // CORE WEAPON GRAPHICS & RENDER PIPELINE (CUSTOM CONICAL TAPERED LASERS)
-            // =========================================================================
+
             bullets.forEach((b) => {
-                // 1. Identify the active weapon profile class
                 const isSTARJOURNERHoming = (ACTIVE_SHIP_SKIN === 'STARJOURNER');
                 const isRandomHoming = (ACTIVE_SHIP_SKIN === 'RANDOM' && window.proceduralShipCache && window.proceduralShipCache.weaponTrait === 'HOMING');
                 const isHoming = isSTARJOURNERHoming || isRandomHoming;
@@ -5059,15 +5005,12 @@ ctx.strokeRect(0, 0, 12000, 12000);
 
                 ctx.save();
 
-                                // -----------------------------------------------------------------
-                // WEAPON STYLE A: HOMING PROJECTILE RENDERER (CIRCLE WITH WHITE STROKE)
-                // -----------------------------------------------------------------
+   
                 if (isHoming) {
                     const tailLength = 1.8; 
                     const tailX = b.x - b.vx * tailLength;
                     const tailY = b.y - b.vy * tailLength;
 
-                    // 1. Draw the gradient flame trail fade stretching behind the hull
                     let particleGrd = ctx.createLinearGradient(b.x, b.y, tailX, tailY);
                     particleGrd.addColorStop(0, 'rgba(255, 34, 34, 1.0)');  
                     particleGrd.addColorStop(1, 'rgba(255, 51, 51, 0.0)');  
@@ -5082,10 +5025,8 @@ ctx.strokeRect(0, 0, 12000, 12000);
                     ctx.lineTo(tailX, tailY);
                     ctx.stroke();
 
-                    // 2. FIXED: Draw the core circle in tracking red, then add the thin white stroke rim
                     const bulletRadius = 2.8;
 
-                    // Draw the core red center body
                     ctx.fillStyle = '#ff2222';
                     ctx.shadowBlur = 8;
                     ctx.shadowColor = '#ff2222';
@@ -5094,40 +5035,33 @@ ctx.strokeRect(0, 0, 12000, 12000);
                     ctx.arc(b.x, b.y, bulletRadius, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // Layer the ultra-thin high-contrast white offset stroke ring around it
                     ctx.strokeStyle = '#ffffff';
-                    ctx.lineWidth = 0.75; // Ultra-thin clean accent line stroke
+                    ctx.lineWidth = 0.75; 
                     ctx.shadowBlur = 4;
-                    ctx.shadowColor = '#ffffff'; // Adds a bright sparking bloom around the white rim
+                    ctx.shadowColor = '#ffffff'; 
                     ctx.stroke();
                 }
 
-                // -----------------------------------------------------------------
-                // WEAPON STYLE B: ADVANCED CONICAL BEAM LAYOUTS (REGULAR, SPREAD, DOUBLE)
-                // -----------------------------------------------------------------
                 else {
                     const tailLength = 3;
                     const tailX = b.x - b.vx * tailLength;
                     const tailY = b.y - b.vy * tailLength;
 
-                    // Calculate perpendicular vectors to dynamically draw the wedge/triangle thickness width
                     const velocityAngle = Math.atan2(b.vy, b.vx);
                     const perpAngle = velocityAngle + Math.PI / 2;
 
-                    // Set custom color templates and glow indicators based on the weapon class
                     let baseColor, glowColor;
                     if (isSpread) {
-                        baseColor = '#77cc99'; // Science / Spread Green
+                        baseColor = '#77cc99'; 
                         glowColor = '#5cd693';
                     } else if (isDouble) {
-                        baseColor = '#b3f5ff'; // Interceptor Light Cyan
+                        baseColor = '#b3f5ff'; 
                         glowColor = '#00ffff';
                     } else {
-                        baseColor = '#ffd1e8'; // Regular Laser Slightly Pinkish
+                        baseColor = '#ffd1e8'; 
                         glowColor = '#ffb3d9';
                     }
 
-                    // Tapered Gradient: Front is solid neon, tail fades completely out
                     let beamGrd = ctx.createLinearGradient(b.x, b.y, tailX, tailY);
                     beamGrd.addColorStop(0, baseColor);
                     beamGrd.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
@@ -5136,14 +5070,10 @@ ctx.strokeRect(0, 0, 12000, 12000);
                     ctx.shadowBlur = 6;
                     ctx.shadowColor = glowColor;
 
-                    // Compile the conical triangle polygon shape path (Wide tip tapering down to zero at tail)
-                    const tipWidth = 2.2; // Width thickness dimension at the laser head tip
+                    const tipWidth = 2.2; 
                     ctx.beginPath();
-                    // Left tip corner
                     ctx.moveTo(b.x + Math.cos(perpAngle) * tipWidth, b.y + Math.sin(perpAngle) * tipWidth);
-                    // Right tip corner
                     ctx.lineTo(b.x - Math.cos(perpAngle) * tipWidth, b.y - Math.sin(perpAngle) * tipWidth);
-                    // Closes perfectly at the sharp rear point coordinates
                     ctx.lineTo(tailX, tailY);
                     ctx.closePath();
                     ctx.fill();
@@ -5153,9 +5083,7 @@ ctx.strokeRect(0, 0, 12000, 12000);
             });
             ctx.globalAlpha = 1;
 
-            // =========================================================================
-            // HOSTILE PROJECTILE DRAWING RENDER PIPELINE (LARGE RED CONICAL BEAM + WHITE SPARK CORE)
-            // =========================================================================
+
             enemyBullets.forEach((eb) => {
                 const tailLength = 3.2; 
                 const tailX = eb.x - eb.vx * tailLength;
@@ -5164,7 +5092,7 @@ ctx.strokeRect(0, 0, 12000, 12000);
                 const velocityAngle = Math.atan2(eb.vy, eb.vx);
                 const perpAngle = velocityAngle + Math.PI / 2;
 
-                ctx.save(); // Locks down bullet state independently!
+                ctx.save(); 
 
                 const baseColor = '#ff3333'; 
                 const glowColor = '#ff0000'; 
@@ -5185,7 +5113,6 @@ ctx.strokeRect(0, 0, 12000, 12000);
                 ctx.closePath();
                 ctx.fill();
 
-                // High-intensity white core spark indicator dot layout
                 ctx.fillStyle = '#ffffff';
                 ctx.shadowBlur = 10;
                 ctx.shadowColor = '#ffffff'; 
@@ -5194,18 +5121,15 @@ ctx.strokeRect(0, 0, 12000, 12000);
                 ctx.arc(eb.x, eb.y, 2.2, 0, Math.PI * 2); 
                 ctx.fill();
 
-                ctx.restore(); // Safely closes state, freeing context for subsequent rendering loops!
+                ctx.restore(); 
             });
 
-            // =========================================================================
-            // VECTOR ASTEROIDS DRAWING LOOP (ISOLATED & BALANCED)
-            // =========================================================================
+            // asteroids
             asteroids.forEach(a => {
-                ctx.save(); // Clean open mapping tracking coordinate space bounds
+                ctx.save(); 
                 ctx.translate(a.x, a.y);
                 ctx.rotate(a.angle);
                 
-                // Determine color and apply to stroke template lines
                 const strokeColor = a.typeKey === 'GENERIC' ? activeTheme.generic : a.type.color;
                 ctx.strokeStyle = strokeColor;
                 ctx.shadowBlur = 6;
@@ -5220,16 +5144,14 @@ ctx.strokeRect(0, 0, 12000, 12000);
                 }
                 ctx.closePath();
                 
-                // Fill with native transparency layouts
                 ctx.fillStyle = strokeColor;
                 ctx.globalAlpha = 0.12;
                 ctx.fill();
                 
-                // Reset alpha parameters securely back to standard full visibility for outlines
                 ctx.globalAlpha = 1.0; 
                 ctx.stroke();
                 
-                ctx.restore(); // Clean execution layer lock down
+                ctx.restore(); 
             });
 
                     
@@ -5238,7 +5160,6 @@ ctx.strokeRect(0, 0, 12000, 12000);
 merchants.forEach(m => {
     ctx.save();
     
-    // Keep the outer radial range circle exactly as is
     ctx.strokeStyle = 'rgba(255, 215, 0, 0.4)'; 
     ctx.lineWidth = 1.5;
     ctx.setLineDash([6, 6]);
@@ -5254,7 +5175,6 @@ merchants.forEach(m => {
     ctx.lineWidth = 2.5; 
 
 
-    // Deterministic pseudo-random seed based on merchant ID to prevent screen flickering
     const getSeed = (id) => {
         let hash = 0;
         const str = String(id);
@@ -5269,7 +5189,6 @@ merchants.forEach(m => {
         return x - Math.floor(x);
     };
 
-    // Procedural name generator parsing arrays from your homeworld word bank
     const generateMerchantName = () => {
         const prefixes = [
             "Do", "J", "Qui", "G", "Dur",
@@ -5299,23 +5218,18 @@ merchants.forEach(m => {
     const topAttachType = Math.floor(rand(7) * 3); // 0 = Rect, 1 = Semi-Circle, 2 = Full Circle
     const botAttachType = Math.floor(rand(8) * 3); // 0 = Rect, 1 = Semi-Circle, 2 = Full Circle
     const sphereR = 13;
-    // Helper function to render a standalone structural element with mask fill and stroke glow
     const renderComponent = (drawPathFunc) => {
         ctx.save();
         ctx.beginPath();
         drawPathFunc();
         
-        // Solid layout background matching standard dark space void
         ctx.fillStyle = '#080810'; 
         ctx.fill();
         
-        // Translucent golden fill glow
         ctx.fillStyle = 'rgba(255, 215, 0, 0.15)';
         ctx.fill();
         
-        // =========================================================================
-        // BALANCED GOLDEN GLOW FOOTPRINT (Vibrant Bloom Adjusted Down from Pass 1)
-        // =========================================================================
+
         ctx.shadowBlur = 14;
         ctx.shadowColor = 'rgba(255, 215, 0, 0.6)';
         
@@ -5323,7 +5237,6 @@ merchants.forEach(m => {
         ctx.restore();
     };
 
-    // LAYER 1: Central Hulls drawn first as the background base anchor (SCALED 1.25x)
     renderComponent(() => {
         if (bodyType === 0) {
             ctx.rect(-10, -30, 20, 60); 
@@ -5338,17 +5251,13 @@ merchants.forEach(m => {
         }
     });
 
-    // LAYER 2: Vertical Extensions drawn cleanly over the central hull edge bounds (SCALED 1.25x)
     if (vertConfig === 1 || vertConfig === 3) {
-        // Top vertical attachment structure
         renderComponent(() => {
-            // Draw connecting neck extension column
             ctx.rect(-7.5, -52.5, 15, 22.5); 
             ctx.closePath();
         });
         
         renderComponent(() => {
-            // Scaled up top cap geometry matching your perfected proportion profile
             const topCapScaleR = sphereR * 1.35; 
             
             if (topAttachType === 0) {
@@ -5362,15 +5271,12 @@ merchants.forEach(m => {
     }
 
     if (vertConfig === 2 || vertConfig === 3) {
-        // Bottom vertical attachment structure
         renderComponent(() => {
-            // Draw connecting neck extension column
             ctx.rect(-7.5, 30, 15, 22.5); 
             ctx.closePath();
         });
 
         renderComponent(() => {
-            // Symmetrical up-scaled bottom cap parameters
             const botCapScaleR = sphereR * 1.35; 
             
             if (botAttachType === 0) {
@@ -5421,9 +5327,7 @@ merchants.forEach(m => {
         drawSolarGrid(wingSpan, -panelH / 2, panelW, panelH);
     }
 
-    // =========================================================================
-    // LAYER 3: 45-DEGREE ROTATED CENTRAL DIAMOND COMMAND POD
-    // =========================================================================
+
     ctx.save();
     ctx.rotate(Math.PI / 4); 
     
@@ -5436,15 +5340,13 @@ merchants.forEach(m => {
     ctx.strokeRect(-12, -12, 24, 24);
     ctx.restore();
 
-    // Topmost bright white interior diamond window core 
+
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(-10, -10, 20, 20); 
     ctx.strokeRect(-10, -10, 20, 20);
     ctx.restore();
     
-    // =========================================================================
-    // FIXED FEATURE: WHITE TEXT BLOCK OVERRIDE WITH ZEROED SHADOW BLUR
-    // =========================================================================
+
     ctx.save(); 
     ctx.shadowBlur = 0;
     ctx.shadowColor = 'transparent';
@@ -5452,7 +5354,6 @@ merchants.forEach(m => {
     ctx.font = 'bold 12px monospace';
     ctx.textAlign = 'center';
 
-    // Renders the merchant string description cleanly right below the model bounds
     ctx.fillText(`MERCHANT - '${merchantName}'`, 0, 76); 
     ctx.restore(); 
     
@@ -5473,15 +5374,13 @@ enemies.forEach(e => {
     ctx.lineWidth = 1.8;
 
        if (e.type === 'pirate') {
-        // =========================================================================
-        // ORIGINAL PIRATE RAIDER HULL CONFIGURATION (150% UP-SCALE + EXPANDED FUEL PODS)
-        // =========================================================================
-        const chassisRadius = 21;    // 14 * 1.5
-        const armLength = 19.5;      // 13 * 1.5
-        // EXPANDED: Sized up the fuel pods further for visual emphasis
+  
+        const chassisRadius = 21;    
+        const armLength = 19.5;      
+        
         const terminusRadius = 10.0; 
 
-        // 1. Core Diamond shape body with its original red fill
+        // 1. Core Diamond shape 
         ctx.fillStyle = '#8f1d2c';
         ctx.beginPath();
         ctx.moveTo(0, -chassisRadius);
@@ -5492,7 +5391,7 @@ enemies.forEach(e => {
         ctx.fill();
         ctx.stroke();
 
-        // 2. Cockpit circle remains ultra-bright near-white tint
+        // 2. Cockpitnear-white tint
         ctx.save();
         ctx.fillStyle = '#ffeeee';
         ctx.beginPath();
@@ -5501,7 +5400,7 @@ enemies.forEach(e => {
         ctx.stroke();
         ctx.restore();
 
-        // 3. Shortened locked X structural frame layout
+        // 3.  locked X structural frame layout
         ctx.fillStyle = 'rgba(255, 51, 51, 0.4)';
         ctx.beginPath();
         ctx.moveTo(-armLength, -armLength);
@@ -5536,7 +5435,6 @@ enemies.forEach(e => {
             ctx.restore();
         }
 
-        // Apply the internal multi-layered detailing to all four frame tips
         drawPodCore(armLength, armLength);
         drawPodCore(-armLength, -armLength);
         drawPodCore(armLength, -armLength);
@@ -5544,9 +5442,7 @@ enemies.forEach(e => {
 
 
     } else if (e.type === 'seeker') {
-        // =========================================================================
-        // FIXED FEATURE: HOSTILE SEEKER DRONE PLASMA PLUME GENERATION
-        // =========================================================================
+
         if (Math.random() < 0.65) {
             const perpAngle = (e.angle || 0) + Math.PI / 2;
             const exhaustSpreadOffset = (Math.random() * 5 - 2.5);
@@ -5563,13 +5459,10 @@ enemies.forEach(e => {
             });
         }
 
-        // =========================================================================
-        // FIXED NATIVE SEEKER CHASSIS VECTOR GEOMETRY PATH DRAWING (SCALED UP)
-        // =========================================================================
-        ctx.save(); // Protects canvas state from leaking to subsequent renders
+
+        ctx.save(); 
         ctx.rotate(e.angle || 0);
         
-        // Scaled up factors (1.5x up from original vector anchors)
         const forwardTip = e.radius * 2.1;
         const tailWing   = -e.radius * 1.5;
         const wingSpan   = e.radius * 1.42;
@@ -5584,9 +5477,6 @@ enemies.forEach(e => {
         ctx.fill();
         ctx.stroke();
 
-        // =========================================================================
-        // FEATURE 2: LIGHT RED ENGINE ACCENT DECAL
-        // =========================================================================
         ctx.save();
         ctx.fillStyle = '#ff6666'; 
         ctx.beginPath();
@@ -5598,12 +5488,9 @@ enemies.forEach(e => {
         ctx.stroke();
         ctx.restore();
 
-        // =========================================================================
-        // FEATURE 3: WHITE & LIGHT RED COCKPIT CANOPY (Glitch-Free Angular Safe Vectors)
-        // =========================================================================
+
         ctx.save();
         
-        // Base Layer: Sleek light red canopy visor plate
         ctx.fillStyle = '#ff8888';
         ctx.beginPath();
         ctx.moveTo(forwardTip - 6, 0);
@@ -5614,7 +5501,6 @@ enemies.forEach(e => {
         ctx.fill();
         ctx.stroke();
 
-        // Top Layer: Crisp white glass reflection circle (Rotation-proof via ctx.arc)
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
         ctx.arc(e.radius * 0.1, 0, e.radius * 0.35, 0, Math.PI * 2);
@@ -5627,10 +5513,7 @@ enemies.forEach(e => {
 
 
     } else {
-        // =========================================================================
-        // CONFIGURABLE VENTRAL BEAM CONE (UNDER LAYER DRAWN FIRST)
-        // =========================================================================
-        // EDIT THIS NUMBER TO ADJUST LENGTH: Larger values = longer cone, smaller = shorter cone!
+  
         const coneLength = 14; 
         
         ctx.save();
@@ -5661,16 +5544,13 @@ enemies.forEach(e => {
         ctx.fill();
         ctx.restore();
 
-        // =========================================================================
-        // NATIVE SAUCER PLATING LAYERS (UNTOUCHED RESTORATION SYSTEM)
-        // =========================================================================
+
         // Basic UFO enemy type (Scaled up by an additional 10% from previous pass)
         ctx.beginPath();
-        ctx.ellipse(0, 2, 26.4, 10.56, 0, 0, Math.PI * 2); // Shifted Y to 2, expanded width/height bounds
+        ctx.ellipse(0, 2, 26.4, 10.56, 0, 0, Math.PI * 2); 
         ctx.fill();
         ctx.stroke();
 
-        // --- Interior Skewed Ring with Red Glow Effect ---
         ctx.save();
         ctx.strokeStyle = '#f16667';
         ctx.lineWidth = 2.2;
@@ -5679,18 +5559,15 @@ enemies.forEach(e => {
         ctx.shadowColor = '#ff3333';
         
         ctx.beginPath();
-        ctx.ellipse(0, 2, 17.16, 6.34, 0, 0, Math.PI * 2); // Follows the 10% scaling and Y=2 alignment shift
+        ctx.ellipse(0, 2, 17.16, 6.34, 0, 0, Math.PI * 2); 
         ctx.stroke();
         ctx.restore();
 
-        // =========================================================================
-        // EXTRUDED ISOMETRIC COCKPIT COWL LAYER (LOWERED & SCALED 10%)
-        // =========================================================================
+   
         ctx.save();
-        ctx.fillStyle = '#ffdddd'; // Ultra-light soft pink/white glass canopy shade
+        ctx.fillStyle = '#ffdddd'; 
         ctx.beginPath();
         
-        // Scaled up by 10% (Width 7.15, Height 4.62) and lowered down by exactly 2 pixels (Y = -4 instead of -6)
         ctx.ellipse(0, -4, 7.15, 4.62, 0, 0, Math.PI * 2);
 
         ctx.fill();
@@ -5704,33 +5581,29 @@ enemies.forEach(e => {
 
 
 
-            // =========================================================================
-            // CIVILIAN TRAFFIC DRAWING ENGINE (NEON CYAN VISOR CONFIGURATION)
-            // =========================================================================
+            // CIVILIAN SHIP
             civilianShips.forEach(ship => {
-                // 1. DYNAMIC COMPONENT: Spawn engine particles straight into the world thread
+             
                 if (Math.random() < 0.65) {
                     const perpAngle = ship.angle + Math.PI / 2;
-                    const exhaustSpreadOffset = (Math.random() * 6 - 3); // Spreads the exhaust trail evenly
+                    const exhaustSpreadOffset = (Math.random() * 6 - 3); 
                     
                     particles.push({
-                        // Anchors coordinates perfectly to the tail end of the civilian chassis frame
                         x: ship.x - Math.cos(ship.angle) * ship.radius + Math.cos(perpAngle) * exhaustSpreadOffset,
                         y: ship.y - Math.sin(ship.angle) * ship.radius + Math.sin(perpAngle) * exhaustSpreadOffset,
                         
-                        // Expels smoke backward relative to the transport's cruise speed
                         vx: -Math.cos(ship.angle) * 1.5 + (Math.random() * 0.4 - 0.2),
                         vy: -Math.sin(ship.angle) * 1.5 + (Math.random() * 0.4 - 0.2),
                         
                         life: 0.6,
                         decay: 0.04, 
-                        color: '#00ffff', // Custom cyan flame trail to match its hull lights
+                        color: '#00ffff', 
                         size: 3.5 + Math.random() * 2.0
                     });
                 }
 
-                // 2. VECTOR DRAWING ROUTINE: Identical to Seeker but Cyan-Themed
-                ctx.save(); // Protects canvas state from leaking to subsequent renders
+                //  CIV SHIP
+                ctx.save(); 
                 ctx.translate(ship.x, ship.y);
                 ctx.rotate(ship.angle);
                 
@@ -5740,7 +5613,7 @@ enemies.forEach(e => {
                 ctx.shadowColor = '#00ffff';
                 ctx.lineWidth = 1.8;
                 
-                // Fixed 1.1x Civilian scale base multiplier applied to the layout anchors
+                // civ ship
                 const currentRadius = ship.radius * 1.1;
                 const forwardTip = currentRadius * 2.1;
                 const tailWing   = -currentRadius * 1.5;
@@ -5759,7 +5632,7 @@ enemies.forEach(e => {
 
                 // LAYER B: NEON CYAN ENGINE ACCENT DECAL
                 ctx.save();
-                ctx.fillStyle = '#66ffff'; // High-visibility bright cyan engine glow accent
+                ctx.fillStyle = '#66ffff'; 
                 ctx.beginPath();
                 ctx.moveTo(innerNotch + 4, 0);
                 ctx.lineTo(tailWing + 2, -wingSpan * 0.35);
@@ -5769,9 +5642,9 @@ enemies.forEach(e => {
                 ctx.stroke();
                 ctx.restore();
 
-                // LAYER C: WHITE & CYAN COCKPIT CANOPY (Glitch-Free Angular Safe Vectors)
+                // LAYER C: WHITE & CYAN COCKPIT CANOPY 
                 ctx.save();
-                // Base Visor Layer: Sleek light cyan glass framing shell
+                // Base Visor Layer
                 ctx.fillStyle = '#88ffff';
                 ctx.beginPath();
                 ctx.moveTo(forwardTip - 6, 0);
@@ -5782,7 +5655,7 @@ enemies.forEach(e => {
                 ctx.fill();
                 ctx.stroke();
 
-                // Top Visor Layer: Symmetrical crisp white reflection point core
+                // Top Visor Layer
                 ctx.fillStyle = '#ffffff';
                 ctx.strokeStyle = '#ffffff';
                 ctx.beginPath();
@@ -5790,8 +5663,8 @@ enemies.forEach(e => {
                 ctx.fill();
                 ctx.stroke();
 
-                ctx.restore(); // Restores canopy shell state
-                ctx.restore(); // Restores civilian matrix translation/rotation state safely!
+                ctx.restore(); 
+                ctx.restore(); 
             });
 
 
@@ -5812,7 +5685,6 @@ enemies.forEach(e => {
             ctx.rotate(player.angle);
             
             if (player.invulnerable === 0 || Math.floor(Date.now() / 60) % 2 === 0) {
-                // Safely execute active selection from lookups
                 try {
                     if (SHIP_SKINS[ACTIVE_SHIP_SKIN]) {
                         SHIP_SKINS[ACTIVE_SHIP_SKIN](ctx, player);
@@ -5820,22 +5692,19 @@ enemies.forEach(e => {
                         SHIP_SKINS['ORIGINAL'](ctx, player);
                     }
                 } catch(e) {
-                    // Fallback to protect main game loop thread from asset layout bugs
                     SHIP_SKINS['ORIGINAL'](ctx, player);
                 }
             }
             ctx.restore();
 
-            // Retained secondary stack parent restore line
+    
             ctx.restore(); 
 
-            ctx.save(); // Opens isolated local context block layer safely
+            ctx.save(); 
             
-            // HIGH-VISIBILITY RESCALE: Crisp white alpha mapping for deep space tracking
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
             ctx.lineWidth = 1.2;
             
-            // FIXED FOR THE DOTS: Sets a clean pattern of 3px dot length followed by 4px gap spacing
             if (ctx.setLineDash) {
                 ctx.setLineDash([3, 4]); 
             }
@@ -5845,17 +5714,15 @@ enemies.forEach(e => {
             const radarScreenCenterY = canvas.height / 2;
             
             ctx.beginPath();
-            // FIXED GAP DISTANCE: Shrinking the ring by 6 pixels pushes your ship's 
-            // native navigation arrows to the outside edge of the dots perfectly!
+
             ctx.arc(radarScreenCenterX, radarScreenCenterY, POINTER_AIM_RADIUS - 6, 0, Math.PI * 2);
             ctx.stroke();
             
-            // CRITICAL SOLID RESET: Empties line dashes so subsequent UI elements draw solid
             if (ctx.setLineDash) {
                 ctx.setLineDash([]); 
             }
             
-            ctx.restore(); // Closes isolated local context block layer perfectly balanced!
+            ctx.restore(); 
 
 
             const spaceportAngle = Math.atan2(
@@ -5961,10 +5828,8 @@ document.addEventListener('click', function(event) {
 
     const skinKey = btn.getAttribute('data-skin');
     
-    // Allow the transaction to proceed for 'RANDOM' even if it's already equipped to handle rerolls
     if (btn.disabled && skinKey !== 'RANDOM') return;
 
-    // --- HANDLE CHASSIS BACKUP RECOVERY TRANSACTIONS ---
     if (skinKey === 'BUYBACK_RECOVERY') {
         if (!player.lastRandomBackup) return;
         const buybackCost = 500;
@@ -5988,7 +5853,6 @@ document.addEventListener('click', function(event) {
         ACTIVE_SHIP_SKIN = 'RANDOM';
         applyShipModifiers('RANDOM');
         
-        // FIXED FOR COMFORT: Automatically fully restores shield arrays upon recovery checkout
         player.shield = player.maxShield;
 
         player.lastRandomBackup = currentActiveCache;
@@ -6023,7 +5887,6 @@ document.addEventListener('click', function(event) {
 
 if (skinKey === 'RANDOM') {
 
-    // Preserve the current random ship for buyback/recovery.
     if (window.proceduralShipCache) {
         player.lastRandomBackup = {
             ...window.proceduralShipCache,
@@ -6031,7 +5894,6 @@ if (skinKey === 'RANDOM') {
         };
     }
 
-    // Generate a completely new locked random configuration NOW.
     generateProceduralShipCache();
 
     player.randomShootDelay = null;
@@ -6043,7 +5905,7 @@ if (skinKey === 'RANDOM') {
 
 applyShipModifiers(skinKey);
 
-// Fully charge the newly generated ship at its true capacity.
+
 player.shield = player.maxShield;
     
 
@@ -6065,7 +5927,66 @@ player.shield = player.maxShield;
     }
 });
 
-// Copyright SPM - Smurphshire 2026
+
+
+(function generateDynamicFavicon() {
+    const iconCanvas = document.createElement('canvas');
+    iconCanvas.width = 64; 
+    iconCanvas.height = 64;
+    const cCtx = iconCanvas.getContext('2d');
+    if (!cCtx) return;
+
+    const mid = 32; 
+
+    cCtx.fillStyle = '#000000';
+    cCtx.fillRect(0, 0, 64, 64);
+
+    const drawFourPointStar = (radiusOuter, radiusInner) => {
+        cCtx.beginPath();
+        cCtx.moveTo(mid, mid - radiusOuter);               
+        cCtx.lineTo(mid + radiusInner, mid - radiusInner); 
+        cCtx.lineTo(mid + radiusOuter, mid);               
+        cCtx.lineTo(mid + radiusInner, mid + radiusInner); 
+        cCtx.lineTo(mid, mid + radiusOuter);               
+        cCtx.lineTo(mid - radiusInner, mid + radiusInner); 
+        cCtx.lineTo(mid - radiusOuter, mid);               
+        cCtx.lineTo(mid - radiusInner, mid - radiusInner); 
+        cCtx.closePath();
+        
+        cCtx.fillStyle = '#ffffff';
+        cCtx.fill();
+        cCtx.strokeStyle = '#111111';
+        cCtx.lineWidth = 2.0;
+        cCtx.lineJoin = 'miter';
+        cCtx.stroke();
+    };
+
+    cCtx.save();
+    cCtx.translate(mid, mid);
+    cCtx.rotate(Math.PI / 4); 
+    cCtx.translate(-mid, -mid);
+    
+    drawFourPointStar(23.5, 7.5);
+    cCtx.restore();
+
+    drawFourPointStar(27, 8.5);
+
+    const faviconDataUrl = iconCanvas.toDataURL('image/png');
+
+    let linkTag = document.querySelector("link[rel*='icon']");
+    if (!linkTag) {
+        linkTag = document.createElement('link');
+        linkTag.rel = 'icon';
+        linkTag.type = 'image/png';
+        document.head.appendChild(linkTag);
+    }
+    
+    linkTag.href = faviconDataUrl;
+})();
+
+
+
+// Copyright SPM - homeworld gen. ported from original illustrator script version - Smurphshire 2026
     </script>
 </body>
 </html>
