@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STARJOURN INFINITE - ACE PILOT EXPEDITION</title>
+    <title>STARJOURN ACE - PILOT EXPEDITION</title>
     <style>
         :root {
             --bg-color: #090909;
@@ -616,7 +616,7 @@
                         <div class="stat-value" id="stat-earnings" style="color: var(--accent-gold);">\$0</div>
                     </div>
                     <div class="stat-card" style="grid-column: span 2;">
-                        <div class="stat-label">Goal to Warp Matrix</div>
+                        <div class="stat-label">Goal to Advance Sector Lvl</div>
                         <div id="stat-goal-bar" style="height:5px; background:#1a1a33; margin-top:4px; border-radius:2px; overflow:hidden;">
                             <div id="stat-goal-fill" style="width:0%; height:100%; background:var(--accent-gold);"></div>
                         </div>
@@ -664,12 +664,12 @@
                 <div class="section-title" style="color: var(--accent-gold); border-color: rgba(255,215,0,0.3);">Comms Hub</div>
                 <p class="merchant-msg" id="pirate-status" style="display:none; color:var(--accent-red); font-weight:bold;"></p>
                 <div id="merchant-content">
-                    <p class="merchant-msg">No merchant signals nearby. Search deep outer border zones for trade ships.</p>
+                    <p class="merchant-msg">No active Merchant Station signals detected nearby. Nearest Signal Targeted, Search deep space for trade opportunities.</p>
                 </div>
             </div>
 
             <div id="spaceport-panel">
-                <div class="section-title" style="color: var(--accent-blue); border-color: rgba(0,255,255,0.3);">Station Central</div>
+                <div class="section-title" style="color: var(--accent-blue); border-color: rgba(0,255,255,0.3);">Central Command:</div>
                 <div id="spaceport-content">
 <button onclick="openShipyardModal()" class="btn" id="btn-bank" disabled>
     HOMEWORLD - Range: 0m
@@ -682,7 +682,7 @@
             <div style="display: flex; flex-direction: column; flex: 1; min-height: 80px;">
                 <div class="section-title" style="font-size:0.75rem; color:#8080a0;">Log Terminal</div>
                 <div id="msg-log" style="margin-top: 5px;">
-                    <div class="log-entry">Navigation online. System configuration set.</div>
+                    <div class="log-entry">Navigation online. Ship systems nominal. Targeting Vectors acquired. Central Command Connection secure. Cleared for departure...</div>
                 </div>
                 <div class="sidebar-actions">
                     <button class="btn" id="audio-toggle" type="button">Enable Audio</button>
@@ -702,9 +702,9 @@
         // Global Parameters & Expanded Coordinates
         const WORLD_SIZE = 12000; 
         const MERCHANT_RANGE = 120; 
-        const BASE_SECTOR_GOAL = 5000;
-        const SECTOR_GOAL_INCREASE = 1200;
-        const POINTER_AIM_RADIUS = 42;
+        const BASE_SECTOR_GOAL = 6000;
+        const SECTOR_GOAL_INCREASE = 2000;
+        const POINTER_AIM_RADIUS =55; // 42 default
         const HOMEWORLD_TILT = 18 * Math.PI / 180;
         
         let keys = {};
@@ -718,18 +718,18 @@
 
         // Sector Environmental Palette Profiles
         const SECTOR_THEMES = {
-            1: { name: "Andromeda Perimeter", primary: "#00ffff", background: "#020208", nebula: "rgba(0, 120, 255, 0.05)", generic: "#888899", modifiers: { enemySpawn: 1.2, merchantSpawn: 1.3, asteroidSpawn: 1.2, goldYield: 0.05 } },
-            2: { name: "Orion Expanse", primary: "#fbfbcc", background: "#08060a", nebula: "rgba(0, 120, 255, 0.05)", generic: "#828e8d", modifiers: { enemySpawn: 1.35, civilianSpawn: 1.25, merchantSpawn: 1.8, asteroidSpawn: 2.5, uraniumYield: 1.3 } },
-            3: { name: "The Keziah Nebula", primary: "#da70d6", background: "#06020c", nebula: "rgba(218, 112, 214, 0.05)", generic: "#998899", modifiers: { asteroidSpawn: 1.35, pirateSpawn: 2.3, goldYield: 0.4, uraniumYield: 0.4, eridiumYield: 0.9 } },
-            4: { name: "Zelion Territory", primary: "#39ff14", background: "#020603", nebula: "rgba(57, 255, 20, 0.04)", generic: "#8a998a", modifiers: { enemySpawn: 2.2, asteroidSpawn: 3.2, uraniumYield: 2.1 } },
-            5: { name: "Supernova Remnant", primary: "#ff6600", background: "#090302", nebula: "rgba(255, 102, 0, 0.06)", generic: "#aa9988", modifiers: { civilianSpawn: 1.4, pirateSpawn: 1.5, uraniumYield: 0.6, eridiumYield: 1.25 } },
-            6: { name: "Empyrean Expanse", primary: "#d5f0f7", background: "#0b0b0b", nebula: "rgba(236, 0, 255, 0.05)", generic: "#bfe0d5", modifiers: { enemySpawn: 1.0, merchantSpawn: 1.6, civilianSpawn: 3.0, asteroidSpawn: 1.3, goldYield: 1.7, uraniumYield: 1.2, eridiumYield: 1.5 } },
-            7: { name: "Solitude Pass", primary: "#7c7c7c", background: "#020208", nebula: "rgba(0, 120, 255, 0.05)", generic: "#888899", modifiers: { enemySpawn: 0.2, merchantSpawn: 0.8, civilianSpawn: 0.2, asteroidSpawn: 1.9, goldYield: 1.2, uraniumYield: 1.2, eridiumYield: 1.6 } },
-            8: { name: "Daxus Quadrant", primary: "#fbfbcc", background: "#08060a", nebula: "rgba(0, 120, 255, 0.05)", generic: "#828e8d", modifiers: { enemySpawn: 1.9, civilianSpawn: 1.25, merchantSpawn: 1.8, asteroidSpawn: 2.5, uraniumYield: 1.3 } },
-            9: { name: "Nebula Abyss", primary: "#7f77ed", background: "#09070a", nebula: "rgba(218, 112, 214, 0.08)", generic: "#998899", modifiers: { asteroidSpawn: 1.35, pirateSpawn: 2.3, goldYield: 1.4, uraniumYield: 0.4, eridiumYield: 1.9 } },
-            10: { name: "The Far Reach", primary: "#8da39b", background: "#0a0705", nebula: "rgba(255, 232, 21, 0.03)", generic: "#a1a5b5", modifiers: { enemySpawn: 1.5, asteroidSpawn: 3.2, uraniumYield: 2.1 } },
+            1: { name: "Andromeda Perimeter", primary: "#00ffff", background: "#020208", nebula: "rgba(0, 120, 255, 0.05)", generic: "#888899", modifiers: { enemySpawn: 1.2, pirateSpawn: 0.6, merchantSpawn: 1.3, asteroidSpawn: 1.2, goldYield: 0.05 } },
+            2: { name: "Outset Expanse", primary: "#fbfbcc", background: "#08060a", nebula: "rgba(0, 120, 255, 0.05)", generic: "#828e8d", modifiers: { enemySpawn: 1.35, pirateSpawn: 1.1, civilianSpawn: 1.25, merchantSpawn: 0.8, asteroidSpawn: 2.5, uraniumYield: 1.3 } },
+            3: { name: "The Keziah Colonies", primary: "#da70d6", background: "#06020c", nebula: "rgba(218, 112, 214, 0.05)", generic: "#998899", modifiers: { asteroidSpawn: 1.35, enemySpawn: 1.8, pirateSpawn: 1.7, goldYield: 0.4, uraniumYield: 0.4, eridiumYield: 0.9 } },
+            4: { name: "Zelion Territory", primary: "#39ff14", background: "#020603", nebula: "rgba(57, 255, 20, 0.04)", generic: "#8a998a", modifiers: { enemySpawn: 2.5, pirateSpawn: 0.2, asteroidSpawn: 3.2, uraniumYield: 2.1 } },
+            5: { name: "Supernova Remnant", primary: "#ff6600", background: "#090302", nebula: "rgba(255, 102, 0, 0.06)", generic: "#aa9988", modifiers: { civilianSpawn: 0.4, merchantSpawn: 0.3, enemySpawn: 1.5, pirateSpawn: 1.5, uraniumYield: 0.6, eridiumYield: 1.25 } },
+            6: { name: "Empyrean Empire", primary: "#d5f0f7", background: "#0b0b0b", nebula: "rgba(236, 0, 255, 0.05)", generic: "#bfe0d5", modifiers: { enemySpawn: 0.4, pirateSpawn: 0.1, merchantSpawn: 1.6, civilianSpawn: 2.5, asteroidSpawn: 1.3, goldYield: 1.7, uraniumYield: 1.2, eridiumYield: 1.5 } },
+            7: { name: "Solitude Pass", primary: "#7c7c7c", background: "#020208", nebula: "rgba(0, 120, 255, 0.05)", generic: "#888899", modifiers: { enemySpawn: 0.9, pirateSpawn: 0.1, merchantSpawn: 0.8, civilianSpawn: 0.2, asteroidSpawn: 1.9, goldYield: 1.2, uraniumYield: 1.2, eridiumYield: 1.6 } },
+            8: { name: "Daxus Quadrant", primary: "#fbfbcc", background: "#08060a", nebula: "rgba(0, 120, 255, 0.05)", generic: "#828e8d", modifiers: { enemySpawn: 1.9, pirateSpawn: 1.2, civilianSpawn: 1.25, merchantSpawn: 1.8, asteroidSpawn: 2.5, uraniumYield: 1.3 } },
+            9: { name: "Nebula Abyss", primary: "#7f77ed", background: "#09070a", nebula: "rgba(218, 112, 214, 0.08)", generic: "#998899", modifiers: { asteroidSpawn: 1.35, enemySpawn: 2.3, pirateSpawn: 2.3, goldYield: 1.4, uraniumYield: 0.4, eridiumYield: 1.9 } },
+            10: { name: "The Far Reach", primary: "#8da39b", background: "#0a0705", nebula: "rgba(255, 232, 21, 0.03)", generic: "#a1a5b5", modifiers: { enemySpawn: 1.5, pirateSpawn: 0.7, asteroidSpawn: 3.2, uraniumYield: 2.1 } },
             11: { name: "Nexus Void", primary: "#9ed1dd", background: "#07090a", nebula: "rgba(0, 182, 255, 0.06)", generic: "#aa9988", modifiers: { civilianSpawn: 1.4, pirateSpawn: 1.5, eridiumYield: 1.25 } },
-            12: { name: "Uncharted Sector", primary: "#ddeff2", background: "#020202", nebula: "rgba(255, 0, 134, 0.05)", generic: "#a1a5b5", modifiers: { enemySpawn: 1.2, merchantSpawn: 1.3, civilianSpawn: 0.3, asteroidSpawn: 2.8, goldYield: 0.5 } }
+            12: { name: "Uncharted Sector", primary: "#ddeff2", background: "#020202", nebula: "rgba(255, 0, 134, 0.05)", generic: "#a1a5b5", modifiers: { enemySpawn: 1.2, merchantSpawn: 1.2, civilianSpawn: 0.3, asteroidSpawn: 2.2, goldYield: 0.5 } }
             
 
 
@@ -784,7 +784,7 @@
 // =========================================================================
 
 // Change this value to switch your active design:
-// Options: 'ORIGINAL', 'SLICKBACK', 'MOSQUITO', 'SCIENCE', 'INTERCEPTOR', or 'RANDOM'
+// Options: 'ORIGINAL', 'STARJOURNER', 'MOSQUITO', 'SCIENCE', 'INTERCEPTOR', or 'RANDOM'
 //const ACTIVE_SHIP_SKIN = 'RANDOM'; 
 
 // Caches procedural components so the random ship layout doesn't change color every single frame
@@ -929,15 +929,15 @@ const SHIP_SKINS = {
         ctx.stroke();
     },
 
-     // Slickback Lavender Interceptor
-    'SLICKBACK': function(ctx, player) {
+     // STARJOURNER Lavender Interceptor
+    'STARJOURNER': function(ctx, player) {
         ctx.rotate(Math.PI / 2);
         ctx.scale(player.radius / 24, player.radius / 24);
         ctx.shadowBlur = 12; ctx.shadowColor = '#ffffff';
         ctx.lineJoin = 'miter'; ctx.miterLimit = 10; ctx.lineCap = 'square';
 
         // ==========================================
-        // 1. BASE OUTLINE & BACKGROUND (Slickback Lavender)
+        // 1. BASE OUTLINE & BACKGROUND (STARJOURNER Lavender)
         // ==========================================
         ctx.fillStyle = '#e1c6e5'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3;
         ctx.beginPath();
@@ -2161,7 +2161,7 @@ let ACTIVE_SHIP_SKIN = 'RANDOM'; // Changed from 'const' to 'let' so it can be s
 
 const SHIP_SHOP_PRICES = {
     'ORIGINAL': 0,               // RETRO Starter Model
-    'SLICKBACK': 900,           // SLICKBACK Fighter
+    'STARJOURNER': 900,           // STARJOURNER Fighter
     'MOSQUITO': 500,         // MOSQUITO Long-Range Escort
     'SCIENCE': 700,  // SCIENCE Research Vessel
     'INTERCEPTOR': 1500, // INTERCEPT Tri-Core Fighter
@@ -2176,9 +2176,9 @@ const SHIP_SHOP_PRICES = {
 const SHIP_STAT_MODIFIERS = {
     'ORIGINAL': {
         thrust: 0.13 * 0.75, // -25% Thrust (Slower acceleration)
-        friction: 0.998      // endless float
+        friction: 0.996      // near endless float
     },
-    'SLICKBACK': {
+    'STARJOURNER': {
         thrust: 0.13,        // Default acceleration
         friction: 0.990      // Default drag
     },
@@ -2227,7 +2227,7 @@ function openShipyardModal() {
     // 2. Generate the shop items list structure matching your exact requirements
     const skinDisplayNames = {
         'ORIGINAL': 'RETRO Starter Model',
-        'SLICKBACK': 'SLICKBACK Fighter',
+        'STARJOURNER': 'STARJOURNER Fighter',
         'MOSQUITO': 'MOSQUITO Long-Range Escort',
         'SCIENCE': 'SCIENCE Research Vessel',
         'INTERCEPTOR': 'INTERCEPT Tri-Core Fighter',
@@ -2312,8 +2312,8 @@ window.closeShipyardModal = function() {
                 GENERIC: { name: 'Generic', color: '#888899', mineral: null },
                 IRON: { name: 'Metallic', color: '#8c8c8c', mineral: 'iron' },
                 GOLD: { name: 'Auric', color: 'rgba(255, 215, 0, 0.9)', mineral: 'gold' },
-                URANIUM: { name: 'Radiant', color: 'rgba(57, 255, 20, 0.9)', mineral: 'uranium' },
-                ERIDIUM: { name: 'Nebula', color: 'rgba(218, 112, 214, 0.9)', mineral: 'eridium' }
+                URANIUM: { name: 'Irradiated', color: 'rgba(57, 255, 20, 0.9)', mineral: 'uranium' },
+                ERIDIUM: { name: 'Exotic', color: 'rgba(218, 112, 214, 0.9)', mineral: 'eridium' }
             };
 
             const MINERAL_COLORS = {
@@ -2459,7 +2459,7 @@ window.closeShipyardModal = function() {
 
             for (let index = 0; index < Math.floor(Math.random() * 5); index++) {
                 const angle = Math.random() * Math.PI * 2;
-                const moonDistance = radius + 40 + Math.random() * 60;
+                const moonDistance = radius + 100 + Math.random() * 190;
                 const moonX = center + Math.cos(angle) * moonDistance;
                 const moonY = center + Math.sin(angle) * moonDistance;
                 const moonRadius = 5 + Math.random() * 9;
@@ -3167,7 +3167,7 @@ function resetGame() {
                 );
                 pirate.campAsteroids.push(asteroids[asteroids.length - 1]);
             }
-            addLog(`Pirate camp detected in outer sector: ${Math.round(distanceBetween(pirate, SPACEPORT))}m from center.`);
+            addLog(`Pirate detected in outer sector: ${Math.round(distanceBetween(pirate, SPACEPORT))}m`);
         }
 
         function spawnPirate() {
@@ -3519,7 +3519,7 @@ generateBackgroundAssets();
                 let activeTrait = 'STANDARD';
                 if (ACTIVE_SHIP_SKIN === 'SCIENCE') activeTrait = 'SPREAD';
                 else if (ACTIVE_SHIP_SKIN === 'INTERCEPTOR') activeTrait = 'DOUBLE';
-                else if (ACTIVE_SHIP_SKIN === 'SLICKBACK') activeTrait = 'HOMING';
+                else if (ACTIVE_SHIP_SKIN === 'STARJOURNER') activeTrait = 'HOMING';
                 else if (ACTIVE_SHIP_SKIN === 'RANDOM' && window.proceduralShipCache && window.proceduralShipCache.weaponTrait) {
                     activeTrait = window.proceduralShipCache.weaponTrait;
                 }
@@ -3563,13 +3563,13 @@ generateBackgroundAssets();
                     });
 
                 } else {
-                    //  STANDARD LINEAR FIRE / SLICKBACK BASELINE
+                    //  STANDARD LINEAR FIRE / STARJOURNER BASELINE
                     bullets.push({
                         x: baseBulletX, y: baseBulletY,
                         vx: Math.cos(player.angle) * 7.5 + player.vx,
                         vy: Math.sin(player.angle) * 7.5 + player.vy,
                         life: 74,
-                        color: ACTIVE_SHIP_SKIN === 'SLICKBACK' ? '#d4b0db' : '#ffffff' 
+                        color: ACTIVE_SHIP_SKIN === 'STARJOURNER' ? '#d4b0db' : '#ffffff' 
                     });
                 }
 
@@ -3582,9 +3582,9 @@ generateBackgroundAssets();
             // PLAYER PROJECTILE TRACKING & PHYSICS MOVEMENT ENGINE WITH BULLET TRAILS
             // =========================================================================
             bullets.forEach((b) => {
-                const isSlickbackHoming = (ACTIVE_SHIP_SKIN === 'SLICKBACK');
+                const isSTARJOURNERHoming = (ACTIVE_SHIP_SKIN === 'STARJOURNER');
                 const isRandomHoming = (ACTIVE_SHIP_SKIN === 'RANDOM' && window.proceduralShipCache && window.proceduralShipCache.weaponTrait === 'HOMING');
-                const isHoming = isSlickbackHoming || isRandomHoming;
+                const isHoming = isSTARJOURNERHoming || isRandomHoming;
 
                 if (isHoming) { 
                     // =============================================================
@@ -3683,8 +3683,22 @@ generateBackgroundAssets();
                         e.vx += campDx * 0.0008;
                         e.vy += campDy * 0.0008;
                     } else {
-                        const playerAngle = Math.atan2(-dy, -dx) + Math.PI / 2 + Math.sin(Date.now() / 700) * 0.25;
-                        const desiredDistance = 520;
+                        if (typeof e.orbitDirection === 'undefined') {
+                            e.orbitDirection = 1;
+                            // PARAM: Initial delay (ms) before first orbit direction flip
+                            e.nextOrbitFlipAt = Date.now() + 800 + Math.random() * 1000; 
+                        }
+
+                        if (Date.now() >= e.nextOrbitFlipAt) {
+                            e.orbitDirection *= -1;
+                            // PARAM: Frequency (ms) of how fast pirates switch orbit directions
+                            e.nextOrbitFlipAt = Date.now() + 800 + Math.random() * 1000; 
+                        }
+
+                        const directionalOffset = (Date.now() / 700) * e.orbitDirection;
+                        const playerAngle = Math.atan2(-dy, -dx) + Math.PI / 2 + Math.sin(directionalOffset) * 0.25;
+                        // PARAM: Distance (pixels) the pirate tries to maintain while circling
+                        const desiredDistance = 520; 
                         const targetX = player.x + Math.cos(playerAngle) * desiredDistance;
                         const targetY = player.y + Math.sin(playerAngle) * desiredDistance;
                         e.vx += wrappedDelta(e.x, targetX) * 0.0012;
@@ -3748,26 +3762,72 @@ generateBackgroundAssets();
                         }
                     }
                 } else if (d < 550) {
-                    e.vx += (dx / Math.max(d, 1)) * 0.055;
-                    e.vy += (dy / Math.max(d, 1)) * 0.055;
-
-                    let spd = Math.hypot(e.vx, e.vy);
-                    if (spd > e.speed) {
-                        e.vx = (e.vx / spd) * e.speed;
-                        e.vy = (e.vy / spd) * e.speed;
+                    if (typeof e.isRamming === 'undefined') {
+                        e.isRamming = false;
+                        // PARAM: Cooldown (ms) before checking for a ram charge sequence
+                        e.nextRamCheckAt = Date.now() + 600 + Math.random() * 1000; 
+                        e.ramActionUntil = 0;
                     }
 
-                    if (Date.now() - e.lastShot > e.shootDelay && Math.random() < 0.22) {
-                        let bAngle = Math.atan2(dy, dx) + (Math.random() * 0.16 - 0.08);
-                        enemyBullets.push({
-                            x: e.x, y: e.y,
-                            vx: Math.cos(bAngle) * 4.8,
-                            vy: Math.sin(bAngle) * 4.8,
-                            life: 130,
-                            owner: e
-                        });
-                        gameAudio.playEnemyFire();
-                        e.lastShot = Date.now();
+                    if (!e.isRamming && Date.now() >= e.nextRamCheckAt) {
+                        // PARAM: Probability chance (0.35 = 35%) to trigger a ram run
+                        if (Math.random() < 0.35) { 
+                            e.isRamming = true;
+                            // PARAM: Total duration (ms) the UFO stays locked in ramming phase
+                            e.ramActionUntil = Date.now() + 1500 + Math.random() * 1000; 
+                        } else {
+                            // PARAM: Retry check gap (ms) if the probability roll fails
+                            e.nextRamCheckAt = Date.now() + 500 + Math.random() * 800; 
+                        }
+                    }
+
+                    if (e.isRamming) {
+                        if (Date.now() < e.ramActionUntil) {
+                            const ramAngle = Math.atan2(dy, dx);
+                            // PARAM: Speed multiplier for overdrive thrust (1.85 = 185% normal speed)
+                            const overdriveSpeed = e.speed * 1.85;
+                            // PARAM: Acceleration intensity vector rate while charging
+                            e.vx += Math.cos(ramAngle) * 0.22; 
+                            e.vy += Math.sin(ramAngle) * 0.22;
+                            let spd = Math.hypot(e.vx, e.vy);
+                            if (spd > overdriveSpeed) {
+                                e.vx = (e.vx / spd) * overdriveSpeed;
+                                e.vy = (e.vy / spd) * overdriveSpeed;
+                            }
+                        } else {
+                            e.isRamming = false;
+                            // PARAM: Safe rest timer gap (ms) before it can attempt a new ram run
+                            e.nextRamCheckAt = Date.now() + 1500 + Math.random() * 1500; 
+                        }
+                    } else {
+                        // PARAM: Distance buffer (pixels) the UFO flees to avoid accidental crashing
+                        const safetyDistance = 210;
+                        if (d < safetyDistance) {
+                            e.vx -= (dx / Math.max(d, 1)) * 0.065;
+                            e.vy -= (dy / Math.max(d, 1)) * 0.065;
+                        } else {
+                            e.vx += (dx / Math.max(d, 1)) * 0.045;
+                            e.vy += (dy / Math.max(d, 1)) * 0.045;
+                        }
+
+                        let spd = Math.hypot(e.vx, e.vy);
+                        if (spd > e.speed) {
+                            e.vx = (e.vx / spd) * e.speed;
+                            e.vy = (e.vy / spd) * e.speed;
+                        }
+
+                        if (Date.now() - e.lastShot > e.shootDelay && Math.random() < 0.22) {
+                            let bAngle = Math.atan2(dy, dx) + (Math.random() * 0.16 - 0.08);
+                            enemyBullets.push({
+                                x: e.x, y: e.y,
+                                vx: Math.cos(bAngle) * 4.8,
+                                vy: Math.sin(bAngle) * 4.8,
+                                life: 130,
+                                owner: e
+                            });
+                            gameAudio.playEnemyFire();
+                            e.lastShot = Date.now();
+                        }
                     }
                 } else {
                     if(Math.random() < 0.015) {
@@ -3779,6 +3839,10 @@ generateBackgroundAssets();
                 e.x += e.vx; e.y += e.vy;
                 wrapEntity(e);
             });
+
+
+
+
 
             merchants.forEach(m => {
                 m.x += m.vx; m.y += m.vy;
@@ -3951,7 +4015,7 @@ generateBackgroundAssets();
                         }
                         
                         asteroids.splice(aIdx, 1);
-                        addLog(`Mined ${a.type.name} fragment overlay.`);
+                        addLog(`Mined ${a.type.name} asteroid.`);
                         break; 
                     }
                 }
@@ -3968,7 +4032,7 @@ generateBackgroundAssets();
                             if (e.type === 'pirate') {
                                 if (e.stolenCargo) {
                                     spawnMineralDrops(e.x, e.y, e.stolenCargo);
-                                    addLog('Pirate defeated. Confiscated cargo dropped for recovery.');
+                                    addLog('Rogue defeated! Cargo dropped for recovery.');
                                 } else {
                                     const salvage = {
                                         gold: 1 + Math.floor(Math.random() * 3),
@@ -3977,7 +4041,7 @@ generateBackgroundAssets();
                                     };
                                     spawnMineralDrops(e.x, e.y, salvage);
                                     player.wallet += 300;
-                                    addLog('Pirate defeated. Salvage bonus: resources recovered and \$300 paid.');
+                                    addLog('Pirate defeated! Resources salvagable for recovery, and bounty bonus of \$300 paid.');
                                 }
                             } else {
                                 player.wallet += 100;
@@ -3991,7 +4055,7 @@ generateBackgroundAssets();
                                 });
                             }
                             gameAudio.playDamage();
-                            if (e.type !== 'pirate') addLog(`Raider cargo hull cracked. Enemy bounty paid: \$100.`);
+                            if (e.type !== 'pirate') addLog(`Raider destroyed! Bounty of \$100 recovered.`);
                             saveGame();
                         }
                         break;
@@ -4043,6 +4107,57 @@ generateBackgroundAssets();
                     healthPacks.splice(packIdx, 1);
                 }
             }
+            // =========================================================================
+            // 3. FEATURE SPEC: PLAYER VS SHIPS PHYSICAL RAMMING COLLISIONS (ROUTED FIX)
+            // =========================================================================
+            // Safely skip checking if the player is currently structural-lock invulnerable
+            if (player.invulnerable <= 0) {
+                
+                // Helper formula to handle physical bounce deflection and ship-to-ship damage
+                const processShipRamming = (targetShip, logMessage) => {
+                    if (distanceBetween(player, targetShip) < player.radius + targetShip.radius) {
+                        
+                        // Step A: Calculate angle of impact between the two bodies
+                        const impactAngle = Math.atan2(player.y - targetShip.y, player.x - targetShip.x);
+                        const pushForce = 3.5; // Force variable determining how hard they get stopped/knocked back
+                        
+                        // Step B: Overwrite player velocity vectors to instantly reverse and halt momentum
+                        player.vx = Math.cos(impactAngle) * pushForce;
+                        player.vy = Math.sin(impactAngle) * pushForce;
+                        
+                        // Step C: ROUTED TRIGGERS: Pass damage straight into your game's native matrix
+                        // This guarantees perfect center map respawning, wallet losses, and new random ship rolls!
+                        const ramDamage = 10;
+                        damagePlayer(ramDamage, targetShip);
+                        
+                        // Step D: Trigger extra visual feedback and logging 
+                        spawnBurst(player.x, player.y, '#ffffff', 8); // White mechanical spark burst
+                        addLog(logMessage);
+                        
+                        // Proactively provoke pirates if you ram into them out in open space!
+                        if (targetShip.type === 'pirate') {
+                            targetShip.provoked = true;
+                        }
+                        
+                        return true; // Break condition check flag
+                    }
+                    return false;
+                };
+
+                // Check collisions against hostile raider arrays
+                for (let i = 0; i < enemies.length; i++) {
+                    if (processShipRamming(enemies[i], "Hull collision with Raider! Shield damaged, hull knocked back.")) {
+                        break;
+                    }
+                }
+
+                // Check collisions against peaceful lane traffic arrays
+                for (let j = 0; j < civilianShips.length; j++) {
+                    if (processShipRamming(civilianShips[j], "Collision warning: Rammed a Civilian transport! Minor shield puncture.")) {
+                        break;
+                    }
+                }
+            }
 
 
 // asteroid pickup
@@ -4062,7 +4177,7 @@ for (let idx = minerals.length - 1; idx >= 0; idx--) {
             gameAudio.playPickup();
             spawnBurst(m.x, m.y, MINERAL_COLORS[m.type], 13);
 
-            addLog(`IRON collected. Wallet +$${ironReward}.`);
+            addLog(`Recovered [IRON]. Wallet +$${ironReward}.`);
 
         // RARE MATERIAL: large instant wallet reward
         } else if (m.type === 'rare') {
@@ -4076,7 +4191,7 @@ for (let idx = minerals.length - 1; idx >= 0; idx--) {
             gameAudio.playSupplyCache();
             spawnBurst(m.x, m.y, MINERAL_COLORS[m.type], 36);
 
-            addLog(`RARE MATERIAL recovered! Wallet +$${rareReward}.`);
+            addLog(`RARE MATERIAL! Wallet +$${rareReward}.`);
 
         // NORMAL MATERIALS: existing cargo behavior
         } else {
@@ -4086,7 +4201,7 @@ for (let idx = minerals.length - 1; idx >= 0; idx--) {
             gameAudio.playPickup();
             spawnBurst(m.x, m.y, MINERAL_COLORS[m.type], 20);
 
-            addLog(`Cargo expanded: [${m.type.toUpperCase()}] captured`);
+            addLog(`Resource Recovered: [${m.type.toUpperCase()}]`);
         }
 
         saveGame();
@@ -4146,7 +4261,7 @@ for (let idx = minerals.length - 1; idx >= 0; idx--) {
 function applyShipModifiers(skinKey) {
     if (!skinKey) return;
 
-    const mods = SHIP_STAT_MODIFIERS[skinKey] || SHIP_STAT_MODIFIERS['SLICKBACK'];
+    const mods = SHIP_STAT_MODIFIERS[skinKey] || SHIP_STAT_MODIFIERS['STARJOURNER'];
     player.thrust = mods.thrust;
     player.friction = mods.friction;
 
@@ -4161,15 +4276,19 @@ function applyShipModifiers(skinKey) {
     // --- 2. EVALUATE WEAPONS & SHIELDS BY SKIN TYPING ---
     if (skinKey === 'INTERCEPTOR') {
         player.shootDelay = 120; 
-        targetMaxShield = 175;
+        targetMaxShield = 160;
         targetRegenInterval = 1750; // Fixed fast rate for named Interceptor
 
     } else if (skinKey === 'SCIENCE') {
         player.shootDelay = 300; 
         targetMaxShield = 200; // Fixed heavy pool for named Science
 
+    } else if (skinKey === 'STARJOURNER') {
+        targetMaxShield = 100; 
+
+
     } else if (skinKey === 'MOSQUITO') {
-        player.shootDelay = 150; 
+        player.shootDelay = 100; 
         targetAbsorption = 0.25; // Fixed flat armor for named Mosquito
 
     } else if (skinKey === 'RANDOM') {
@@ -4236,7 +4355,7 @@ if (sTrait === 'SHIELD_BOOST') {
         }
 
     } else {
-        // SLICKBACK BASELINE
+        // STARJOURNER BASELINE
         player.shootDelay = 188; 
     }
     
@@ -4333,8 +4452,8 @@ if (sTrait === 'SHIELD_BOOST') {
                 // Fully charge the replacement ship to its generated capacity.
                 player.shield = player.maxShield;
 
-                showAlert("!! CRITICAL DESTRO !! Ship Towed. Reverted to RANDOM Chassis.");
-                addLog(`Hull atomized! Reverted to baseline random assembly. Previous configuration saved to shipyard backup memory bank.`);
+                showAlert("Ship Destroyed! Resources Lost, new ship purchased.");
+                addLog(`Ship destroyed!, life pod deployed successfully. Resources and partial funds lost, new random ship from shipyard acquired.`);
                 
                 saveGame();
             }
@@ -4494,10 +4613,10 @@ function updateUI() {
 
                 if (checkedAmt > 0) {
                     gameAudio.playBank();
-                    addLog(`Vault registration accepted: \$${checkedAmt} deposited into high score record.`);
-                    showAlert(`VAULT SECURED +\$${checkedAmt}`);
+                    addLog(`Deposit Accepted: \$${checkedAmt} Credits secured in Central Command Bank.`);
+                    showAlert(`Deposited! +\$${checkedAmt}`);
                 } else {
-                    showAlert("SHIELDS DEPLOYED FULL");
+                    showAlert("SHIELDS FULL");
                 }
 
                 if (player.bank >= getSectorGoal()) {
@@ -4554,7 +4673,7 @@ function updateUI() {
             nearbyMerchant = null;
             nearbyMerchantCargoState = null;
             if (merchPanel) {
-                merchPanel.innerHTML = `<p class="merchant-msg">No merchant signals nearby. Search deep outer border zones for trade ships.</p>`;
+                merchPanel.innerHTML = `<p class="merchant-msg">No active Merchant Station signals detected nearby. Nearest Signal Targeted, Search deep space for trade opportunities.</p>`;  // com text
             }
         }
     }
@@ -4570,16 +4689,16 @@ function updateUI() {
                 merchPanel.setAttribute('data-render-cache', currentSystemStateKey);
 
                 const skinDisplayNames = {
-                    'ORIGINAL': 'RETRO',
-                    'SLICKBACK': 'SLICKBACK',
-                    'MOSQUITO': 'MOSQUITO',
-                    'SCIENCE': 'SCIENCE',
-                    'INTERCEPTOR': 'INTERCEPT',
-                    'RANDOM': 'RANDOM'
+                    'ORIGINAL': 'RETRO ARCADE',
+                    'STARJOURNER': 'STARJOURNER',
+                    'MOSQUITO': 'THE MOSQUITO',
+                    'SCIENCE': 'SCIENCE VESSEL',
+                    'INTERCEPTOR': 'INTERCEPTOR',
+                    'RANDOM': 'RANDOMIZED SHIP'
                 };
 
                             // SCALED DOWN TITLE: Compact 11px font profile to prevent clipping lines
-            let shopHTML = `<h3 style="color: #ff9d42; margin: 0 0 6px 0; font-size: 11px; font-weight: bold; letter-spacing: 0.3px; border-bottom: 1px solid #333; padding-bottom: 2px; text-transform: uppercase;">🛰️ Shipyard Online</h3>`;
+            let shopHTML = `<h3 style="color: #ff9d42; margin: 0 0 6px 0; font-size: 11px; font-weight: bold; letter-spacing: 0.3px; border-bottom: 1px solid #333; padding-bottom: 2px; text-transform: uppercase;">Shipyard Available</h3>`;
             
             // FIXED SIZING: Tightened gap spacing from 5px to 3px to maximize vertical clearance
             shopHTML += `<div class="shipyard-grid-wrapper" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 3px; padding: 1px 0; font-family: monospace;">`;
@@ -4611,7 +4730,7 @@ function updateUI() {
             if (player.lastRandomBackup) {
                 shopHTML += `
                     <button class="ship-shop-btn" data-skin="BUYBACK_RECOVERY" style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; background: rgba(0, 229, 255, 0.04); border: 1px dashed #00e5ff; padding: 3px 6px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 4px; font-family: monospace; box-sizing: border-box; min-height: 22px; transition: background 0.1s;">
-                        <span style="font-size: 8px; font-weight: 900; color: #00e5ff; letter-spacing: 0.1px; text-transform: uppercase;">🔄 RECOVER PRE-DEATH HULL MOD</span>
+                        <span style="font-size: 8px; font-weight: 900; color: #00e5ff; letter-spacing: 0.1px; text-transform: uppercase;">RECOVER LAST CUSTOM SHIP</span>
                         <span style="font-size: 8.5px; font-weight: 900; background: #00e5ff; color: #000; padding: 1px 4px; border-radius: 2px; line-height: 1;">\$500</span>
                     </button>`;
             }
@@ -4639,7 +4758,7 @@ function updateUI() {
                 } else {
                     sCtx.save(); sCtx.shadowBlur = 3; sCtx.shadowColor = '#ffffff';
 
-                    if (targetSkin === 'SLICKBACK') {
+                    if (targetSkin === 'STARJOURNER') {
                         sCtx.fillStyle = '#e1c6e5'; sCtx.strokeStyle = '#ffffff'; sCtx.lineWidth = 1.2;
                         sCtx.beginPath(); sCtx.moveTo(11, 4); sCtx.lineTo(19, 18); sCtx.lineTo(11, 12); sCtx.lineTo(3, 18); sCtx.closePath(); sCtx.fill(); sCtx.stroke();
                     } else if (targetSkin === 'MOSQUITO') {
@@ -4666,7 +4785,7 @@ function updateUI() {
         } else {
             if (merchPanel.getAttribute('data-render-cache') !== 'deep_space') {
                 merchPanel.setAttribute('data-render-cache', 'deep_space');
-                merchPanel.innerHTML = `<p style="color: #888; font-size: 11px; margin: 0;">No merchant signals nearby. Search deep outer border zones for trade ships.</p>`;
+                merchPanel.innerHTML = `<p style="color: #888; font-size: 12px; margin: 0;">No active Merchant Station signals detected nearby. Nearest Signal Targeted, Search deep space for trade opportunities.</p>`;
             }
         }
     }
@@ -4729,8 +4848,8 @@ function updateUI() {
             saveGame();
 
             // FIXED FOR THE UI: Changed m.reward to tradePayout so notifications show the boosted cash!
-            addLog(`Trade verified with ship profile ${m.id}. Received \$${tradePayout} trade cash.`);
-            showAlert(`INVENTORY SOLD +\$${tradePayout}`);
+            addLog(`Trade of resources verified with merchant ship profile ${m.id}. Received \$${tradePayout} credits.`);
+            showAlert(`RESOURCES SOLD! +\$${tradePayout}`);
 
             
             // Cycle merchant positions onto border regions cleanly
@@ -4762,9 +4881,9 @@ function updateUI() {
 
             // FIXED: Using string parameters referencing independent global window scope actions to avoid template injection click stalls
             panel.innerHTML = `
-                <p class="merchant-msg" style="color:var(--accent-gold); font-weight:bold;">SPACE MERCHANTS SYNDICATE: ${m.id}</p>
+                <p class="merchant-msg" style="color:var(--accent-gold); font-weight:bold;">TRADE ALLIANCE ID#: ${m.id}</p>
                 <div class="trade-reqs" style="margin:4px 0;">${reqHtml}</div>
-                <p class="merchant-msg">Wallet Payout Offer: <span style="color:#55ff55; font-weight:bold;">\$${Math.floor(m.reward * (1 + (currentSector - 1) * 0.07))}</span></p>
+                <p class="merchant-msg">MERCHANT'S TRADE OFFER: <span style="color:#55ff55; font-size:1.25rem; font-weight:bold;">\$${Math.floor(m.reward * (1 + (currentSector - 1) * 0.07))}</span></p>
                 <button class="btn" id="btn-trade" onclick="executeMerchantTrade('${m.id}')" style="width:100%; border-color:var(--accent-gold); color:var(--accent-gold); margin-top:4px;" ${canTrade ? '' : 'disabled'}>${pirateStatusUntil > Date.now() ? 'Locked - Piracy' : 'Execute Trade'}</button>
             `;
         }
@@ -4926,9 +5045,9 @@ ctx.strokeRect(0, 0, 12000, 12000);
             // =========================================================================
             bullets.forEach((b) => {
                 // 1. Identify the active weapon profile class
-                const isSlickbackHoming = (ACTIVE_SHIP_SKIN === 'SLICKBACK');
+                const isSTARJOURNERHoming = (ACTIVE_SHIP_SKIN === 'STARJOURNER');
                 const isRandomHoming = (ACTIVE_SHIP_SKIN === 'RANDOM' && window.proceduralShipCache && window.proceduralShipCache.weaponTrait === 'HOMING');
-                const isHoming = isSlickbackHoming || isRandomHoming;
+                const isHoming = isSTARJOURNERHoming || isRandomHoming;
 
                 const isScienceSpread = (ACTIVE_SHIP_SKIN === 'SCIENCE');
                 const isRandomSpread = (ACTIVE_SHIP_SKIN === 'RANDOM' && window.proceduralShipCache && window.proceduralShipCache.weaponTrait === 'SPREAD');
@@ -5153,18 +5272,18 @@ merchants.forEach(m => {
     // Procedural name generator parsing arrays from your homeworld word bank
     const generateMerchantName = () => {
         const prefixes = [
-            "Do", "J", "Qui", "G", "Rom",
+            "Do", "J", "Qui", "G", "Dur",
 
-            "M", "Nix", "Crom", "Phas", "Yor",
-            "Kor", "Ai", "Bo", "K", "Sha",
+            "M", "Nix", "Cr", "Gip", "Yor",
+            "Kor", "Ai", "B", "K", "Sha", "Vo",
             "Mi", "Tch", "Kel", "Ryn", "T"
         ];
 
         const roots = [
-            "yst", "ox", "ion", "or", "ur",
+            "yst", "oss", "ion", "or", "ur",
             "ell", "on", "ax", "ul", "un",
             "eth", "lek", "rin", "vek", "ith",
-            "ara", "esh", "ok", "trek", "strin"
+            "ara", "esh", "nix", "tlu", "strin"
         ];
         
         const prefIdx = Math.floor(rand(10) * prefixes.length);
@@ -5180,128 +5299,169 @@ merchants.forEach(m => {
     const topAttachType = Math.floor(rand(7) * 3); // 0 = Rect, 1 = Semi-Circle, 2 = Full Circle
     const botAttachType = Math.floor(rand(8) * 3); // 0 = Rect, 1 = Semi-Circle, 2 = Full Circle
     const sphereR = 13;
-
     // Helper function to render a standalone structural element with mask fill and stroke glow
     const renderComponent = (drawPathFunc) => {
         ctx.save();
         ctx.beginPath();
         drawPathFunc();
+        
         // Solid layout background matching standard dark space void
         ctx.fillStyle = '#080810'; 
         ctx.fill();
+        
         // Translucent golden fill glow
         ctx.fillStyle = 'rgba(255, 215, 0, 0.15)';
         ctx.fill();
+        
+        // =========================================================================
+        // BALANCED GOLDEN GLOW FOOTPRINT (Vibrant Bloom Adjusted Down from Pass 1)
+        // =========================================================================
+        ctx.shadowBlur = 14;
+        ctx.shadowColor = 'rgba(255, 215, 0, 0.6)';
+        
         ctx.stroke();
         ctx.restore();
-
     };
 
-    // LAYER 1: Central Hulls drawn first as the background base anchor
+    // LAYER 1: Central Hulls drawn first as the background base anchor (SCALED 1.25x)
     renderComponent(() => {
         if (bodyType === 0) {
-            ctx.rect(-8, -24, 16, 48);
+            ctx.rect(-10, -30, 20, 60); 
         } else if (bodyType === 1) {
-            ctx.moveTo(0, -28);
-            ctx.lineTo(28, 0);
-            ctx.lineTo(0, 28);
-            ctx.lineTo(-28, 0);
+            ctx.moveTo(0, -35); 
+            ctx.lineTo(35, 0);
+            ctx.lineTo(0, 35);
+            ctx.lineTo(-35, 0);
             ctx.closePath();
         } else {
-            ctx.arc(0, 0, 24, 0, Math.PI * 2);
+            ctx.arc(0, 0, 30, 0, Math.PI * 2); 
         }
     });
 
-    // LAYER 2: Vertical Extensions drawn cleanly over the central hull edge bounds
+    // LAYER 2: Vertical Extensions drawn cleanly over the central hull edge bounds (SCALED 1.25x)
     if (vertConfig === 1 || vertConfig === 3) {
-
         // Top vertical attachment structure
         renderComponent(() => {
             // Draw connecting neck extension column
-            ctx.rect(-6, -42, 12, 18);
+            ctx.rect(-7.5, -52.5, 15, 22.5); 
             ctx.closePath();
         });
         
         renderComponent(() => {
-            // Draw the cap element as an isolated path to prevent backtrace glitches
+            // Scaled up top cap geometry matching your perfected proportion profile
+            const topCapScaleR = sphereR * 1.35; 
+            
             if (topAttachType === 0) {
-                ctx.rect(-12, -54, 24, 12);
+                ctx.rect(-18, -72.5, 36, 20); 
             } else if (topAttachType === 1) {
-                ctx.arc(0, -42, sphereR, Math.PI, 0, false);
+                ctx.arc(0, -52.5, topCapScaleR, Math.PI, 0, false);
             } else {
-                ctx.arc(0, -42, sphereR, 0, Math.PI * 2);
+                ctx.arc(0, -52.5, topCapScaleR, 0, Math.PI * 2);
             }
         });
     }
-
 
     if (vertConfig === 2 || vertConfig === 3) {
         // Bottom vertical attachment structure
         renderComponent(() => {
             // Draw connecting neck extension column
-            ctx.rect(-6, 24, 12, 18);
+            ctx.rect(-7.5, 30, 15, 22.5); 
             ctx.closePath();
         });
 
         renderComponent(() => {
-            // Draw the cap element as an isolated path to prevent backtrace glitches
+            // Symmetrical up-scaled bottom cap parameters
+            const botCapScaleR = sphereR * 1.35; 
+            
             if (botAttachType === 0) {
-                ctx.rect(-12, 42, 24, 12);
+                ctx.rect(-18, 52.5, 36, 20); 
             } else if (botAttachType === 1) {
-                ctx.arc(0, 42, sphereR, 0, Math.PI, false);
+                ctx.arc(0, 52.5, botCapScaleR, 0, Math.PI, false);
             } else {
-                ctx.arc(0, 42, sphereR, 0, Math.PI * 2);
+                ctx.arc(0, 52.5, botCapScaleR, 0, Math.PI * 2);
             }
         });
     }
 
-
-    // Procedural Solar Panel Setup (Kept separate from main station hull paths)
-    const wingSpan = 24 + Math.floor(rand(3) * 16);
-    const panelW = 12 + Math.floor(rand(4) * 14);
-    const panelH = 20 + Math.floor(rand(5) * 16);
+    // Procedural Solar Panel Setup
+    const wingSpan = (24 + Math.floor(rand(3) * 16)) * 1.25;
+    const panelW = (12 + Math.floor(rand(4) * 14)) * 1.25;
+    const panelH = (20 + Math.floor(rand(5) * 16)) * 1.25;
     const doublePanels = rand(6) > 0.5;
 
+    ctx.save();
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = 'rgba(255, 215, 0, 0.5)';
     ctx.beginPath();
-    ctx.moveTo(-8, 0); ctx.lineTo(-wingSpan - panelW, 0);
-    ctx.moveTo(8, 0); ctx.lineTo(wingSpan + panelW, 0);
+    ctx.moveTo(-10, 0); ctx.lineTo(-wingSpan - panelW, 0);
+    ctx.moveTo(10, 0); ctx.lineTo(wingSpan + panelW, 0);
     ctx.stroke();
+    ctx.restore();
 
     const drawSolarGrid = (x, y, w, h) => {
+        ctx.save();
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = 'rgba(255, 215, 0, 0.5)';
         ctx.fillRect(x, y, w, h);
         ctx.strokeRect(x, y, w, h);
         ctx.beginPath();
         ctx.moveTo(x + w / 2, y); ctx.lineTo(x + w / 2, y + h);
         ctx.moveTo(x, y + h / 2); ctx.lineTo(x + w, y + h / 2);
         ctx.stroke();
+        ctx.restore();
     };
 
-
     if (doublePanels) {
-        drawSolarGrid(-wingSpan - panelW, -panelH - 3, panelW, panelH);
-        drawSolarGrid(-wingSpan - panelW, 3, panelW, panelH);
-        drawSolarGrid(wingSpan, -panelH - 3, panelW, panelH);
-        drawSolarGrid(wingSpan, 3, panelW, panelH);
+        drawSolarGrid(-wingSpan - panelW, -panelH - 3.75, panelW, panelH);
+        drawSolarGrid(-wingSpan - panelW, 3.75, panelW, panelH);
+        drawSolarGrid(wingSpan, -panelH - 3.75, panelW, panelH);
+        drawSolarGrid(wingSpan, 3.75, panelW, panelH);
     } else {
         drawSolarGrid(-wingSpan - panelW, -panelH / 2, panelW, panelH);
         drawSolarGrid(wingSpan, -panelH / 2, panelW, panelH);
     }
 
-    // Keep the inner white rectangle structure exactly as is on the topmost layer
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(-8, -8, 16, 16);
-    ctx.strokeRect(-8, -8, 16, 16);
+    // =========================================================================
+    // LAYER 3: 45-DEGREE ROTATED CENTRAL DIAMOND COMMAND POD
+    // =========================================================================
+    ctx.save();
+    ctx.rotate(Math.PI / 4); 
     
-    // Renders custom labeled string matching requested text template style
+    // Outer golden backing capsule frame
+    ctx.save();
+    ctx.shadowBlur = 14;
+    ctx.shadowColor = 'rgba(255, 215, 0, 0.6)';
     ctx.fillStyle = 'var(--accent-gold)';
+    ctx.fillRect(-12, -12, 24, 24);
+    ctx.strokeRect(-12, -12, 24, 24);
+    ctx.restore();
+
+    // Topmost bright white interior diamond window core 
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(-10, -10, 20, 20); 
+    ctx.strokeRect(-10, -10, 20, 20);
+    ctx.restore();
+    
+    // =========================================================================
+    // FIXED FEATURE: WHITE TEXT BLOCK OVERRIDE WITH ZEROED SHADOW BLUR
+    // =========================================================================
+    ctx.save(); 
+    ctx.shadowBlur = 0;
+    ctx.shadowColor = 'transparent';
+    ctx.fillStyle = '#ffffff'; // White text override
     ctx.font = 'bold 12px monospace';
     ctx.textAlign = 'center';
 
-    ctx.shadowBlur = 0;
-    ctx.fillText(`MERCHANT - '${merchantName}'`, 0, 58);
-    ctx.restore();
-   
+    // Renders the merchant string description cleanly right below the model bounds
+    ctx.fillText(`MERCHANT - '${merchantName}'`, 0, 76); 
+    ctx.restore(); 
+    
+    ctx.restore(); 
 });
+
+
+
+
 // Enemy Raiders
 enemies.forEach(e => {
     ctx.save();
@@ -5312,34 +5472,37 @@ enemies.forEach(e => {
     ctx.shadowColor = '#ff3333';
     ctx.lineWidth = 1.8;
 
-    if (e.type === 'pirate') {
-        // Keep Diamond shape body with its original red fill
+       if (e.type === 'pirate') {
+        // =========================================================================
+        // ORIGINAL PIRATE RAIDER HULL CONFIGURATION (150% UP-SCALE + EXPANDED FUEL PODS)
+        // =========================================================================
+        const chassisRadius = 21;    // 14 * 1.5
+        const armLength = 19.5;      // 13 * 1.5
+        // EXPANDED: Sized up the fuel pods further for visual emphasis
+        const terminusRadius = 10.0; 
+
+        // 1. Core Diamond shape body with its original red fill
         ctx.fillStyle = '#8f1d2c';
         ctx.beginPath();
-
-        ctx.moveTo(0, -14);
-        ctx.lineTo(14, 0);
-        ctx.lineTo(0, 14);
-        ctx.lineTo(-14, 0);
+        ctx.moveTo(0, -chassisRadius);
+        ctx.lineTo(chassisRadius, 0);
+        ctx.lineTo(0, chassisRadius);
+        ctx.lineTo(-chassisRadius, 0);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
 
-        // Cockpit circle remains ultra-bright near-white tint
+        // 2. Cockpit circle remains ultra-bright near-white tint
         ctx.save();
         ctx.fillStyle = '#ffeeee';
         ctx.beginPath();
-        ctx.arc(0, -2, 8.5, 0, Math.PI * 2);
+        ctx.arc(0, -3, 12.75, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
         ctx.restore();
 
-        // Shortened locked X structural frame layout
-        const armLength = 13;
-
-        const terminusRadius = 3.5;
+        // 3. Shortened locked X structural frame layout
         ctx.fillStyle = 'rgba(255, 51, 51, 0.4)';
-
         ctx.beginPath();
         ctx.moveTo(-armLength, -armLength);
         ctx.lineTo(armLength, armLength);
@@ -5347,62 +5510,188 @@ enemies.forEach(e => {
         ctx.lineTo(armLength, -armLength);
         ctx.stroke();
 
-        // Spheres sitting snug on all four endpoints of the locked X frame structure
+        // 4. Draw the base expanded fuel pod spheres on all four endpoints
         ctx.beginPath(); ctx.arc(armLength, armLength, terminusRadius, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
         ctx.beginPath(); ctx.arc(-armLength, -armLength, terminusRadius, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
         ctx.beginPath(); ctx.arc(armLength, -armLength, terminusRadius, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
         ctx.beginPath(); ctx.arc(-armLength, armLength, terminusRadius, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
 
-       } else if (e.type === 'seeker') {
+        function drawPodCore(pX, pY) {
+            ctx.save();
+            
+            // Step A: ring accents
+            ctx.strokeStyle = '#ff6666';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(pX, pY, terminusRadius * 0.55, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // fuel pod accents
+            ctx.fillStyle = '#ff6666';
+            ctx.beginPath();
+            ctx.arc(pX, pY, terminusRadius * 0.25, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        // Apply the internal multi-layered detailing to all four frame tips
+        drawPodCore(armLength, armLength);
+        drawPodCore(-armLength, -armLength);
+        drawPodCore(armLength, -armLength);
+        drawPodCore(-armLength, armLength);
+
+
+    } else if (e.type === 'seeker') {
         // =========================================================================
         // FIXED FEATURE: HOSTILE SEEKER DRONE PLASMA PLUME GENERATION
         // =========================================================================
-        // Spawns a fierce tracking combustion plume behind active seeker drones
         if (Math.random() < 0.65) {
             const perpAngle = (e.angle || 0) + Math.PI / 2;
             const exhaustSpreadOffset = (Math.random() * 5 - 2.5);
 
             particles.push({
-                // Anchors particles cleanly to the tail end of the seeker drone frame boundaries
                 x: e.x - Math.cos(e.angle || 0) * e.radius + Math.cos(perpAngle) * exhaustSpreadOffset,
                 y: e.y - Math.sin(e.angle || 0) * e.radius + Math.sin(perpAngle) * exhaustSpreadOffset,
-                
-                // Ejects plasma smoke backward relative to the drone's intercept angle heading
                 vx: -Math.cos(e.angle || 0) * 1.4 + (Math.random() * 0.4 - 0.2),
                 vy: -Math.sin(e.angle || 0) * 1.4 + (Math.random() * 0.4 - 0.2),
-                
                 life: 0.6,
                 decay: 0.04,
-                color: '#ff3333', // Deep plasma accent red matching the hostile weapon profile color tint
+                color: '#ff3333', 
                 size: 3.5 + Math.random() * 2.0
             });
         }
 
         // =========================================================================
-        // NATIVE SEEKER CHASSIS VECTOR GEOMETRY PATH DRAWING
+        // FIXED NATIVE SEEKER CHASSIS VECTOR GEOMETRY PATH DRAWING (SCALED UP)
         // =========================================================================
+        ctx.save(); // Protects canvas state from leaking to subsequent renders
         ctx.rotate(e.angle || 0);
+        
+        // Scaled up factors (1.5x up from original vector anchors)
+        const forwardTip = e.radius * 2.1;
+        const tailWing   = -e.radius * 1.5;
+        const wingSpan   = e.radius * 1.42;
+        const innerNotch = -e.radius * 0.67;
+
         ctx.beginPath();
-        ctx.moveTo(e.radius * 1.4, 0);
-        ctx.lineTo(-e.radius, -e.radius * 0.95);
-        ctx.lineTo(-e.radius * 0.45, 0);
-        ctx.lineTo(-e.radius, e.radius * 0.95);
+        ctx.moveTo(forwardTip, 0);                 // Extended Nose Point Forward
+        ctx.lineTo(tailWing, -wingSpan);           // Port Wing Tip
+        ctx.lineTo(innerNotch, 0);                 // Inner Mechanical Tail Notch
+        ctx.lineTo(tailWing, wingSpan);            // Starboard Wing Tip
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
 
-    } else {
-        // Basic UFO enemy type
+        // =========================================================================
+        // FEATURE 2: LIGHT RED ENGINE ACCENT DECAL
+        // =========================================================================
+        ctx.save();
+        ctx.fillStyle = '#ff6666'; 
         ctx.beginPath();
-        ctx.ellipse(0, 0, 15, 6, 0, 0, Math.PI * 2);
+        ctx.moveTo(innerNotch + 4, 0);
+        ctx.lineTo(tailWing + 2, -wingSpan * 0.35);
+        ctx.lineTo(tailWing + 2, wingSpan * 0.35);
+        ctx.closePath();
+        ctx.fill(); 
+        ctx.stroke();
+        ctx.restore();
+
+        // =========================================================================
+        // FEATURE 3: WHITE & LIGHT RED COCKPIT CANOPY (Glitch-Free Angular Safe Vectors)
+        // =========================================================================
+        ctx.save();
+        
+        // Base Layer: Sleek light red canopy visor plate
+        ctx.fillStyle = '#ff8888';
+        ctx.beginPath();
+        ctx.moveTo(forwardTip - 6, 0);
+        ctx.lineTo(innerNotch + 10, -wingSpan * 0.25);
+        ctx.lineTo(innerNotch + 6, 0);
+        ctx.lineTo(innerNotch + 10, wingSpan * 0.25);
+        ctx.closePath();
         ctx.fill();
         ctx.stroke();
 
-        // Cockpit replacement
-        ctx.save();
-        ctx.fillStyle = '#ff8888';
+        // Top Layer: Crisp white glass reflection circle (Rotation-proof via ctx.arc)
+        ctx.fillStyle = '#ffffff';
         ctx.beginPath();
-        ctx.arc(0, -4, 4.5, 0, Math.PI * 2);
+        ctx.arc(e.radius * 0.1, 0, e.radius * 0.35, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.restore(); 
+        ctx.restore(); 
+
+
+
+    } else {
+        // =========================================================================
+        // CONFIGURABLE VENTRAL BEAM CONE (UNDER LAYER DRAWN FIRST)
+        // =========================================================================
+        // EDIT THIS NUMBER TO ADJUST LENGTH: Larger values = longer cone, smaller = shorter cone!
+        const coneLength = 14; 
+        
+        ctx.save();
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = '#ff3333';
+        
+        // 1. Draw the bold outer red border outline path for the under-cone
+        ctx.fillStyle = '#ff3333';
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, 4);                     // Core center anchor point matching saucer baseline
+        ctx.lineTo(9, 6);                     // Starboard upper width edge flange
+        ctx.lineTo(0, 4 + coneLength);        // Dynamically adjusted red tip point
+        ctx.lineTo(-9, 6);                    // Port upper width edge flange
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // 2. Layer the bright white core triangle directly over the red frame
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.moveTo(0, 6);
+        ctx.lineTo(6.5, 7.5);
+        ctx.lineTo(0, 4 + (coneLength * 0.85)); // Scales the inner white tip proportionally inside the frame
+        ctx.lineTo(-6.5, 7.5);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+
+        // =========================================================================
+        // NATIVE SAUCER PLATING LAYERS (UNTOUCHED RESTORATION SYSTEM)
+        // =========================================================================
+        // Basic UFO enemy type (Scaled up by an additional 10% from previous pass)
+        ctx.beginPath();
+        ctx.ellipse(0, 2, 26.4, 10.56, 0, 0, Math.PI * 2); // Shifted Y to 2, expanded width/height bounds
+        ctx.fill();
+        ctx.stroke();
+
+        // --- Interior Skewed Ring with Red Glow Effect ---
+        ctx.save();
+        ctx.strokeStyle = '#f16667';
+        ctx.lineWidth = 2.2;
+        
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = '#ff3333';
+        
+        ctx.beginPath();
+        ctx.ellipse(0, 2, 17.16, 6.34, 0, 0, Math.PI * 2); // Follows the 10% scaling and Y=2 alignment shift
+        ctx.stroke();
+        ctx.restore();
+
+        // =========================================================================
+        // EXTRUDED ISOMETRIC COCKPIT COWL LAYER (LOWERED & SCALED 10%)
+        // =========================================================================
+        ctx.save();
+        ctx.fillStyle = '#ffdddd'; // Ultra-light soft pink/white glass canopy shade
+        ctx.beginPath();
+        
+        // Scaled up by 10% (Width 7.15, Height 4.62) and lowered down by exactly 2 pixels (Y = -4 instead of -6)
+        ctx.ellipse(0, -4, 7.15, 4.62, 0, 0, Math.PI * 2);
 
         ctx.fill();
         ctx.stroke();
@@ -5416,7 +5705,7 @@ enemies.forEach(e => {
 
 
             // =========================================================================
-            // CIVILIAN TRAFFIC DRAWING ENGINE (10% LARGER + NEON CYAN EMBER PLUME TRAILS)
+            // CIVILIAN TRAFFIC DRAWING ENGINE (NEON CYAN VISOR CONFIGURATION)
             // =========================================================================
             civilianShips.forEach(ship => {
                 // 1. DYNAMIC COMPONENT: Spawn engine particles straight into the world thread
@@ -5440,28 +5729,71 @@ enemies.forEach(e => {
                     });
                 }
 
-                // 2. VECTOR DRAWING ROUTINE: Up-scaled by 10%
-                ctx.save();
+                // 2. VECTOR DRAWING ROUTINE: Identical to Seeker but Cyan-Themed
+                ctx.save(); // Protects canvas state from leaking to subsequent renders
                 ctx.translate(ship.x, ship.y);
                 ctx.rotate(ship.angle);
+                
                 ctx.strokeStyle = '#00ffff';
                 ctx.fillStyle = 'rgba(0, 255, 255, 0.22)';
                 ctx.shadowBlur = 10;
                 ctx.shadowColor = '#00ffff';
                 ctx.lineWidth = 1.8;
                 
-                // FIXED SCALE: Multiplied all vertex coordinates by 1.1 to make the ship 10% larger
-                const scaledRadius = ship.radius * 1.1; 
+                // Fixed 1.1x Civilian scale base multiplier applied to the layout anchors
+                const currentRadius = ship.radius * 1.1;
+                const forwardTip = currentRadius * 2.1;
+                const tailWing   = -currentRadius * 1.5;
+                const wingSpan   = currentRadius * 1.42;
+                const innerNotch = -currentRadius * 0.67;
+
+                // LAYER A: Main Chassis Hull Geometry
                 ctx.beginPath();
-                ctx.moveTo(scaledRadius * 1.4, 0);
-                ctx.lineTo(-scaledRadius, -scaledRadius * 0.95);
-                ctx.lineTo(-scaledRadius * 0.45, 0);
-                ctx.lineTo(-scaledRadius, scaledRadius * 0.95);
+                ctx.moveTo(forwardTip, 0);                 // Extended Nose Point Forward
+                ctx.lineTo(tailWing, -wingSpan);           // Port Wing Tip
+                ctx.lineTo(innerNotch, 0);                 // Inner Mechanical Tail Notch
+                ctx.lineTo(tailWing, wingSpan);            // Starboard Wing Tip
                 ctx.closePath();
                 ctx.fill();
                 ctx.stroke();
+
+                // LAYER B: NEON CYAN ENGINE ACCENT DECAL
+                ctx.save();
+                ctx.fillStyle = '#66ffff'; // High-visibility bright cyan engine glow accent
+                ctx.beginPath();
+                ctx.moveTo(innerNotch + 4, 0);
+                ctx.lineTo(tailWing + 2, -wingSpan * 0.35);
+                ctx.lineTo(tailWing + 2, wingSpan * 0.35);
+                ctx.closePath();
+                ctx.fill(); 
+                ctx.stroke();
                 ctx.restore();
+
+                // LAYER C: WHITE & CYAN COCKPIT CANOPY (Glitch-Free Angular Safe Vectors)
+                ctx.save();
+                // Base Visor Layer: Sleek light cyan glass framing shell
+                ctx.fillStyle = '#88ffff';
+                ctx.beginPath();
+                ctx.moveTo(forwardTip - 6, 0);
+                ctx.lineTo(innerNotch + 10, -wingSpan * 0.25);
+                ctx.lineTo(innerNotch + 6, 0);
+                ctx.lineTo(innerNotch + 10, wingSpan * 0.25);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+
+                // Top Visor Layer: Symmetrical crisp white reflection point core
+                ctx.fillStyle = '#ffffff';
+                ctx.strokeStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(currentRadius * 0.1, 0, currentRadius * 0.35, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.restore(); // Restores canopy shell state
+                ctx.restore(); // Restores civilian matrix translation/rotation state safely!
             });
+
 
 
             // Burst Particles
@@ -5474,7 +5806,7 @@ enemies.forEach(e => {
 
             });
 
-// Player Craft Chassis - Draw Player Starship SVG
+
             ctx.save();
             ctx.translate(player.x, player.y);
             ctx.rotate(player.angle);
@@ -5496,9 +5828,7 @@ enemies.forEach(e => {
 
             // Retained secondary stack parent restore line
             ctx.restore(); 
-            // =========================================================================
-            // TARGETING CROSSHAIR RING TRACKING LINE (HIGH-VISIBILITY DOTTED INNER LINE)
-            // =========================================================================
+
             ctx.save(); // Opens isolated local context block layer safely
             
             // HIGH-VISIBILITY RESCALE: Crisp white alpha mapping for deep space tracking
@@ -5532,7 +5862,7 @@ enemies.forEach(e => {
                 wrappedDelta(player.y, SPACEPORT.y),
                 wrappedDelta(player.x, SPACEPORT.x)
             );
-            const indicatorDistance = 50;
+            const indicatorDistance = 60; // player nav pointer indicator icon distance standard
             const indicatorX = canvas.width / 2 + Math.cos(spaceportAngle) * indicatorDistance;
             const indicatorY = canvas.height / 2 + Math.sin(spaceportAngle) * indicatorDistance;
 
@@ -5624,9 +5954,7 @@ enemies.forEach(e => {
         requestAnimationFrame(gameLoop);
 
 
-// =========================================================================
-// MODULE-SAFE CLICK LISTENER ROUTINE WITH AUTO-SHIELD RECHARGE (Absolute end of script)
-// =========================================================================
+
 document.addEventListener('click', function(event) {
     const btn = event.target.closest('.ship-shop-btn');
     if (!btn) return;
@@ -5643,7 +5971,7 @@ document.addEventListener('click', function(event) {
 
         if (player.wallet < buybackCost) {
             if (typeof showAlert === 'function') {
-                showAlert(`❌ INSUFFICIENT FUNDS! Restoring your configuration requires \$${buybackCost} in your pocket wallet.`);
+                showAlert(`INSUFFICIENT FUNDS! Restoring your ship requires \$${buybackCost}.`);
             }
             return;
         }
@@ -5669,7 +5997,8 @@ document.addEventListener('click', function(event) {
             gameAudio.playSupplyCache(); 
         }
         if (typeof showAlert === 'function') {
-            showAlert(`🔄 MODULE RECOVERED: Configuration restored & shields fully charged!`);
+            showAlert(`SHIP RECOVERED: Shields fully charged!`);
+            addLog(`Ship recovered and shields fully charged, ready for re-deployment.`);
         }
         if (typeof saveGame === 'function') saveGame();
         return;
@@ -5681,10 +6010,10 @@ document.addEventListener('click', function(event) {
 
     if (player.wallet < cost) {
         if (typeof showAlert === 'function') {
-            showAlert(`❌ INSUFFICIENT FUNDS! Upgrading to this hull configuration requires \$${cost} in your wallet.`);
+            showAlert(`INSUFFICIENT FUNDS! Upgrading to this ship requires \$${cost}.`);
         }
         if (typeof addLog === 'function') {
-            addLog(`Shipyard Transaction denied: You lack the funds to cover the \$${cost} conversion fee.`);
+            addLog(`Transaction denied: You lack the funds to cover the \$${cost} fee.`);
         }
         return;
     }
@@ -5724,8 +6053,10 @@ player.shield = player.maxShield;
     
     if (typeof showAlert === 'function') {
         showAlert(skinKey === 'RANDOM' 
-            ? `🎲 NEW SHIP REROLLED: Configuration randomized and shields fully charged!` 
-            : `🚀 CHASSIS RECONFIGURED: Swapped hull profile to ${skinKey} & shield arrays filled!`
+            ? `NEW SHIP ACQUIRED!: Loadout reconfigured & shields fully charged!` 
+            : `SHIP PURCHASED: Swapped to ${skinKey} & shield charged!`
+
+            
         );
     }
     
