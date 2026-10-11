@@ -619,7 +619,7 @@
 
         #msg-log {
             min-height: 36px;
-            max-height: none;
+            max-height: 200px;
             flex: 1 1 auto;
             background: rgba(0,0,0,0.5);
             border: 1px solid rgba(255,255,255,0.03);
@@ -1315,7 +1315,7 @@
     <div id="main-menu">
         <main class="main-menu-card" aria-labelledby="main-menu-title">
             <h1 class="main-menu-title" id="main-menu-title">STARJOURN ACE</h1>
-            <p class="main-menu-subtitle">explore endlessly...</p>
+            <p class="main-menu-subtitle">- - EXPLORE THE INFINITE EXPANSE - - </p>
             <div class="main-menu-portraits">
                 <div class="main-menu-portrait">
                     <span class="main-menu-portrait-label">Homeworld</span>
@@ -3137,7 +3137,7 @@ window.closeShipyardModal = function() {
         let lastAutosaveAt = 0;
         let lastMenuSubtitleIndex = -1;
         const MAIN_MENU_SUBTITLES = [
-            'explore endlessly...'
+            '- - EXPLORE THE INFINITE EXPANSE - -'
         ];
         let pilotHelmetRequestNumber = 0;
         let pilotHelmetRequestId = null;
@@ -3278,7 +3278,7 @@ window.closeShipyardModal = function() {
         initializeMerchantHelmetGenerator();
 
             const ASTEROID_TYPES = {
-                GENERIC: { name: 'Generic', color: '#888899', mineral: null },
+                GENERIC: { name: 'Rocky', color: '#888899', mineral: null },
                 IRON: { name: 'Metallic', color: '#8c8c8c', mineral: 'iron' },
                 GOLD: { name: 'Auric', color: 'rgba(255, 215, 0, 0.9)', mineral: 'gold' },
                 URANIUM: { name: 'Irradiated', color: 'rgba(57, 255, 20, 0.9)', mineral: 'uranium' },
