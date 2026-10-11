@@ -37,6 +37,307 @@
             flex-direction: column;
         }
 
+        #main-menu {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: #000;
+        }
+
+        #main-menu[hidden] {
+            display: none;
+        }
+
+        .main-menu-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: min(100%, 560px);
+            max-height: calc(100vh - 40px);
+            min-height: 430px;
+            padding: 30px 32px 24px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 215, 0, 0.62);
+            border-radius: 8px;
+            background: #0c0c12;
+            box-shadow: 0 0 28px rgba(255, 215, 0, 0.22), 0 16px 48px rgba(0, 0, 0, 0.75);
+            text-align: center;
+        }
+
+        #main-menu.is-pause-menu {
+            position: absolute;
+            inset: 0;
+            z-index: 200;
+            background: rgba(0, 0, 0, 0.48);
+        }
+
+        #main-menu.is-pause-menu .main-menu-card {
+            min-height: 0;
+        }
+
+        #main-menu.is-pause-menu .main-menu-title,
+        #main-menu.is-pause-menu .main-menu-subtitle,
+        #main-menu.is-pause-menu .main-menu-footer,
+        #main-menu.is-pause-menu #generate-pilot-icon {
+            display: none;
+        }
+
+        .main-menu-title {
+            width: 100%;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.45);
+            color: #fff;
+            font-size: clamp(1.5rem, 6vw, 2.2rem);
+            font-weight: bold;
+            letter-spacing: 0.16em;
+            text-shadow: 0 0 12px rgba(255, 215, 0, 0.25);
+        }
+
+        .main-menu-subtitle {
+            margin: 9px 0 18px;
+            color: #a8a8c4;
+            font-size: 0.9rem;
+            letter-spacing: 0.04em;
+        }
+
+        .main-menu-pilot {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .main-menu-portraits {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 120px));
+            justify-content: center;
+            align-items: start;
+            width: 100%;
+            gap: clamp(6px, 3vw, 20px);
+        }
+
+        .main-menu-portrait {
+            display: flex;
+            min-width: 0;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .main-menu-portrait-label {
+            color: #a8a8c4;
+            font-size: 0.62rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .main-menu-portrait-image,
+        #pilot-helmet-preview {
+            display: block;
+            width: clamp(72px, 23vw, 120px);
+            height: clamp(72px, 23vw, 120px);
+            min-width: 0;
+            min-height: 0;
+            border: 1px solid #343443;
+            background: #000;
+            object-fit: contain;
+        }
+
+        #pilot-helmet-preview[hidden],
+        #pilot-helmet-placeholder[hidden] {
+            display: none;
+        }
+
+        #pilot-helmet-placeholder {
+            display: grid;
+            width: clamp(72px, 23vw, 120px);
+            height: clamp(72px, 23vw, 120px);
+            min-width: 0;
+            min-height: 0;
+            place-items: center;
+            border: 1px solid #343443;
+            background: #000;
+            color: #7a7a99;
+            font-size: 4rem;
+            font-weight: bold;
+        }
+
+        #pilot-helmet-preview {
+            padding: 12px;
+        }
+
+        #regenerate-pilot-icon,
+        #generate-pilot-icon {
+            padding: 5px 9px;
+            font-size: 0.65rem;
+        }
+
+        .main-menu-stats {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            width: 100%;
+            gap: 8px;
+            margin: 16px 0;
+        }
+
+        .main-menu-stat {
+            padding: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.02);
+            text-align: left;
+        }
+
+        .main-menu-stat-label {
+            color: #7a7a99;
+            font-size: 0.62rem;
+            text-transform: uppercase;
+        }
+
+        .main-menu-stat-value {
+            margin-top: 3px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            font-weight: bold;
+        }
+
+        #menu-bank {
+            color: var(--accent-uranium);
+        }
+
+        #menu-earnings {
+            color: var(--accent-gold);
+        }
+
+        .main-menu-cargo {
+            display: flex;
+            grid-column: 1 / -1;
+            justify-content: space-around;
+            gap: 10px;
+            padding: 10px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.02);
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .main-menu-cargo span {
+            white-space: nowrap;
+        }
+
+        .main-menu-piracy-status {
+            width: 100%;
+            margin: -8px 0 16px;
+            padding: 9px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.02);
+            color: #858596;
+            font-size: 0.72rem;
+            font-weight: bold;
+            letter-spacing: 0.035em;
+        }
+
+        .main-menu-piracy-status.has-history {
+            color: #ff9999;
+            border-color: rgba(255, 153, 153, 0.28);
+        }
+
+        .main-menu-piracy-status.is-active {
+            color: #ff3535;
+            border-color: rgba(255, 53, 53, 0.55);
+            text-shadow: 0 0 8px rgba(255, 53, 53, 0.45);
+        }
+
+        #menu-cargo-gold {
+            color: var(--accent-gold);
+        }
+
+        #menu-cargo-uranium {
+            color: var(--accent-uranium);
+        }
+
+        #menu-cargo-eridium {
+            color: var(--accent-eridium);
+        }
+
+        #launch-game {
+            width: min(100%, 360px);
+            margin-top: auto;
+            padding: 13px;
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+            font-size: 1.15rem;
+            letter-spacing: 0.08em;
+        }
+
+        #launch-game:disabled {
+            border-color: #333344;
+            color: #55556b;
+            background: #111126;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        #launch-game:hover:not(:disabled) {
+            background: var(--accent-gold);
+            color: #000;
+        }
+
+        .main-menu-footer {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 18px;
+        }
+
+        .main-menu-footer .btn {
+            width: auto;
+            padding: 5px 8px;
+            font-size: 0.62rem;
+        }
+
+        #menu-enable-audio {
+            border-color: #3e6f76;
+            color: #79b8bc;
+        }
+
+        #menu-reset-game {
+            border-color: #55556b;
+            color: #8b8b9d;
+        }
+
+        @media (max-height: 620px) {
+            .main-menu-card {
+                min-height: 0;
+                padding: 16px 22px 12px;
+            }
+
+            .main-menu-subtitle {
+                margin-bottom: 10px;
+            }
+
+            #pilot-helmet-preview {
+                width: clamp(72px, 23vw, 96px);
+                height: clamp(72px, 23vw, 96px);
+            }
+
+            #pilot-helmet-placeholder {
+                width: clamp(72px, 23vw, 96px);
+                height: clamp(72px, 23vw, 96px);
+            }
+
+            .main-menu-stats {
+                margin: 10px 0;
+            }
+        }
+
         #game-container {
             display: flex;
 
@@ -48,9 +349,6 @@
         @media (max-width: 900px) {
             #game-container {
                 flex-direction: column;
-            }
-            #sidebar {
-                display: none;
             }
             #mobile-controls {
                 display: none !important;
@@ -183,11 +481,12 @@
             height: 210px;
             min-height: 210px;
             overflow: hidden;
+            gap: 4px;
         }
 
         .merchant-msg {
             font-size: 0.68rem;
-            line-height: 1.3;
+            line-height: 1.2;
             color: #a8a8c4;
             overflow-wrap: anywhere;
         }
@@ -199,8 +498,59 @@
         }
 
         #merchant-content .trade-reqs {
-            font-size: 0.68rem;
-            padding: 4px;
+            font-size: 0.64rem;
+            padding: 3px;
+        }
+
+        .merchant-trade-layout {
+            display: grid;
+            grid-template-columns: 56px minmax(0, 1fr);
+            align-items: center;
+            gap: 6px;
+        }
+
+        .merchant-helmet-frame {
+            width: 56px;
+            height: 56px;
+            border: 1px solid #303044;
+            background: #000;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+        }
+
+        .merchant-helmet-frame img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .merchant-portrait-name {
+            width: 56px;
+            margin-top: 2px;
+            color: #8b8b9d;
+            font-size: 0.52rem;
+            line-height: 1.2;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .merchant-req-list {
+            min-width: 0;
+        }
+
+        #merchant-content .merchant-req-list > div {
+            margin: 2px 0 !important;
+            font-size: 0.68rem !important;
+        }
+
+        #merchant-content #btn-trade {
+            padding: 5px;
+            margin-top: 2px !important;
+            font-size: 0.85rem;
         }
 
 
@@ -245,6 +595,13 @@
             color: var(--accent-blue);
 
         }
+        #spaceport-panel #btn-bank {
+            background: #123038;
+            border-color: #74eaff;
+            color: #c9faff;
+            text-shadow: 0 0 5px rgba(116, 234, 255, 0.45);
+        }
+
         #spaceport-panel .btn:hover:not(:disabled) {
             background: var(--accent-blue);
             color: #000;
@@ -262,7 +619,8 @@
 
         #msg-log {
             min-height: 36px;
-            max-height: 72px;
+            max-height: none;
+            flex: 1 1 auto;
             background: rgba(0,0,0,0.5);
             border: 1px solid rgba(255,255,255,0.03);
             padding: 8px;
@@ -277,8 +635,9 @@
 
         }
 
-        #sidebar > div:last-child {
-            flex: 0 0 auto !important;
+        #log-terminal {
+            flex: 1 1 140px;
+            min-height: 140px;
         }
 
         #reset-game {
@@ -296,6 +655,7 @@
             align-items: center;
             gap: 8px;
             margin-top: 5px;
+            flex: 0 0 auto;
         }
 
         #audio-toggle {
@@ -333,21 +693,23 @@
         #mobile-hud {
             display: none;
             position: absolute;
-            top: 8px;
-            left: 8px;
-            right: 8px;
-            grid-template-columns: 1fr 1fr;
-            gap: 5px;
+            top: 0;
+            left: 0;
+            right: 0;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 3px;
             z-index: 20;
             pointer-events: none;
             font-size: 0.62rem;
             color: var(--text-main);
+            padding: calc(env(safe-area-inset-top) + 5px) 7px 5px;
+            background: linear-gradient(rgba(9, 9, 9, 0.94), rgba(9, 9, 9, 0.68));
         }
 
         .mobile-hud-panel {
-            background: rgba(8, 8, 20, 0.82);
-            border: 1px solid rgba(0, 255, 255, 0.45);
-            padding: 5px 7px;
+            background: rgba(12, 12, 18, 0.92);
+            border: 1px solid var(--panel-border);
+            padding: 4px 6px;
             min-width: 0;
         }
 
@@ -357,8 +719,8 @@
 
         .mobile-goal-row {
             display: grid;
-            grid-template-columns: 0.8fr 2fr 0.8fr;
-            gap: 5px;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 4px;
             grid-column: 1 / -1;
             align-items: stretch;
         }
@@ -366,7 +728,19 @@
         .mobile-hud-values {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             gap: 8px;
+        }
+
+        #mobile-sidebar-toggle {
+            pointer-events: auto;
+            width: auto;
+            padding: 3px 7px;
+            font-size: 0.62rem;
+            line-height: 1.2;
+            border-color: rgba(255, 215, 0, 0.55);
+            color: var(--accent-gold);
+            flex: 0 0 auto;
         }
 
         .mobile-hud-value {
@@ -382,16 +756,242 @@
         }
 
         #mobile-shield-fill {
-            height: 4px;
+            height: 100%;
             background: var(--accent-blue);
             width: 100%;
+            transition: width 0.2s ease, background-color 0.2s ease;
+        }
+
+        .mobile-shield-track {
+            flex: 1;
+            height: 6px;
+            align-self: center;
+            overflow: hidden;
+            background: #331111;
+            border-radius: 3px;
         }
 
         .mobile-hud-action {
             pointer-events: auto;
             width: 100%;
-            padding: 5px;
+            padding: 5px 8px;
+            font-size: 0.68rem;
+        }
+
+        #mobile-bank {
+            width: auto;
+            min-width: 54px;
+        }
+
+        #mobile-bank.bank-ready {
+            color: #061317;
+            background: var(--accent-blue);
+            border-color: #83ffff;
+            text-shadow: none;
+        }
+
+        #mobile-merchant-quick-trade {
+            display: none;
+            grid-column: 1 / -1;
+            gap: 3px;
+            border-color: rgba(255, 215, 0, 0.5);
+        }
+
+        #mobile-merchant-quick-trade.is-visible {
+            display: grid;
+            grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.8fr) minmax(0, 1.8fr) auto;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .mobile-merchant-identity {
+            display: flex;
+            min-width: 0;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .mobile-merchant-copy {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+            gap: 2px;
+        }
+
+        #mobile-merchant-icon {
+            width: 28px;
+            height: 28px;
+            border: 1px solid #303044;
+            background: #000;
+            object-fit: contain;
+            flex: 0 0 auto;
+        }
+
+        #mobile-merchant-name {
+            min-width: 0;
+            overflow: hidden;
+            color: #c3c3d0;
             font-size: 0.62rem;
+            font-weight: bold;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        #mobile-merchant-prompt {
+            overflow: hidden;
+            color: #8b8b9d;
+            font-size: 0.48rem;
+            line-height: 1.1;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        #mobile-trade-summary {
+            display: flex;
+            flex: 1;
+            justify-content: center;
+            flex-wrap: nowrap;
+            min-width: 0;
+            gap: 3px 12px;
+            font-size: 0.68rem;
+            line-height: 1.3;
+        }
+
+        .mobile-trade-terms {
+            display: flex;
+            align-items: center;
+            min-width: 0;
+            gap: 8px;
+        }
+
+        #mobile-trade-for {
+            color: #8b8b9d;
+            font-size: 0.62rem;
+            white-space: nowrap;
+        }
+
+        .mobile-trade-requirement {
+            white-space: nowrap;
+        }
+
+        .mobile-trade-requirement.has-enough {
+            color: var(--accent-uranium);
+        }
+
+        .mobile-trade-requirement.needs-more {
+            color: var(--accent-red);
+        }
+
+        .mobile-trade-offer {
+            color: #55ff55;
+            font-size: 1rem;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        #mobile-trade {
+            width: auto;
+            min-width: 58px;
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+            flex: 0 0 auto;
+        }
+
+        #pause-game {
+            width: auto;
+            padding: 3px 6px;
+            font-size: 0.58rem;
+            border-color: #777786;
+            color: #b8b8c5;
+            box-shadow: none;
+        }
+
+        body.desktop-paused #canvas-wrapper > :not(#main-menu),
+        body.desktop-paused #sidebar {
+            filter: grayscale(0.72) brightness(0.82);
+        }
+
+        @media (max-width: 900px) {
+            #pause-game {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #mobile-merchant-quick-trade.is-visible {
+                grid-template-columns: minmax(0, 1fr) minmax(0, 0.75fr) minmax(0, 1.65fr) auto;
+                gap: 4px;
+                padding: 3px;
+            }
+
+            #mobile-merchant-icon {
+                width: 24px;
+                height: 24px;
+            }
+
+            .mobile-merchant-identity {
+                gap: 3px;
+            }
+
+            #mobile-merchant-name {
+                font-size: 0.56rem;
+            }
+
+            #mobile-merchant-prompt {
+                font-size: 0.42rem;
+            }
+
+            #mobile-trade-summary {
+                gap: 2px 5px;
+                font-size: 0.54rem;
+            }
+
+            .mobile-trade-terms {
+                gap: 4px;
+            }
+
+            #mobile-trade-for {
+                font-size: 0.52rem;
+            }
+
+            .mobile-trade-offer {
+                font-size: 0.78rem;
+            }
+
+            #mobile-trade {
+                min-width: 48px;
+                padding: 4px;
+                font-size: 0.58rem;
+            }
+        }
+
+        #sidebar.mobile-open {
+            display: flex !important;
+            position: fixed;
+            top: var(--mobile-sidebar-top, 90px);
+            right: 0;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            max-height: calc(100vh - var(--mobile-sidebar-top, 90px));
+            border: 1px solid var(--panel-border);
+            border-top: 2px solid var(--accent-gold);
+            padding: 10px;
+            z-index: 30;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.75);
+            background: rgba(12, 12, 18, 0.98);
+        }
+
+        #sidebar.mobile-open #log-terminal {
+            flex: 1 1 140px;
+            min-height: 140px;
+        }
+
+        #sidebar.mobile-open .sidebar-actions {
+            position: static;
         }
 
         .control-group {
@@ -578,10 +1178,10 @@
                     <div class="mobile-hud-values">
                         <span>WALLET <span class="mobile-hud-value" id="mobile-wallet">\$0</span></span>
                         <span>BANK <span class="mobile-hud-value" id="mobile-bank-value">\$0</span></span>
+                        <button class="btn" id="mobile-sidebar-toggle" type="button" aria-expanded="false" aria-controls="sidebar">SYSTEMS</button>
                     </div>
                 </div>
                 <div class="mobile-goal-row">
-                    <button class="btn mobile-hud-action" id="mobile-trade" type="button">Trade</button>
                     <div class="mobile-hud-panel">
                         <div class="mobile-hud-values">
                             <span id="mobile-sector">SECTOR 1</span>
@@ -592,13 +1192,32 @@
                     <button class="btn mobile-hud-action" id="mobile-bank" type="button">Bank</button>
                 </div>
                 <div class="mobile-hud-panel mobile-hud-wide">
-                    <span>SHIELD</span>
-                    <div id="mobile-shield-fill"></div>
+                    <div class="mobile-hud-values">
+                        <span>SHIELD <span id="mobile-shield-text">100/100</span></span>
+                        <div class="mobile-shield-track">
+                            <div id="mobile-shield-fill"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mobile-hud-panel" id="mobile-merchant-quick-trade" aria-live="polite">
+                    <div class="mobile-merchant-identity">
+                        <img id="mobile-merchant-icon" alt="" hidden>
+                        <span class="mobile-merchant-copy">
+                            <span id="mobile-merchant-name"></span>
+                            <span id="mobile-merchant-prompt">requests a trade:</span>
+                        </span>
+                    </div>
+                    <span class="mobile-trade-offer" id="mobile-trade-offer"></span>
+                    <div class="mobile-trade-terms">
+                        <span id="mobile-trade-for">for:</span>
+                        <div id="mobile-trade-summary"></div>
+                    </div>
+                    <button class="btn mobile-hud-action" id="mobile-trade" type="button" disabled>TRADE</button>
                 </div>
             </div>
         </div>
 
-        <div id="sidebar">
+        <div id="sidebar" aria-label="Game systems menu">
             <div>
                 <div class="section-title" id="sector-title">Sector 1: Orion Perimeter</div>
                 <div class="stats-grid" style="margin-top: 8px;">
@@ -679,18 +1298,213 @@
                 </div>
             </div>
 
-            <div style="display: flex; flex-direction: column; flex: 1; min-height: 80px;">
+            <div id="log-terminal" style="display: flex; flex-direction: column; flex: 1; min-height: 80px;">
                 <div class="section-title" style="font-size:0.75rem; color:#8080a0;">Log Terminal</div>
                 <div id="msg-log" style="margin-top: 5px;">
                     <div class="log-entry">Navigation online. Ship systems nominal. Targeting Vectors acquired. Central Command Connection secure. Cleared for departure...</div>
                 </div>
-                <div class="sidebar-actions">
-                    <button class="btn" id="audio-toggle" type="button">Enable Audio</button>
-                    <button class="btn" id="reset-game" type="button">Reset Game</button>
-                </div>
+            </div>
+            <div class="sidebar-actions">
+                <button class="btn" id="audio-toggle" type="button">Enable Audio</button>
+                <button class="btn" id="pause-game" type="button" aria-pressed="false">Pause</button>
+                <button class="btn" id="reset-game" type="button">Reset Game</button>
             </div>
         </div>
     </div>
+
+    <div id="main-menu">
+        <main class="main-menu-card" aria-labelledby="main-menu-title">
+            <h1 class="main-menu-title" id="main-menu-title">STARJOURN ACE</h1>
+            <p class="main-menu-subtitle">explore endlessly...</p>
+            <div class="main-menu-portraits">
+                <div class="main-menu-portrait">
+                    <span class="main-menu-portrait-label">Homeworld</span>
+                    <img class="main-menu-portrait-image" id="menu-homeworld-preview" alt="Current sector homeworld">
+                </div>
+                <div class="main-menu-pilot">
+                    <span class="main-menu-portrait-label">Pilot</span>
+                    <div id="pilot-helmet-placeholder" aria-label="Pilot helmet not generated">?</div>
+                    <img id="pilot-helmet-preview" alt="Your astronaut pilot helmet" hidden>
+                </div>
+                <div class="main-menu-portrait">
+                    <span class="main-menu-portrait-label">Ship</span>
+                    <img class="main-menu-portrait-image" id="menu-ship-preview" alt="Your current ship">
+                </div>
+            </div>
+            <div class="main-menu-pilot">
+                <button class="btn" id="generate-pilot-icon" type="button">Generate Pilot</button>
+                <button class="btn" id="regenerate-pilot-icon" type="button" hidden>Regenerate Pilot Icon</button>
+            </div>
+            <div class="main-menu-stats" id="main-menu-stats" hidden>
+                <div class="main-menu-stat">
+                    <div class="main-menu-stat-label">Sector</div>
+                    <div class="main-menu-stat-value" id="menu-sector"></div>
+                </div>
+                <div class="main-menu-stat">
+                    <div class="main-menu-stat-label">Current Wallet</div>
+                    <div class="main-menu-stat-value" id="menu-wallet"></div>
+                </div>
+                <div class="main-menu-stat">
+                    <div class="main-menu-stat-label">Current Bank</div>
+                    <div class="main-menu-stat-value" id="menu-bank"></div>
+                </div>
+                <div class="main-menu-stat">
+                    <div class="main-menu-stat-label">Overall Earnings</div>
+                    <div class="main-menu-stat-value" id="menu-earnings"></div>
+                </div>
+                <div class="main-menu-cargo" aria-label="Resources in cargo">
+                    <span id="menu-cargo-gold"></span>
+                    <span id="menu-cargo-uranium"></span>
+                    <span id="menu-cargo-eridium"></span>
+                </div>
+            </div>
+            <div class="main-menu-piracy-status" id="menu-piracy-status" role="status"></div>
+            <button class="btn" id="launch-game" type="button" disabled>Start Game</button>
+            <div class="main-menu-footer">
+                <button class="btn" id="menu-enable-audio" type="button">Enable Audio</button>
+                <button class="btn" id="menu-reset-game" type="button">Reset Game</button>
+            </div>
+        </main>
+    </div>
+
+    <script type="text/plain" id="embedded-helmet-generator">
+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
+    </script>
 
     <script>
 
@@ -698,9 +1512,12 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const wrapper = document.getElementById('canvas-wrapper');
+        const mainMenu = document.getElementById('main-menu');
+        wrapper.appendChild(mainMenu);
 
         // Global Parameters & Expanded Coordinates
         const WORLD_SIZE = 12000; 
+        const ASTEROID_SAFE_SPAWN_BUFFER = 300;
         const MERCHANT_RANGE = 120; 
         const BASE_SECTOR_GOAL = 6000;
         const SECTOR_GOAL_INCREASE = 2000;
@@ -2131,7 +2948,7 @@ ctx.fill(); ctx.stroke();
 }
 ctx.restore();
 }
-drawInGameGuns(10);
+drawInGameGuns(12);
 drawInGameGuns(-12);
 ctx.restore();
 }
@@ -2300,13 +3117,165 @@ window.closeShipyardModal = function() {
         let enemyBullets = [];
         let minerals = [];
         let merchants = [];
+        let merchantHelmetFrame = null;
+        let merchantHelmetGeneratorReady = false;
+        let merchantHelmetRequestNumber = 0;
+        const merchantHelmetRequests = new Map();
         let enemies = [];
         let civilianShips = [];
         let healthPacks = [];
         let particles = [];
-        let pirateStatusUntil = 0;
+        let pirateStatusRemainingMs = 0;
+        let piracyIncidents = 0;
+        let lastPiracyTimerTick = performance.now();
         const SAVE_KEY = 'starpath-save-v1';
+        const PILOT_MENU_STICKER_BORDER_REDUCTION = 3;
         let homeworldCache = {};
+        let pilotHelmetIcon = null;
+        let gameStarted = false;
+        let savedGameAvailable = false;
+        let lastAutosaveAt = 0;
+        let lastMenuSubtitleIndex = -1;
+        const MAIN_MENU_SUBTITLES = [
+            'explore endlessly...'
+        ];
+        let pilotHelmetRequestNumber = 0;
+        let pilotHelmetRequestId = null;
+        let pilotHelmetGenerationPending = false;
+
+        function advancePiracyTimer(now = performance.now()) {
+            const elapsed = Math.max(0, now - lastPiracyTimerTick);
+            if (gameStarted && !mobileSystemsPaused && !desktopPaused && pirateStatusRemainingMs > 0) {
+                pirateStatusRemainingMs = Math.max(0, pirateStatusRemainingMs - elapsed);
+            }
+            lastPiracyTimerTick = now;
+        }
+
+        function requestMerchantHelmet(merchant) {
+            if (!merchantHelmetGeneratorReady || merchant.helmetIconData || merchant.helmetIconPending) return;
+
+            const requestId = `merchant-helmet-${++merchantHelmetRequestNumber}`;
+            merchant.helmetIconPending = true;
+            merchantHelmetRequests.set(requestId, merchant.id);
+            merchantHelmetFrame.contentWindow.postMessage({
+                type: 'starjourn-generate-merchant-helmet',
+                requestId,
+                merchantId: merchant.id
+            }, '*');
+        }
+
+        function requestPilotHelmet() {
+            if (!merchantHelmetGeneratorReady || pilotHelmetGenerationPending) return;
+
+            pilotHelmetGenerationPending = true;
+            const requestId = `pilot-helmet-${++pilotHelmetRequestNumber}`;
+            pilotHelmetRequestId = requestId;
+            const launchButton = document.getElementById('launch-game');
+            const generateButton = document.getElementById('generate-pilot-icon');
+            const regenerateButton = document.getElementById('regenerate-pilot-icon');
+            generateButton.disabled = true;
+            if (!pilotHelmetIcon) launchButton.disabled = true;
+            if (!generateButton.hidden) generateButton.textContent = 'Generating...';
+            regenerateButton.disabled = true;
+            merchantHelmetFrame.contentWindow.postMessage({
+                type: 'starjourn-generate-pilot-helmet',
+                requestId,
+                stickerBorderReduction: PILOT_MENU_STICKER_BORDER_REDUCTION
+            }, '*');
+        }
+
+        function initializeMerchantHelmetGenerator() {
+            merchantHelmetFrame = document.createElement('iframe');
+            merchantHelmetFrame.title = 'Merchant helmet icon generator';
+            merchantHelmetFrame.setAttribute('aria-hidden', 'true');
+            merchantHelmetFrame.tabIndex = -1;
+            merchantHelmetFrame.style.cssText = 'position:fixed;left:-10000px;top:0;width:1px;height:1px;border:0;opacity:0;pointer-events:none;';
+            merchantHelmetFrame.addEventListener('error', () => {
+                console.error('Merchant helmet generator could not be loaded.');
+            });
+            document.body.appendChild(merchantHelmetFrame);
+
+            const embeddedPayload = document.getElementById('embedded-helmet-generator')?.textContent.trim();
+            if (!embeddedPayload || typeof DecompressionStream !== 'function') {
+                console.error('Embedded helmet generator data or gzip decompression support is unavailable.');
+                return;
+            }
+
+            try {
+                const compressedBytes = Uint8Array.from(atob(embeddedPayload), character => character.charCodeAt(0));
+                const decompressedStream = new Blob([compressedBytes])
+                    .stream()
+                    .pipeThrough(new DecompressionStream('gzip'));
+                new Response(decompressedStream).text().then(html => {
+                    merchantHelmetFrame.srcdoc = html;
+                }).catch(error => {
+                    console.error('Embedded helmet generator could not be decoded:', error);
+                });
+            } catch (error) {
+                console.error('Embedded helmet generator could not be initialized:', error);
+            }
+        }
+
+        window.addEventListener('message', event => {
+            if (!merchantHelmetFrame || event.source !== merchantHelmetFrame.contentWindow) return;
+            if (event.data?.type === 'starjourn-helmet-generator-ready') {
+                merchantHelmetGeneratorReady = true;
+                merchants.forEach(requestMerchantHelmet);
+                return;
+            }
+
+            if (event.data?.type === 'starjourn-pilot-helmet-generated') {
+                if (event.data.requestId !== pilotHelmetRequestId) return;
+                pilotHelmetGenerationPending = false;
+                const preview = document.getElementById('pilot-helmet-preview');
+                const placeholder = document.getElementById('pilot-helmet-placeholder');
+                const launchButton = document.getElementById('launch-game');
+                const generateButton = document.getElementById('generate-pilot-icon');
+                const regenerateButton = document.getElementById('regenerate-pilot-icon');
+
+                if (typeof event.data.iconDataUrl !== 'string' || !event.data.iconDataUrl.startsWith('data:image/png;base64,')) {
+                    launchButton.disabled = !pilotHelmetIcon;
+                    generateButton.disabled = false;
+                    generateButton.textContent = 'Generate Pilot';
+                    regenerateButton.disabled = false;
+                    console.error('Pilot helmet generation failed.');
+                    return;
+                }
+
+                pilotHelmetIcon = event.data.iconDataUrl;
+                preview.src = pilotHelmetIcon;
+                preview.hidden = false;
+                placeholder.hidden = true;
+                launchButton.disabled = false;
+                generateButton.hidden = true;
+                regenerateButton.hidden = false;
+                regenerateButton.disabled = false;
+                if (savedGameAvailable) saveGame();
+                return;
+            }
+
+            if (event.data?.type !== 'starjourn-merchant-helmet-generated') return;
+
+            const merchantId = merchantHelmetRequests.get(event.data.requestId);
+            if (!merchantId || merchantId !== event.data.merchantId) return;
+            merchantHelmetRequests.delete(event.data.requestId);
+
+            const merchant = merchants.find(candidate => candidate.id === merchantId);
+            if (!merchant) return;
+            merchant.helmetIconPending = false;
+            if (typeof event.data.iconDataUrl !== 'string' || !event.data.iconDataUrl.startsWith('data:image/png;base64,')) {
+                console.error(`Merchant helmet generation failed for merchant ${merchantId}.`);
+                return;
+            }
+
+            merchant.helmetIconData = event.data.iconDataUrl;
+            if (nearbyMerchant === merchant) {
+                nearbyMerchantCargoState = null;
+                updateUI();
+            }
+        });
+
+        initializeMerchantHelmetGenerator();
 
             const ASTEROID_TYPES = {
                 GENERIC: { name: 'Generic', color: '#888899', mineral: null },
@@ -2657,7 +3626,7 @@ function generateHomeworldName() {
             };
             homeworldCache[sectorSlot] = record;
             setHomeworldFromRecord(record);
-            saveGame();
+            if (gameStarted) saveGame();
         }
 
  function saveGame() {
@@ -2665,6 +3634,8 @@ function generateHomeworldName() {
         localStorage.setItem(SAVE_KEY, JSON.stringify({
             currentSector,
             player: {
+                x: player.x,
+                y: player.y,
                 wallet: player.wallet,
                 bank: player.bank,
                 overallEarnings: player.overallEarnings,
@@ -2680,6 +3651,9 @@ function generateHomeworldName() {
                 randomShootDelay: player.randomShootDelay,
                 lastRandomBackup: player.lastRandomBackup
             },
+            pilotHelmetIcon,
+            pirateStatusRemainingMs,
+            piracyIncidents,
             homeworldCache
         }));
     } catch (error) {
@@ -2690,9 +3664,20 @@ function generateHomeworldName() {
 function loadGame() {
     try {
         const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
-        if (!saved || !saved.player) return;
+        if (!saved || !saved.player) return false;
 
         currentSector = Number.isFinite(saved.currentSector) ? Math.max(1, saved.currentSector) : 1;
+        pirateStatusRemainingMs = Number.isFinite(saved.pirateStatusRemainingMs)
+            ? Math.max(0, saved.pirateStatusRemainingMs)
+            : 0;
+        piracyIncidents = Number.isFinite(saved.piracyIncidents)
+            ? Math.max(0, Math.floor(saved.piracyIncidents))
+            : 0;
+        lastPiracyTimerTick = performance.now();
+        if (Number.isFinite(saved.player.x) && Number.isFinite(saved.player.y)) {
+            player.x = ((saved.player.x % WORLD_SIZE) + WORLD_SIZE) % WORLD_SIZE;
+            player.y = ((saved.player.y % WORLD_SIZE) + WORLD_SIZE) % WORLD_SIZE;
+        }
         player.wallet = Math.max(0, Number(saved.player.wallet) || 0);
         player.bank = Math.max(0, Number(saved.player.bank) || 0);
         player.overallEarnings = Math.max(0, Number(saved.player.overallEarnings) || 0);
@@ -2701,6 +3686,9 @@ function loadGame() {
             uranium: Math.max(0, Number(saved.player.cargo?.uranium) || 0),
             eridium: Math.max(0, Number(saved.player.cargo?.eridium) || 0)
         };
+        pilotHelmetIcon = typeof saved.pilotHelmetIcon === 'string' && saved.pilotHelmetIcon.startsWith('data:image/png;base64,')
+            ? saved.pilotHelmetIcon
+            : null;
         
         homeworldCache = saved.homeworldCache && typeof saved.homeworldCache === 'object'
             ? saved.homeworldCache
@@ -2737,17 +3725,126 @@ function loadGame() {
         // Now that player.maxShield is accurately calculated (e.g. 121), loading 
         // player.shield will never cap it down to 100 accidentally!
         player.shield = Math.max(1, Math.min(player.maxShield, Number(saved.player.shield) || player.maxShield));
-        
+
+        return true;
     } catch (error) {
         console.warn('Starpath save could not be loaded:', error);
+        return false;
     }
 }
 
 function resetGame() {
     if (!window.confirm('Are you sure you want to reset the game? All saved progress will be cleared.')) return;
     localStorage.removeItem(SAVE_KEY);
+    gameStarted = false;
     window.location.reload();
 }
+
+function renderMainMenu() {
+    const menu = document.getElementById('main-menu');
+    const stats = document.getElementById('main-menu-stats');
+    const launchButton = document.getElementById('launch-game');
+    const generateButton = document.getElementById('generate-pilot-icon');
+    const regenerateButton = document.getElementById('regenerate-pilot-icon');
+    const preview = document.getElementById('pilot-helmet-preview');
+    const placeholder = document.getElementById('pilot-helmet-placeholder');
+    const homeworldPreview = document.getElementById('menu-homeworld-preview');
+    const shipPreview = document.getElementById('menu-ship-preview');
+    const subtitle = document.querySelector('.main-menu-subtitle');
+    const piracyStatus = document.getElementById('menu-piracy-status');
+
+    stats.hidden = !savedGameAvailable;
+    generateButton.hidden = Boolean(pilotHelmetIcon);
+    generateButton.disabled = pilotHelmetGenerationPending;
+    generateButton.textContent = pilotHelmetGenerationPending ? 'Generating...' : 'Generate Pilot';
+    regenerateButton.hidden = !pilotHelmetIcon;
+    launchButton.textContent = savedGameAvailable ? 'Continue' : 'Start Game';
+    launchButton.disabled = !pilotHelmetIcon;
+
+    if (savedGameAvailable) {
+        document.getElementById('menu-sector').textContent = `Sector ${currentSector}, '${homeworld.name}'`;
+        document.getElementById('menu-wallet').textContent = `$${player.wallet}`;
+        document.getElementById('menu-bank').textContent = `$${player.bank}`;
+        document.getElementById('menu-earnings').textContent = `$${player.overallEarnings}`;
+        document.getElementById('menu-cargo-gold').textContent = `GOLD ${player.cargo.gold}`;
+        document.getElementById('menu-cargo-uranium').textContent = `URANIUM ${player.cargo.uranium}`;
+        document.getElementById('menu-cargo-eridium').textContent = `ERIDIUM ${player.cargo.eridium}`;
+    }
+
+    piracyStatus.classList.toggle('has-history', piracyIncidents > 0);
+    piracyStatus.classList.toggle('is-active', pirateStatusRemainingMs > 0);
+    if (pirateStatusRemainingMs > 0) {
+        piracyStatus.textContent = `PIRACY: ${piracyIncidents} INCIDENT${piracyIncidents === 1 ? '' : 'S'} — ACTIVE — ${Math.ceil(pirateStatusRemainingMs / 1000)}s remaining`;
+    } else if (piracyIncidents > 0) {
+        piracyStatus.textContent = `PIRACY: ${piracyIncidents} INCIDENT${piracyIncidents === 1 ? '' : 'S'} — INACTIVE`;
+    } else {
+        piracyStatus.textContent = 'PIRACY STATUS: NONE';
+    }
+
+    if (homeworld.svg) {
+        const iconSvg = homeworld.svg.replace('viewBox="0 0 1000 1000"', 'viewBox="250 250 500 500"');
+        homeworldPreview.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(iconSvg)}`;
+    } else {
+        homeworldPreview.removeAttribute('src');
+    }
+
+    const subtitleIndex = (lastMenuSubtitleIndex + 1) % MAIN_MENU_SUBTITLES.length;
+    lastMenuSubtitleIndex = subtitleIndex;
+    subtitle.textContent = MAIN_MENU_SUBTITLES[subtitleIndex];
+
+    if (ACTIVE_SHIP_SKIN === 'RANDOM' && !window.proceduralShipCache) {
+        generateProceduralShipCache();
+        applyShipModifiers(ACTIVE_SHIP_SKIN);
+    }
+    const shipCanvas = document.createElement('canvas');
+    shipCanvas.width = 256;
+    shipCanvas.height = 256;
+    const shipContext = shipCanvas.getContext('2d');
+    if (!shipContext) throw new Error('Could not render the menu ship preview.');
+    shipContext.fillStyle = '#000';
+    shipContext.fillRect(0, 0, shipCanvas.width, shipCanvas.height);
+    shipContext.save();
+    shipContext.translate(shipCanvas.width / 2, shipCanvas.height / 2);
+    shipContext.scale(2.7, 2.7);
+    shipContext.rotate(-Math.PI / 2);
+    const previewPlayer = { ...player, angle: 0, invulnerable: 0, radius: 13 };
+    const shipRenderer = SHIP_SKINS[ACTIVE_SHIP_SKIN] || SHIP_SKINS.ORIGINAL;
+    shipRenderer(shipContext, previewPlayer);
+    shipContext.restore();
+    shipPreview.src = shipCanvas.toDataURL('image/png');
+
+    if (pilotHelmetIcon) {
+        preview.src = pilotHelmetIcon;
+        preview.hidden = false;
+        placeholder.hidden = true;
+    } else {
+        preview.removeAttribute('src');
+        preview.hidden = true;
+        placeholder.hidden = false;
+    }
+
+    menu.hidden = false;
+}
+
+document.getElementById('launch-game').addEventListener('click', () => {
+    if (mainMenu.classList.contains('is-pause-menu')) {
+setDesktopPaused(false);
+return;
+    }
+    if (!pilotHelmetIcon) return;
+    gameStarted = true;
+    savedGameAvailable = true;
+    saveGame();
+    updateUI();
+    document.getElementById('main-menu').hidden = true;
+});
+
+document.getElementById('generate-pilot-icon').addEventListener('click', requestPilotHelmet);
+document.getElementById('regenerate-pilot-icon').addEventListener('click', requestPilotHelmet);
+document.getElementById('menu-enable-audio').addEventListener('click', () => {
+    document.getElementById('audio-toggle').click();
+});
+document.getElementById('menu-reset-game').addEventListener('click', resetGame);
 
 
         function resize() {
@@ -2932,6 +4029,7 @@ function resetGame() {
                 const now = this.ctx.currentTime;
                 this.master.gain.linearRampToValueAtTime(this.muted ? 0 : 0.25, now + 0.05);
                 document.getElementById('audio-toggle').innerText = this.muted ? 'Enable Audio' : 'Mute Audio';
+                document.getElementById('menu-enable-audio').innerText = this.muted ? 'Enable Audio' : 'Mute Audio';
             }
         }
 
@@ -2940,26 +4038,78 @@ function resetGame() {
         document.getElementById('audio-toggle').addEventListener('click', () => gameAudio.toggle());
         document.getElementById('reset-game').addEventListener('click', resetGame);
 
+        const mobileSidebar = document.getElementById('sidebar');
+        const mobileSidebarToggle = document.getElementById('mobile-sidebar-toggle');
+        const mobileHud = document.getElementById('mobile-hud');
+        let mobileQuickTradeMerchantId = null;
+        let mobileSystemsPaused = false;
+        let desktopPaused = false;
+
+        function setDesktopPaused(paused) {
+            advancePiracyTimer();
+            desktopPaused = paused;
+            document.body.classList.toggle('desktop-paused', paused);
+            const pauseButton = document.getElementById('pause-game');
+            pauseButton.setAttribute('aria-pressed', String(paused));
+            pauseButton.textContent = paused ? 'Resume' : 'Pause';
+            mainMenu.classList.toggle('is-pause-menu', paused);
+
+            if (paused) {
+                renderMainMenu();
+                document.getElementById('launch-game').textContent = 'Resume';
+            } else {
+                mainMenu.hidden = true;
+            }
+        }
+
+        function syncMobileSidebarTop() {
+            if (window.matchMedia('(max-width: 900px)').matches) {
+                mobileSidebar.style.setProperty('--mobile-sidebar-top', `${Math.ceil(mobileHud.getBoundingClientRect().bottom)}px`);
+                if (desktopPaused) {
+                    setDesktopPaused(false);
+                }
+            } else if (mobileSidebar.classList.contains('mobile-open')) {
+                mobileSidebar.classList.remove('mobile-open');
+                mobileSystemsPaused = false;
+                mobileSidebarToggle.setAttribute('aria-expanded', 'false');
+                mobileSidebar.setAttribute('aria-hidden', 'true');
+                mobileSidebarToggle.textContent = 'SYSTEMS';
+            }
+        }
+
+        mobileSidebarToggle.addEventListener('click', () => {
+            const isOpen = mobileSidebar.classList.toggle('mobile-open');
+            mobileSystemsPaused = isOpen && window.matchMedia('(max-width: 900px)').matches;
+            mobileSidebarToggle.setAttribute('aria-expanded', String(isOpen));
+            mobileSidebar.setAttribute('aria-hidden', String(!isOpen));
+            mobileSidebarToggle.textContent = isOpen ? 'CLOSE' : 'SYSTEMS';
+            if (isOpen) syncMobileSidebarTop();
+        });
+
+        window.addEventListener('resize', syncMobileSidebarTop);
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && mobileSidebar.classList.contains('mobile-open')) {
+                mobileSidebar.classList.remove('mobile-open');
+                mobileSystemsPaused = false;
+                mobileSidebarToggle.setAttribute('aria-expanded', 'false');
+                mobileSidebar.setAttribute('aria-hidden', 'true');
+                mobileSidebarToggle.textContent = 'SYSTEMS';
+            }
+        });
+        mobileSidebar.setAttribute('aria-hidden', 'true');
+        syncMobileSidebarTop();
+
+        document.getElementById('pause-game').addEventListener('click', () => {
+            if (window.matchMedia('(max-width: 900px)').matches) return;
+            setDesktopPaused(!desktopPaused);
+        });
+
         document.getElementById('mobile-bank').addEventListener('click', () => {
             document.getElementById('btn-bank').click();
         });
 
         document.getElementById('mobile-trade').addEventListener('click', () => {
-            let closestMerchant = null;
-            let closestDistance = MERCHANT_RANGE;
-            merchants.forEach(merchant => {
-                const merchantDistance = distanceBetween(player, merchant);
-                if (merchantDistance <= closestDistance) {
-                    closestDistance = merchantDistance;
-                    closestMerchant = merchant;
-                }
-            });
-
-            if (closestMerchant) {
-                executeMerchantTrade(closestMerchant.id);
-            } else {
-                addLog('Trade link unavailable: no merchant in range.');
-            }
+            if (mobileQuickTradeMerchantId) executeMerchantTrade(mobileQuickTradeMerchantId);
         });
 
         function generateBackgroundAssets() {
@@ -3071,6 +4221,32 @@ function resetGame() {
             return { x, y };
         }
 
+        function generateMerchantName(id) {
+            const prefixes = [
+                "Do", "J", "Qui", "G", "Dur",
+                "M", "Nix", "Cr", "Gip", "Yor",
+                "Kor", "Ai", "B", "K", "Sha", "Vo",
+                "Mi", "Tch", "Kel", "Ryn", "T"
+            ];
+            const roots = [
+                "yst", "oss", "ion", "or", "ur",
+                "ell", "on", "ax", "ul", "un",
+                "eth", "lek", "rin", "vek", "ith",
+                "ara", "esh", "nix", "tlu", "strin"
+            ];
+            let seed = 0;
+            for (const character of String(id)) {
+                seed = character.charCodeAt(0) + ((seed << 5) - seed);
+            }
+            seed = Math.abs(seed);
+            const randomAt = offset => {
+                const value = Math.sin(seed + offset) * 10000;
+                return value - Math.floor(value);
+            };
+
+            return `${prefixes[Math.floor(randomAt(10) * prefixes.length)]}${roots[Math.floor(randomAt(11) * roots.length)]}`.toUpperCase();
+        }
+
         function spawnMerchant() {
             const merchantAngle = Math.random() * Math.PI * 2;
             const minSpawnRadius = 1100;
@@ -3096,8 +4272,10 @@ function resetGame() {
                 reward += reqs['gold'] * 35;
             }
 
-            merchants.push({
-                id: Math.random().toString(36).substr(2, 5).toUpperCase(),
+            const id = Math.random().toString(36).substr(2, 5).toUpperCase();
+            const merchant = {
+                id,
+                name: generateMerchantName(id),
                 x: mx, y: my,
                 vx: (Math.random() * 0.3 - 0.15),
                 vy: (Math.random() * 0.3 - 0.15),
@@ -3105,7 +4283,9 @@ function resetGame() {
                 reqs: reqs,
                 reward: reward,
                 heading: Math.random() * Math.PI * 2
-            });
+            };
+            merchants.push(merchant);
+            requestMerchantHelmet(merchant);
 
         }
 
@@ -3320,6 +4500,36 @@ function spawnBurst(x, y, color, count = 12) {
             });
         }
 
+        function spawnCivilianPiracyLoot(ship) {
+            const totalDrops = 24;
+            const rareDrops = 5 + Math.floor(Math.random() * 3);
+            const commonMaterials = ['gold', 'uranium', 'eridium'];
+            const commonDrops = totalDrops - rareDrops;
+            const drops = Array.from(
+                { length: commonDrops },
+                (_, index) => commonMaterials[index % commonMaterials.length]
+            );
+            for (let i = 0; i < rareDrops; i++) {
+                drops.push('rare');
+            }
+
+            for (let i = drops.length - 1; i > 0; i--) {
+                const swapIndex = Math.floor(Math.random() * (i + 1));
+                [drops[i], drops[swapIndex]] = [drops[swapIndex], drops[i]];
+            }
+
+            for (const type of drops) {
+                minerals.push({
+                    x: ship.x + (Math.random() * 24 - 12),
+                    y: ship.y + (Math.random() * 24 - 12),
+                    vx: Math.random() * 2 - 1,
+                    vy: Math.random() * 2 - 1,
+                    type,
+                    radius: 5
+                });
+            }
+        }
+
         function initWorld() {
             asteroids = [];
             merchants = [];
@@ -3343,7 +4553,10 @@ function spawnBurst(x, y, color, count = 12) {
                     x = Math.random() * WORLD_SIZE;
                     y = Math.random() * WORLD_SIZE;
                     d = Math.hypot(x - WORLD_SIZE/2, y - WORLD_SIZE/2);
-                } while (d < 450);
+                } while (
+                    d < 450 ||
+                    Math.hypot(wrappedDelta(player.x, x), wrappedDelta(player.y, y)) < ASTEROID_SAFE_SPAWN_BUFFER
+                );
 
                 let keysArr = Object.keys(ASTEROID_TYPES);
                 let selectedType = keysArr[Math.floor(Math.random() * keysArr.length)];
@@ -3410,7 +4623,13 @@ generateBackgroundAssets();
                 let keysArr = Object.keys(ASTEROID_TYPES);
                 let type = keysArr[Math.floor(Math.random() * keysArr.length)];
                 let edge = Math.random() > 0.5 ? 50 : WORLD_SIZE - 50;
-                spawnAsteroid(Math.random() * WORLD_SIZE, edge, 3, type);
+                let x;
+                let y;
+                do {
+                    x = Math.random() * WORLD_SIZE;
+                    y = edge;
+                } while (Math.hypot(wrappedDelta(player.x, x), wrappedDelta(player.y, y)) < ASTEROID_SAFE_SPAWN_BUFFER);
+                spawnAsteroid(x, y, 3, type);
             }
             const populationBase = 8 + Math.floor((currentSector - 1) / 2);
             const enemyTarget = Math.ceil(populationBase * 1.2 * 1.2 * modifiers.enemySpawn);
@@ -3666,9 +4885,9 @@ generateBackgroundAssets();
                 let d = Math.hypot(dx, dy);
 
                 if (e.type === 'pirate') {
-                    if (pirateStatusUntil > Date.now() && !e.provoked) e.alerted = false;
+                    if (pirateStatusRemainingMs > 0 && !e.provoked) e.alerted = false;
                     if (d > 600) e.alerted = false;
-                    if (d < e.alertDistance && (!pirateStatusUntil || pirateStatusUntil <= Date.now() || e.provoked)) {
+                    if (d < e.alertDistance && (pirateStatusRemainingMs <= 0 || e.provoked)) {
                         e.alerted = true;
                     }
 
@@ -3867,13 +5086,18 @@ generateBackgroundAssets();
                 ship.vx += (desiredVx - ship.vx) * 0.035;
                 ship.vy += (desiredVy - ship.vy) * 0.035;
 
-                for (const asteroid of asteroids) {
-                    if (Date.now() >= ship.asteroidAvoidUntil && distanceBetween(ship, asteroid) < ship.radius + asteroid.radius + 12) {
-                        ship.routeAngle += Math.PI;
-                        ship.nextReversal = Date.now() + 20000 + Math.random() * 15000;
-                        ship.meanderTarget = (Math.random() * 50 - 25) * Math.PI / 180;
-                        ship.asteroidAvoidUntil = Date.now() + 1200;
-                        break;
+                if (Date.now() >= ship.asteroidAvoidUntil) {
+                    for (const asteroid of asteroids) {
+                        const dx = wrappedDelta(ship.x, asteroid.x);
+                        const dy = wrappedDelta(ship.y, asteroid.y);
+                        const avoidanceDistance = ship.radius + asteroid.radius + 12;
+                        if (dx * dx + dy * dy < avoidanceDistance * avoidanceDistance) {
+                            ship.routeAngle += Math.PI;
+                            ship.nextReversal = Date.now() + 20000 + Math.random() * 15000;
+                            ship.meanderTarget = (Math.random() * 50 - 25) * Math.PI / 180;
+                            ship.asteroidAvoidUntil = Date.now() + 1200;
+                            break;
+                        }
                     }
                 }
 
@@ -3917,14 +5141,6 @@ generateBackgroundAssets();
             }
             enemyBullets.length = activeEBCount;
 
-            let activePCount = 0;
-            for (let i = 0; i < particles.length; i++) {
-                if (particles[i].life > 0) {
-                    particles[activePCount++] = particles[i];
-                }
-            }
-            particles.length = activePCount;
-
             healthPacks.forEach(pack => {
                 if (Date.now() >= pack.nextMeander) {
                     pack.meanderTarget = (Math.random() * 36 - 18) * Math.PI / 180;
@@ -3944,12 +5160,16 @@ generateBackgroundAssets();
                 wrapEntity(pack);
             });
 
-            particles.forEach(p => {
-                p.x += p.vx; p.y += p.vy; p.life -= p.decay;
+            let activePCount = 0;
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= p.decay;
                 wrapEntity(p);
-            });
-
-            particles = particles.filter(p => p.life > 0);
+                if (p.life > 0) particles[activePCount++] = p;
+            }
+            particles.length = activePCount;
 // minerals behavior
             minerals.forEach(m => {
                 let dx = wrappedDelta(m.x, player.x);
@@ -3983,7 +5203,7 @@ generateBackgroundAssets();
                     if (distanceBetween(b, a) < a.radius) {
                         b.life = 0; 
                         gameAudio.playFire();
-                        spawnBurst(a.x, a.y, a.type.color, a.size * 6);
+                        spawnBurst(a.x, a.y, a.type.color, a.size * 12);
                         
                         if (a.type.mineral) {
                             let dropsCount = a.size === 3 ? 3 : a.size === 2 ? 2 : 1;
@@ -4026,7 +5246,7 @@ generateBackgroundAssets();
                         b.life = 0;
                         if (e.type === 'pirate') e.provoked = true;
                         e.hp--;
-                        spawnBurst(e.x, e.y, '#ff3333', 6);
+                        spawnBurst(e.x, e.y, '#ff3333', 10);
                         if (e.hp <= 0) {
                             enemies.splice(eIdx, 1);
                             if (e.type === 'pirate') {
@@ -4067,20 +5287,11 @@ generateBackgroundAssets();
                     if (distanceBetween(b, ship) < ship.radius) {
                         b.life = 0;
                         civilianShips.splice(shipIdx, 1);
-                        pirateStatusUntil = Date.now() + 60000;
+                        pirateStatusRemainingMs += 60000;
+                        piracyIncidents++;
+                        saveGame();
 
-                        for (const type of ['gold', 'uranium', 'eridium']) {
-                            for (let drop = 0; drop < 8; drop++) {
-                                minerals.push({
-                                    x: ship.x + (Math.random() * 24 - 12),
-                                    y: ship.y + (Math.random() * 24 - 12),
-                                    vx: Math.random() * 2 - 1,
-                                    vy: Math.random() * 2 - 1,
-                                    type,
-                                    radius: 5
-                                });
-                            }
-                        }
+                        spawnCivilianPiracyLoot(ship);
 
                         spawnPirateWave(3);
                         spawnBurst(ship.x, ship.y, '#00ffff', 20);
@@ -4131,7 +5342,7 @@ generateBackgroundAssets();
                         damagePlayer(ramDamage, targetShip);
                         
                         // Step D: Trigger extra visual feedback and logging 
-                        spawnBurst(player.x, player.y, '#ffffff', 8); // White mechanical spark burst
+                        spawnBurst(player.x, player.y, '#ffffff', 12); // White mechanical spark burst
                         addLog(logMessage);
                         
                         // Proactively provoke pirates if you ram into them out in open space!
@@ -4199,7 +5410,7 @@ for (let idx = minerals.length - 1; idx >= 0; idx--) {
             player.cargo[m.type]++;
 
             gameAudio.playPickup();
-            spawnBurst(m.x, m.y, MINERAL_COLORS[m.type], 20);
+            spawnBurst(m.x, m.y, MINERAL_COLORS[m.type], 16);
 
             addLog(`Resource Recovered: [${m.type.toUpperCase()}]`);
         }
@@ -4242,7 +5453,7 @@ for (let idx = minerals.length - 1; idx >= 0; idx--) {
                     if (distanceBetween(player, eb) < player.radius) {
                         eb.life = 0; 
                         damagePlayer(12, eb.owner || null);
-                        spawnBurst(player.x, player.y, '#ff3333', 5);
+                        spawnBurst(player.x, player.y, '#ff3333', 8);
                         
                         if (player.needsNewShip) {
                             break;
@@ -4265,20 +5476,23 @@ function applyShipModifiers(skinKey) {
     player.thrust = mods.thrust;
     player.friction = mods.friction;
 
+    // --- 1. DEFAULT BASELINE SHIELD RULES (Min Boundaries) ---
     let targetMaxShield = 100;
-    let targetRegenInterval = Infinity; 
-    let targetAbsorption = 0.0;     
+    let targetRegenInterval = Infinity; // 5s base rate
+    let targetAbsorption = 0.0;     // 0% damage blocked
+    // comment out the below three lines to use shield mods
     targetRegenInterval = Infinity;
     targetAbsorption = 0.0;
 
+    // --- 2. EVALUATE WEAPONS & SHIELDS BY SKIN TYPING ---
     if (skinKey === 'INTERCEPTOR') {
         player.shootDelay = 120; 
         targetMaxShield = 160;
-        targetRegenInterval = 1750; 
+        targetRegenInterval = 1750; // Fixed fast rate for named Interceptor
 
     } else if (skinKey === 'SCIENCE') {
         player.shootDelay = 300; 
-        targetMaxShield = 200; 
+        targetMaxShield = 200; // Fixed heavy pool for named Science
 
     } else if (skinKey === 'STARJOURNER') {
         targetMaxShield = 100; 
@@ -4286,10 +5500,12 @@ function applyShipModifiers(skinKey) {
 
     } else if (skinKey === 'MOSQUITO') {
         player.shootDelay = 100; 
-        targetAbsorption = 0.25; 
+        targetAbsorption = 0.25; // Fixed flat armor for named Mosquito
 
     } else if (skinKey === 'RANDOM') {
+        // --- PROCESS RANDOM PROCEDURAL CACHE MODIFIERS ---
         
+        // Handle Weapon Traits
         if (window.proceduralShipCache && window.proceduralShipCache.weaponTrait) {
             const trait = window.proceduralShipCache.weaponTrait;
             if (trait === 'HOMING') {
@@ -4316,6 +5532,7 @@ function applyShipModifiers(skinKey) {
             player.shootDelay = 182;
         }
 
+        // --- CONTINUOUS RANDOM SHIELD TRAIT EXTENSIONS ---
         if (window.proceduralShipCache && window.proceduralShipCache.shieldTrait) {
             const sTrait = window.proceduralShipCache.shieldTrait;
             
@@ -4326,6 +5543,7 @@ if (sTrait === 'SHIELD_BOOST') {
             window.proceduralShipCache.shieldBoostAmount * 30
         );
     } else {
+        // Backward compatibility for older random-ship saves
         window.proceduralShipCache.shieldBoostAmount =
             0.10 + Math.random() * 0.40;
 
@@ -4336,11 +5554,13 @@ if (sTrait === 'SHIELD_BOOST') {
     }
 }
             else if (sTrait === 'REGEN_MATRIX') {
+                // Changing the Math.random() to 1 or 0 will freeze it at a flat, non-random rate if you want later!
                 targetRegenInterval = Math.floor(2000 + (Math.random() * 1001));
             
             } 
             else if (sTrait === 'FORCE_FIELD') {
- 
+                // FIXED BINARY CAP: Set to 1 instead of Math.random() to lock it at exactly 25% (0.25)
+                // Simply change the 1 back to Math.random() if you want to restore the range later!
                 targetAbsorption = 0.10 + (1 * 0.15);
             }
         }
@@ -4350,15 +5570,21 @@ if (sTrait === 'SHIELD_BOOST') {
         player.shootDelay = 188; 
     }
     
+    // --- 3. COMMIT SHIELD CALCULATIONS TO PLAYER OBJECT ---
     player.maxShield = targetMaxShield;
     player.shieldRegenInterval = targetRegenInterval;
     player.shieldDamageAbsorption = targetAbsorption;
 
-
+    // =========================================================================
+    // 💥 BULLETPROOF FAIL-SAFE OVERRIDE 💥
+    // =========================================================================
+    // If the player has a bonus pool (like 121) but something else forced their 
+    // active points back down to a flat 100 placeholder, instantly top them off!
     if (player.shield === 100 && player.maxShield > 100) {
         player.shield = player.maxShield;
     }
 
+    // Standard safety boundary check (Keeps shield from exceeding maxShield)
     if (player.shield > player.maxShield) {
         player.shield = player.maxShield;
     }
@@ -4372,7 +5598,8 @@ if (sTrait === 'SHIELD_BOOST') {
         function damagePlayer(amount, source = null) {
             if (player.needsNewShip) return;
 
-
+            // --- FORCE FIELD DAMAGE REDUCTION MATRIX ---
+            // Reduces incoming amount by 25% if FORCE_FIELD trait is active, otherwise takes 100%
             const finalDamage = amount * (1 - (player.shieldDamageAbsorption || 0));
 
             player.shield -= finalDamage;
@@ -4391,7 +5618,7 @@ if (sTrait === 'SHIELD_BOOST') {
                     player.cargo.eridium = Math.floor(player.cargo.eridium / 2);
                 }
 
-                const pirateDeath = pirateStatusUntil > Date.now();
+                const pirateDeath = pirateStatusRemainingMs > 0;
                 const walletLost = pirateDeath ? player.wallet : Math.floor(player.wallet / 2);
                 player.wallet = pirateDeath ? 0 : walletLost;
                 
@@ -4401,32 +5628,39 @@ if (sTrait === 'SHIELD_BOOST') {
                 player.shield = player.maxShield; // Restores full health on tow respawn
                 player.invulnerable = 35;
 
-    
+                // =============================================================
+                // FIXED FOR BACKUP ISOLATION: SAFE STAT PACKING
+                // =============================================================
                 if (window.proceduralShipCache) {
                     player.lastRandomBackup = { ...window.proceduralShipCache };
                     
-             
+                    // FIXED STAT LEAK: Only carry over the rolled gun speed IF you were 
+                    // actively flying a RANDOM ship model when you took terminal damage.
                     if (ACTIVE_SHIP_SKIN === 'RANDOM' && player.randomShootDelay) {
                         player.lastRandomBackup.savedShootDelay = player.randomShootDelay; 
                     } else {
                         player.lastRandomBackup.savedShootDelay = 210; // Reset to default base standard delay rate
                     }
                 } else {
+                    // Safety protection if you died while piloting a normal ship class variant layout option
                     player.lastRandomBackup = null;
                 }
 
+                // Forcefully assign the baseline 'RANDOM' hull designation upon death
                 window.proceduralShipCache = null;
 
                 ACTIVE_SHIP_SKIN = 'RANDOM';
 
                 player.randomShootDelay = null;
 
+                // Generate the replacement random ship BEFORE applying its modifiers.
                 generateProceduralShipCache();
 
                 if (typeof applyShipModifiers === 'function') {
                     applyShipModifiers('RANDOM');
                 }
 
+                // Fully charge the replacement ship to its generated capacity.
                 player.shield = player.maxShield;
 
                 showAlert("Ship Destroyed! Resources Lost, new ship purchased.");
@@ -4443,7 +5677,7 @@ if (sTrait === 'SHIELD_BOOST') {
 
 function updateUI() {
     // 1. Calculate General Status & Timers
-    const pirateActive = pirateStatusUntil > Date.now();
+    const pirateActive = pirateStatusRemainingMs > 0;
     const sectorGoal = getSectorGoal();
     const goalPct = Math.min(100, (player.bank / sectorGoal) * 100);
     const shieldPct = (player.shield / player.maxShield) * 100;
@@ -4452,6 +5686,7 @@ function updateUI() {
     let baseDist = Math.hypot(player.x - SPACEPORT.x, player.y - SPACEPORT.y);
     const activeTheme = SECTOR_THEMES[Math.min(12, currentSector)] || { name: "Deep Space" };
 
+    // 2. Sync Shared Stats (Desktop & Mobile)
     // Wallet & Bank
     document.getElementById('stat-wallet').innerText = `\$${player.wallet}`;
     document.getElementById('mobile-wallet').innerText = `\$${player.wallet}`;
@@ -4467,20 +5702,28 @@ function updateUI() {
     document.getElementById('stat-goal-fill').style.width = `${goalPct}%`;
     document.getElementById('mobile-goal-fill').style.width = `${goalPct}%`;
 
+       // --- FULLY DYNAMIC COLOR-CODED SHIELD HUD REFRESH LOOP ---
     const rawRate = (player.shieldRegenInterval / 1000).toFixed(1);
     const displayRate = parseFloat(rawRate);
     const roundedCurrentShield = Math.ceil(player.shield);
 
+    // 1. Target UI elements
     const desktopShieldText = document.getElementById('stat-shield-text');
     const absorbTextContainer = document.getElementById('stat-shield-absorb');
     const rateTextContainer = document.getElementById('stat-shield-rate');
 
     if (desktopShieldText) {
+        // --- CORE VALUES (xx/XX) COLORING RULE ---
         desktopShieldText.innerText = `${roundedCurrentShield}/${player.maxShield}`;
+        // Turns pale greenish (#a1cca5) if max shield is modified above the 100 baseline, fallback to white
         desktopShieldText.style.color = (player.maxShield > 100) ? '#a1cca5' : '#ffffff';
     }
+    const mobileShieldText = document.getElementById('mobile-shield-text');
+    mobileShieldText.innerText = `${roundedCurrentShield}/${player.maxShield}`;
+    mobileShieldText.style.color = (player.maxShield > 100) ? '#a1cca5' : '#ffffff';
 
-
+    // --- CLEAN ARCADE MODE OVERRIDES ---
+    // Clears out the old recharge interval labels since regeneration is now permanently off!
     if (rateTextContainer) {
         rateTextContainer.innerText = '';
     }
@@ -4536,27 +5779,33 @@ function updateUI() {
         // 1. Keep your existing paragraph text updated
        // document.getElementById('spaceport-dist').innerText = `Range: ${calculatedDistance}m`;
 
+        // 2. DYNAMIC BUTTON TEXT: Swap text based on player distance
         const bankButton = document.getElementById('btn-bank');
         if (calculatedDistance <= 160) { 
+            // Player is AT homeworld
             bankButton.innerText = "HOMEWORLD - BANK & REPAIR SHIP";
         } else {
+            // Player is away from homeworld
             bankButton.innerText = `HOMEWORLD - Distance: ${calculatedDistance}m`;
         }
 
+    // 3. Handle Pirate Alert Status
     const pirateStatus = document.getElementById('pirate-status');
     if (pirateActive) {
-        const secondsRemaining = Math.ceil((pirateStatusUntil - Date.now()) / 1000);
+        const secondsRemaining = Math.ceil(pirateStatusRemainingMs / 1000);
         pirateStatus.style.display = 'block';
         pirateStatus.innerText = `PIRATE STATUS: ${secondsRemaining}s remaining. Banking, repairs, and trade locked.`;
     } else {
         pirateStatus.style.display = 'none';
     }
 
+    // 4. Handle Spaceport Interaction & Banking Logic
     const bankBtn = document.getElementById('btn-bank');
     const mobileBankBtn = document.getElementById('mobile-bank');
     const isDockedAndSafe = (baseDist <= SPACEPORT.radius && !pirateActive);
 
     if (isDockedAndSafe) {
+        // Enable buttons and add visual polish
         bankBtn.disabled = false;
         bankBtn.classList.add('bank-ready');
         if (mobileBankBtn) {
@@ -4564,8 +5813,9 @@ function updateUI() {
             mobileBankBtn.classList.add('bank-ready');
         }
 
+        // Shared action handler when docking is successful
         const handleBankTransaction = () => {
-            if (pirateStatusUntil > Date.now()) return;
+            if (pirateStatusRemainingMs > 0) return;
             
             if (player.wallet > 0 || player.shield < player.maxShield) {
                 player.bank += player.wallet;
@@ -4589,10 +5839,12 @@ function updateUI() {
             }
         };
 
+        // Assign action to both desktop and mobile layouts
         bankBtn.onclick = handleBankTransaction;
         if (mobileBankBtn) mobileBankBtn.onclick = handleBankTransaction;
 
     } else {
+        // Disable buttons and strip readiness styling
         bankBtn.disabled = true;
         bankBtn.classList.remove('bank-ready');
         bankBtn.onclick = null;
@@ -4604,7 +5856,9 @@ function updateUI() {
         }
     }
 
-
+      // =========================================================================
+    // 5. Merchant Proximity Radar & Panel Sync (STATE-SHIELDED ICON GRID SHOP)
+    // =========================================================================
     let closestM = null;
     let minDist = MERCHANT_RANGE; 
 
@@ -4615,6 +5869,50 @@ function updateUI() {
             closestM = m;
         }
     });
+
+    const mobileQuickTrade = document.getElementById('mobile-merchant-quick-trade');
+    const mobileTradeSummary = document.getElementById('mobile-trade-summary');
+    const mobileTradeOffer = document.getElementById('mobile-trade-offer');
+    const mobileTradeButton = document.getElementById('mobile-trade');
+    const mobileMerchantIcon = document.getElementById('mobile-merchant-icon');
+    const mobileMerchantName = document.getElementById('mobile-merchant-name');
+    if (closestM) {
+        const quickTradeWasVisible = mobileQuickTrade.classList.contains('is-visible');
+        mobileQuickTradeMerchantId = closestM.id;
+        const mineralCodes = { gold: 'AU', uranium: 'U', eridium: 'ER' };
+        let canQuickTrade = !pirateActive;
+        const requirements = Object.entries(closestM.reqs).map(([item, amount]) => {
+            const available = player.cargo[item] || 0;
+            const hasEnough = available >= amount;
+            if (!hasEnough) canQuickTrade = false;
+            const requirement = document.createElement('span');
+            requirement.className = `mobile-trade-requirement ${hasEnough ? 'has-enough' : 'needs-more'}`;
+            requirement.textContent = `${mineralCodes[item] || item.toUpperCase()}: ${available}/${amount}`;
+            return requirement;
+        });
+        mobileMerchantName.textContent = closestM.name;
+        mobileTradeOffer.textContent = `OFFER: $${Math.floor(closestM.reward * (1 + (currentSector - 1) * 0.07))}`;
+        mobileMerchantIcon.hidden = !closestM.helmetIconData;
+        if (closestM.helmetIconData && mobileMerchantIcon.getAttribute('src') !== closestM.helmetIconData) {
+            mobileMerchantIcon.src = closestM.helmetIconData;
+        }
+        mobileTradeSummary.replaceChildren(...requirements);
+        mobileTradeButton.disabled = !canQuickTrade;
+        mobileTradeButton.textContent = pirateActive ? 'LOCKED' : 'TRADE';
+        mobileQuickTrade.classList.add('is-visible');
+        if (!quickTradeWasVisible) syncMobileSidebarTop();
+    } else {
+        const quickTradeWasVisible = mobileQuickTrade.classList.contains('is-visible');
+        mobileQuickTradeMerchantId = null;
+        mobileQuickTrade.classList.remove('is-visible');
+        mobileTradeButton.disabled = true;
+        mobileMerchantName.textContent = '';
+        mobileTradeOffer.textContent = '';
+        mobileMerchantIcon.hidden = true;
+        mobileMerchantIcon.removeAttribute('src');
+        mobileTradeSummary.replaceChildren();
+        if (quickTradeWasVisible) syncMobileSidebarTop();
+    }
 
     const merchPanel = document.getElementById('merchant-content');
     
@@ -4641,6 +5939,7 @@ function updateUI() {
     if (merchPanel && !closestM) {
         if (isDockedAndSafe || (player.x === WORLD_SIZE / 2 && player.y === WORLD_SIZE / 2)) {
             
+            // Included backup token mapping directly inside the cache tracking signature string
             const backupStateToken = player.lastRandomBackup ? 'has_backup' : 'no_backup';
             const currentSystemStateKey = `shop_wallet:${player.wallet}_skin:${ACTIVE_SHIP_SKIN}_bk:${backupStateToken}`;
 
@@ -4656,8 +5955,10 @@ function updateUI() {
                     'RANDOM': 'RANDOMIZED SHIP'
                 };
 
+                            // SCALED DOWN TITLE: Compact 11px font profile to prevent clipping lines
             let shopHTML = `<h3 style="color: #ff9d42; margin: 0 0 6px 0; font-size: 11px; font-weight: bold; letter-spacing: 0.3px; border-bottom: 1px solid #333; padding-bottom: 2px; text-transform: uppercase;">Shipyard Available</h3>`;
             
+            // FIXED SIZING: Tightened gap spacing from 5px to 3px to maximize vertical clearance
             shopHTML += `<div class="shipyard-grid-wrapper" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 3px; padding: 1px 0; font-family: monospace;">`;
 
             for (const [skinKey, price] of Object.entries(SHIP_SHOP_PRICES)) {
@@ -4681,7 +5982,9 @@ function updateUI() {
             }
             shopHTML += `</div>`;
 
-   
+            // =============================================================
+            // COMPACT RECOVERY BUY BACK OPTION STRIP
+            // =============================================================
             if (player.lastRandomBackup) {
                 shopHTML += `
                     <button class="ship-shop-btn" data-skin="BUYBACK_RECOVERY" style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; background: rgba(0, 229, 255, 0.04); border: 1px dashed #00e5ff; padding: 3px 6px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 4px; font-family: monospace; box-sizing: border-box; min-height: 22px; transition: background 0.1s;">
@@ -4692,7 +5995,9 @@ function updateUI() {
 
             merchPanel.innerHTML = shopHTML;
 
- 
+            // =============================================================
+            // ARCADE ICON PREVIEW RENDERINGS (UPDATED CANVAS CENTER TARGETS)
+            // =============================================================
             const shopCanvases = merchPanel.querySelectorAll('.shop-preview-canvas');
             shopCanvases.forEach(canv => {
                 const sCtx = canv.getContext('2d');
@@ -4702,6 +6007,7 @@ function updateUI() {
                 sCtx.clearRect(0, 0, canv.width, canv.height);
                 sCtx.lineJoin = 'miter'; sCtx.lineCap = 'square';
 
+                // FIXED CENTER TRANSFORMS: Adjusted center point to 11, 11 and radius scale to 6 to match 22x22 canvas
                 if (targetSkin === 'ORIGINAL' && SHIP_SKINS[targetSkin]) {
                     const mockPlayer = { x: 11, y: 11, radius: 6, angle: -Math.PI / 2, invulnerable: 0 };
                     sCtx.save(); sCtx.translate(mockPlayer.x, mockPlayer.y); sCtx.rotate(mockPlayer.angle);
@@ -4747,8 +6053,9 @@ function updateUI() {
 
 
 
+        // FIXED: Shifted execution completely out of rapid dynamic innerHTML injection blocks to stop DOM event listeners from breaking mid-click
         function executeMerchantTrade(merchantId) {
-            if (pirateStatusUntil > Date.now()) {
+            if (pirateStatusRemainingMs > 0) {
                 addLog('Trade denied: Pirate status is active.');
                 return;
             }
@@ -4798,11 +6105,14 @@ function updateUI() {
             gameAudio.playTrade();
             saveGame();
 
+            // FIXED FOR THE UI: Changed m.reward to tradePayout so notifications show the boosted cash!
             addLog(`Trade of resources verified with merchant ship profile ${m.id}. Received \$${tradePayout} credits.`);
             showAlert(`RESOURCES SOLD! +\$${tradePayout}`);
 
             
             // Cycle merchant positions onto border regions cleanly
+            spawnBurst(m.x, m.y, '#ffffff', 10);
+            spawnBurst(m.x, m.y, '#ffd700', 10);
             merchants = merchants.filter(merchantShip => merchantShip.id !== m.id);
             spawnMerchant();
             
@@ -4814,7 +6124,7 @@ function updateUI() {
         function renderMerchantPanel(m) {
             const panel = document.getElementById('merchant-content');
             let reqHtml = '';
-            let canTrade = pirateStatusUntil <= Date.now();
+            let canTrade = pirateStatusRemainingMs <= 0;
 
             for (let item in m.reqs) {
                 let has = player.cargo[item] || 0;
@@ -4829,17 +6139,31 @@ function updateUI() {
                 </div>`;
             }
 
+            // FIXED: Using string parameters referencing independent global window scope actions to avoid template injection click stalls
             panel.innerHTML = `
                 <p class="merchant-msg" style="color:var(--accent-gold); font-weight:bold;">TRADE ALLIANCE ID#: ${m.id}</p>
-                <div class="trade-reqs" style="margin:4px 0;">${reqHtml}</div>
+                <div class="trade-reqs merchant-trade-layout" style="margin:4px 0;">
+                    <div>
+                        <div class="merchant-helmet-frame">${m.helmetIconData ? `<img src="${m.helmetIconData}" alt="">` : ''}</div>
+                        <div class="merchant-portrait-name" title="${m.name}">${m.name}</div>
+                    </div>
+                    <div class="merchant-req-list">${reqHtml}</div>
+                </div>
                 <p class="merchant-msg">MERCHANT'S TRADE OFFER: <span style="color:#55ff55; font-size:1.25rem; font-weight:bold;">\$${Math.floor(m.reward * (1 + (currentSector - 1) * 0.07))}</span></p>
-                <button class="btn" id="btn-trade" onclick="executeMerchantTrade('${m.id}')" style="width:100%; border-color:var(--accent-gold); color:var(--accent-gold); margin-top:4px;" ${canTrade ? '' : 'disabled'}>${pirateStatusUntil > Date.now() ? 'Locked - Piracy' : 'Execute Trade'}</button>
+                <button class="btn" id="btn-trade" onclick="executeMerchantTrade('${m.id}')" style="width:100%; border-color:var(--accent-gold); color:var(--accent-gold); margin-top:4px;" ${canTrade ? '' : 'disabled'}>${pirateStatusRemainingMs > 0 ? 'Locked - Piracy' : 'Execute Trade'}</button>
             `;
         }
 
         function draw() {
 
             const activeTheme = SECTOR_THEMES[Math.min(12, currentSector)] || { background: "#020205", primary: "#00ffff" };
+            const viewLeft = player.x - canvas.width / 2;
+            const viewRight = player.x + canvas.width / 2;
+            const viewTop = player.y - canvas.height / 2;
+            const viewBottom = player.y + canvas.height / 2;
+            const isInViewport = (x, y, margin = 64) =>
+                x >= viewLeft - margin && x <= viewRight + margin &&
+                y >= viewTop - margin && y <= viewBottom + margin;
             
             ctx.fillStyle = activeTheme.background;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -4865,6 +6189,7 @@ ctx.translate(canvas.width / 2 - player.x, canvas.height / 2 - player.y);
 ctx.save();
 
 nebulae.forEach(n => {
+    if (!isInViewport(n.x, n.y, n.radius)) return;
     let grad = ctx.createRadialGradient(n.x, n.y, n.radius * 0.1, n.x, n.y, n.radius);
     grad.addColorStop(0, activeTheme.nebula);
     grad.addColorStop(1, 'transparent');
@@ -4878,9 +6203,9 @@ ctx.restore();
 ctx.strokeStyle = '#111124';
 ctx.lineWidth = 1;
 const gridSpacing = 200;
-let startX = Math.max(0, Math.floor((player.x - canvas.width) / gridSpacing) * gridSpacing);let endX = Math.min(12000, Math.ceil((player.x + canvas.width) / gridSpacing) * gridSpacing);
+let startX = Math.max(0, Math.floor((viewLeft - gridSpacing) / gridSpacing) * gridSpacing);let endX = Math.min(WORLD_SIZE, Math.ceil((viewRight + gridSpacing) / gridSpacing) * gridSpacing);
 
-let startY = Math.max(0, Math.floor((player.y - canvas.height) / gridSpacing) * gridSpacing);let endY = Math.min(12000, Math.ceil((player.y + canvas.height) / gridSpacing) * gridSpacing);
+let startY = Math.max(0, Math.floor((viewTop - gridSpacing) / gridSpacing) * gridSpacing);let endY = Math.min(WORLD_SIZE, Math.ceil((viewBottom + gridSpacing) / gridSpacing) * gridSpacing);
 for (let x = startX; x <= endX; x += gridSpacing) {
     ctx.beginPath(); 
     ctx.moveTo(x, startY); 
@@ -4904,6 +6229,7 @@ ctx.strokeRect(0, 0, 12000, 12000);
 
 
             // Procedural sector homeworld and rotating banking perimeter
+            if (isInViewport(SPACEPORT.x, SPACEPORT.y, 500)) {
             ctx.save();
             ctx.translate(SPACEPORT.x, SPACEPORT.y);
             const bankingPulse = (Math.sin(Date.now() / 700) + 1) / 2;
@@ -4934,9 +6260,11 @@ ctx.strokeRect(0, 0, 12000, 12000);
 
             ctx.fillText(homeworldLabel, 0, -SPACEPORT.radius - 18);
             ctx.restore();
+            }
 
             // Resource Collectibles
             minerals.forEach(m => {
+                if (!isInViewport(m.x, m.y, 16)) return;
                 ctx.save();
                 ctx.translate(m.x, m.y);
                 ctx.fillStyle = MINERAL_COLORS[m.type];
@@ -4951,6 +6279,7 @@ ctx.strokeRect(0, 0, 12000, 12000);
 
             // Floating health beacons
             healthPacks.forEach(pack => {
+                if (!isInViewport(pack.x, pack.y, 36)) return;
                 const pulse = (Math.sin(pack.pulse) + 1) / 2;
                 ctx.save();
                 ctx.translate(pack.x, pack.y);
@@ -4983,14 +6312,18 @@ ctx.strokeRect(0, 0, 12000, 12000);
                 ctx.restore();
             });
 
-            // bullet styles 
+            // Laser Projectiles
             ctx.strokeStyle = 'var(--accent-blue)';
             ctx.lineWidth = 6;
             ctx.shadowBlur = 12;
             ctx.shadowColor = 'var(--accent-blue)';
             ctx.globalAlpha = 0.95;
-
+                       // =========================================================================
+            // CORE WEAPON GRAPHICS & RENDER PIPELINE (CUSTOM CONICAL TAPERED LASERS)
+            // =========================================================================
             bullets.forEach((b) => {
+                if (!isInViewport(b.x, b.y, 40)) return;
+                // 1. Identify the active weapon profile class
                 const isSTARJOURNERHoming = (ACTIVE_SHIP_SKIN === 'STARJOURNER');
                 const isRandomHoming = (ACTIVE_SHIP_SKIN === 'RANDOM' && window.proceduralShipCache && window.proceduralShipCache.weaponTrait === 'HOMING');
                 const isHoming = isSTARJOURNERHoming || isRandomHoming;
@@ -5005,12 +6338,15 @@ ctx.strokeRect(0, 0, 12000, 12000);
 
                 ctx.save();
 
-   
+                                // -----------------------------------------------------------------
+                // WEAPON STYLE A: HOMING PROJECTILE RENDERER (CIRCLE WITH WHITE STROKE)
+                // -----------------------------------------------------------------
                 if (isHoming) {
                     const tailLength = 1.8; 
                     const tailX = b.x - b.vx * tailLength;
                     const tailY = b.y - b.vy * tailLength;
 
+                    // 1. Draw the gradient flame trail fade stretching behind the hull
                     let particleGrd = ctx.createLinearGradient(b.x, b.y, tailX, tailY);
                     particleGrd.addColorStop(0, 'rgba(255, 34, 34, 1.0)');  
                     particleGrd.addColorStop(1, 'rgba(255, 51, 51, 0.0)');  
@@ -5025,8 +6361,10 @@ ctx.strokeRect(0, 0, 12000, 12000);
                     ctx.lineTo(tailX, tailY);
                     ctx.stroke();
 
+                    // 2. FIXED: Draw the core circle in tracking red, then add the thin white stroke rim
                     const bulletRadius = 2.8;
 
+                    // Draw the core red center body
                     ctx.fillStyle = '#ff2222';
                     ctx.shadowBlur = 8;
                     ctx.shadowColor = '#ff2222';
@@ -5035,33 +6373,40 @@ ctx.strokeRect(0, 0, 12000, 12000);
                     ctx.arc(b.x, b.y, bulletRadius, 0, Math.PI * 2);
                     ctx.fill();
 
+                    // Layer the ultra-thin high-contrast white offset stroke ring around it
                     ctx.strokeStyle = '#ffffff';
-                    ctx.lineWidth = 0.75; 
+                    ctx.lineWidth = 0.75; // Ultra-thin clean accent line stroke
                     ctx.shadowBlur = 4;
-                    ctx.shadowColor = '#ffffff'; 
+                    ctx.shadowColor = '#ffffff'; // Adds a bright sparking bloom around the white rim
                     ctx.stroke();
                 }
 
+                // -----------------------------------------------------------------
+                // WEAPON STYLE B: ADVANCED CONICAL BEAM LAYOUTS (REGULAR, SPREAD, DOUBLE)
+                // -----------------------------------------------------------------
                 else {
                     const tailLength = 3;
                     const tailX = b.x - b.vx * tailLength;
                     const tailY = b.y - b.vy * tailLength;
 
+                    // Calculate perpendicular vectors to dynamically draw the wedge/triangle thickness width
                     const velocityAngle = Math.atan2(b.vy, b.vx);
                     const perpAngle = velocityAngle + Math.PI / 2;
 
+                    // Set custom color templates and glow indicators based on the weapon class
                     let baseColor, glowColor;
                     if (isSpread) {
-                        baseColor = '#77cc99'; 
+                        baseColor = '#77cc99'; // Science / Spread Green
                         glowColor = '#5cd693';
                     } else if (isDouble) {
-                        baseColor = '#b3f5ff'; 
+                        baseColor = '#b3f5ff'; // Interceptor Light Cyan
                         glowColor = '#00ffff';
                     } else {
-                        baseColor = '#ffd1e8'; 
+                        baseColor = '#ffd1e8'; // Regular Laser Slightly Pinkish
                         glowColor = '#ffb3d9';
                     }
 
+                    // Tapered Gradient: Front is solid neon, tail fades completely out
                     let beamGrd = ctx.createLinearGradient(b.x, b.y, tailX, tailY);
                     beamGrd.addColorStop(0, baseColor);
                     beamGrd.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
@@ -5070,10 +6415,14 @@ ctx.strokeRect(0, 0, 12000, 12000);
                     ctx.shadowBlur = 6;
                     ctx.shadowColor = glowColor;
 
-                    const tipWidth = 2.2; 
+                    // Compile the conical triangle polygon shape path (Wide tip tapering down to zero at tail)
+                    const tipWidth = 2.2; // Width thickness dimension at the laser head tip
                     ctx.beginPath();
+                    // Left tip corner
                     ctx.moveTo(b.x + Math.cos(perpAngle) * tipWidth, b.y + Math.sin(perpAngle) * tipWidth);
+                    // Right tip corner
                     ctx.lineTo(b.x - Math.cos(perpAngle) * tipWidth, b.y - Math.sin(perpAngle) * tipWidth);
+                    // Closes perfectly at the sharp rear point coordinates
                     ctx.lineTo(tailX, tailY);
                     ctx.closePath();
                     ctx.fill();
@@ -5083,8 +6432,11 @@ ctx.strokeRect(0, 0, 12000, 12000);
             });
             ctx.globalAlpha = 1;
 
-
+            // =========================================================================
+            // HOSTILE PROJECTILE DRAWING RENDER PIPELINE (LARGE RED CONICAL BEAM + WHITE SPARK CORE)
+            // =========================================================================
             enemyBullets.forEach((eb) => {
+                if (!isInViewport(eb.x, eb.y, 32)) return;
                 const tailLength = 3.2; 
                 const tailX = eb.x - eb.vx * tailLength;
                 const tailY = eb.y - eb.vy * tailLength;
@@ -5092,7 +6444,7 @@ ctx.strokeRect(0, 0, 12000, 12000);
                 const velocityAngle = Math.atan2(eb.vy, eb.vx);
                 const perpAngle = velocityAngle + Math.PI / 2;
 
-                ctx.save(); 
+                ctx.save(); // Locks down bullet state independently!
 
                 const baseColor = '#ff3333'; 
                 const glowColor = '#ff0000'; 
@@ -5113,6 +6465,7 @@ ctx.strokeRect(0, 0, 12000, 12000);
                 ctx.closePath();
                 ctx.fill();
 
+                // High-intensity white core spark indicator dot layout
                 ctx.fillStyle = '#ffffff';
                 ctx.shadowBlur = 10;
                 ctx.shadowColor = '#ffffff'; 
@@ -5121,15 +6474,19 @@ ctx.strokeRect(0, 0, 12000, 12000);
                 ctx.arc(eb.x, eb.y, 2.2, 0, Math.PI * 2); 
                 ctx.fill();
 
-                ctx.restore(); 
+                ctx.restore(); // Safely closes state, freeing context for subsequent rendering loops!
             });
 
-            // asteroids
+            // =========================================================================
+            // VECTOR ASTEROIDS DRAWING LOOP (ISOLATED & BALANCED)
+            // =========================================================================
             asteroids.forEach(a => {
-                ctx.save(); 
+                if (!isInViewport(a.x, a.y, a.radius + 12)) return;
+                ctx.save(); // Clean open mapping tracking coordinate space bounds
                 ctx.translate(a.x, a.y);
                 ctx.rotate(a.angle);
                 
+                // Determine color and apply to stroke template lines
                 const strokeColor = a.typeKey === 'GENERIC' ? activeTheme.generic : a.type.color;
                 ctx.strokeStyle = strokeColor;
                 ctx.shadowBlur = 6;
@@ -5144,22 +6501,26 @@ ctx.strokeRect(0, 0, 12000, 12000);
                 }
                 ctx.closePath();
                 
+                // Fill with native transparency layouts
                 ctx.fillStyle = strokeColor;
                 ctx.globalAlpha = 0.12;
                 ctx.fill();
                 
+                // Reset alpha parameters securely back to standard full visibility for outlines
                 ctx.globalAlpha = 1.0; 
                 ctx.stroke();
                 
-                ctx.restore(); 
+                ctx.restore(); // Clean execution layer lock down
             });
 
                     
 
 // Merchant Vessels
 merchants.forEach(m => {
+    if (!isInViewport(m.x, m.y, MERCHANT_RANGE + 80)) return;
     ctx.save();
     
+    // Keep the outer radial range circle exactly as is
     ctx.strokeStyle = 'rgba(255, 215, 0, 0.4)'; 
     ctx.lineWidth = 1.5;
     ctx.setLineDash([6, 6]);
@@ -5175,6 +6536,7 @@ merchants.forEach(m => {
     ctx.lineWidth = 2.5; 
 
 
+    // Deterministic pseudo-random seed based on merchant ID to prevent screen flickering
     const getSeed = (id) => {
         let hash = 0;
         const str = String(id);
@@ -5189,47 +6551,28 @@ merchants.forEach(m => {
         return x - Math.floor(x);
     };
 
-    const generateMerchantName = () => {
-        const prefixes = [
-            "Do", "J", "Qui", "G", "Dur",
-
-            "M", "Nix", "Cr", "Gip", "Yor",
-            "Kor", "Ai", "B", "K", "Sha", "Vo",
-            "Mi", "Tch", "Kel", "Ryn", "T"
-        ];
-
-        const roots = [
-            "yst", "oss", "ion", "or", "ur",
-            "ell", "on", "ax", "ul", "un",
-            "eth", "lek", "rin", "vek", "ith",
-            "ara", "esh", "nix", "tlu", "strin"
-        ];
-        
-        const prefIdx = Math.floor(rand(10) * prefixes.length);
-        const rootIdx = Math.floor(rand(11) * roots.length);
-        
-        return prefixes[prefIdx] + roots[rootIdx];
-    };
-    const merchantName = generateMerchantName().toUpperCase();
-
-
     const bodyType = Math.floor(rand(1) * 3); // 0 = Thick Rect, 1 = Diamond, 2 = Circle
     const vertConfig = Math.floor(rand(2) * 4); // 0 = None, 1 = Above, 2 = Below, 3 = Both
     const topAttachType = Math.floor(rand(7) * 3); // 0 = Rect, 1 = Semi-Circle, 2 = Full Circle
     const botAttachType = Math.floor(rand(8) * 3); // 0 = Rect, 1 = Semi-Circle, 2 = Full Circle
     const sphereR = 13;
+    // Helper function to render a standalone structural element with mask fill and stroke glow
     const renderComponent = (drawPathFunc) => {
         ctx.save();
         ctx.beginPath();
         drawPathFunc();
         
+        // Solid layout background matching standard dark space void
         ctx.fillStyle = '#080810'; 
         ctx.fill();
         
+        // Translucent golden fill glow
         ctx.fillStyle = 'rgba(255, 215, 0, 0.15)';
         ctx.fill();
         
-
+        // =========================================================================
+        // BALANCED GOLDEN GLOW FOOTPRINT (Vibrant Bloom Adjusted Down from Pass 1)
+        // =========================================================================
         ctx.shadowBlur = 14;
         ctx.shadowColor = 'rgba(255, 215, 0, 0.6)';
         
@@ -5237,6 +6580,7 @@ merchants.forEach(m => {
         ctx.restore();
     };
 
+    // LAYER 1: Central Hulls drawn first as the background base anchor (SCALED 1.25x)
     renderComponent(() => {
         if (bodyType === 0) {
             ctx.rect(-10, -30, 20, 60); 
@@ -5251,13 +6595,17 @@ merchants.forEach(m => {
         }
     });
 
+    // LAYER 2: Vertical Extensions drawn cleanly over the central hull edge bounds (SCALED 1.25x)
     if (vertConfig === 1 || vertConfig === 3) {
+        // Top vertical attachment structure
         renderComponent(() => {
+            // Draw connecting neck extension column
             ctx.rect(-7.5, -52.5, 15, 22.5); 
             ctx.closePath();
         });
         
         renderComponent(() => {
+            // Scaled up top cap geometry matching your perfected proportion profile
             const topCapScaleR = sphereR * 1.35; 
             
             if (topAttachType === 0) {
@@ -5271,12 +6619,15 @@ merchants.forEach(m => {
     }
 
     if (vertConfig === 2 || vertConfig === 3) {
+        // Bottom vertical attachment structure
         renderComponent(() => {
+            // Draw connecting neck extension column
             ctx.rect(-7.5, 30, 15, 22.5); 
             ctx.closePath();
         });
 
         renderComponent(() => {
+            // Symmetrical up-scaled bottom cap parameters
             const botCapScaleR = sphereR * 1.35; 
             
             if (botAttachType === 0) {
@@ -5327,7 +6678,9 @@ merchants.forEach(m => {
         drawSolarGrid(wingSpan, -panelH / 2, panelW, panelH);
     }
 
-
+    // =========================================================================
+    // LAYER 3: 45-DEGREE ROTATED CENTRAL DIAMOND COMMAND POD
+    // =========================================================================
     ctx.save();
     ctx.rotate(Math.PI / 4); 
     
@@ -5340,13 +6693,15 @@ merchants.forEach(m => {
     ctx.strokeRect(-12, -12, 24, 24);
     ctx.restore();
 
-
+    // Topmost bright white interior diamond window core 
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(-10, -10, 20, 20); 
     ctx.strokeRect(-10, -10, 20, 20);
     ctx.restore();
     
-
+    // =========================================================================
+    // FIXED FEATURE: WHITE TEXT BLOCK OVERRIDE WITH ZEROED SHADOW BLUR
+    // =========================================================================
     ctx.save(); 
     ctx.shadowBlur = 0;
     ctx.shadowColor = 'transparent';
@@ -5354,7 +6709,8 @@ merchants.forEach(m => {
     ctx.font = 'bold 12px monospace';
     ctx.textAlign = 'center';
 
-    ctx.fillText(`MERCHANT - '${merchantName}'`, 0, 76); 
+    // Renders the merchant string description cleanly right below the model bounds
+    ctx.fillText(`MERCHANT - '${m.name}'`, 0, 76); 
     ctx.restore(); 
     
     ctx.restore(); 
@@ -5365,6 +6721,7 @@ merchants.forEach(m => {
 
 // Enemy Raiders
 enemies.forEach(e => {
+    if (!isInViewport(e.x, e.y, Math.max(64, (e.radius || 0) * 2 + 24))) return;
     ctx.save();
     ctx.translate(e.x, e.y);
     ctx.strokeStyle = '#ff3333';
@@ -5374,13 +6731,15 @@ enemies.forEach(e => {
     ctx.lineWidth = 1.8;
 
        if (e.type === 'pirate') {
-  
-        const chassisRadius = 21;    
-        const armLength = 19.5;      
-        
+        // =========================================================================
+        // ORIGINAL PIRATE RAIDER HULL CONFIGURATION (150% UP-SCALE + EXPANDED FUEL PODS)
+        // =========================================================================
+        const chassisRadius = 21;    // 14 * 1.5
+        const armLength = 19.5;      // 13 * 1.5
+        // EXPANDED: Sized up the fuel pods further for visual emphasis
         const terminusRadius = 10.0; 
 
-        // 1. Core Diamond shape 
+        // 1. Core Diamond shape body with its original red fill
         ctx.fillStyle = '#8f1d2c';
         ctx.beginPath();
         ctx.moveTo(0, -chassisRadius);
@@ -5391,7 +6750,7 @@ enemies.forEach(e => {
         ctx.fill();
         ctx.stroke();
 
-        // 2. Cockpitnear-white tint
+        // 2. Cockpit circle remains ultra-bright near-white tint
         ctx.save();
         ctx.fillStyle = '#ffeeee';
         ctx.beginPath();
@@ -5400,7 +6759,7 @@ enemies.forEach(e => {
         ctx.stroke();
         ctx.restore();
 
-        // 3.  locked X structural frame layout
+        // 3. Shortened locked X structural frame layout
         ctx.fillStyle = 'rgba(255, 51, 51, 0.4)';
         ctx.beginPath();
         ctx.moveTo(-armLength, -armLength);
@@ -5435,6 +6794,7 @@ enemies.forEach(e => {
             ctx.restore();
         }
 
+        // Apply the internal multi-layered detailing to all four frame tips
         drawPodCore(armLength, armLength);
         drawPodCore(-armLength, -armLength);
         drawPodCore(armLength, -armLength);
@@ -5442,7 +6802,9 @@ enemies.forEach(e => {
 
 
     } else if (e.type === 'seeker') {
-
+        // =========================================================================
+        // FIXED FEATURE: HOSTILE SEEKER DRONE PLASMA PLUME GENERATION
+        // =========================================================================
         if (Math.random() < 0.65) {
             const perpAngle = (e.angle || 0) + Math.PI / 2;
             const exhaustSpreadOffset = (Math.random() * 5 - 2.5);
@@ -5459,10 +6821,13 @@ enemies.forEach(e => {
             });
         }
 
-
-        ctx.save(); 
+        // =========================================================================
+        // FIXED NATIVE SEEKER CHASSIS VECTOR GEOMETRY PATH DRAWING (SCALED UP)
+        // =========================================================================
+        ctx.save(); // Protects canvas state from leaking to subsequent renders
         ctx.rotate(e.angle || 0);
         
+        // Scaled up factors (1.5x up from original vector anchors)
         const forwardTip = e.radius * 2.1;
         const tailWing   = -e.radius * 1.5;
         const wingSpan   = e.radius * 1.42;
@@ -5477,6 +6842,9 @@ enemies.forEach(e => {
         ctx.fill();
         ctx.stroke();
 
+        // =========================================================================
+        // FEATURE 2: LIGHT RED ENGINE ACCENT DECAL
+        // =========================================================================
         ctx.save();
         ctx.fillStyle = '#ff6666'; 
         ctx.beginPath();
@@ -5488,9 +6856,12 @@ enemies.forEach(e => {
         ctx.stroke();
         ctx.restore();
 
-
+        // =========================================================================
+        // FEATURE 3: WHITE & LIGHT RED COCKPIT CANOPY (Glitch-Free Angular Safe Vectors)
+        // =========================================================================
         ctx.save();
         
+        // Base Layer: Sleek light red canopy visor plate
         ctx.fillStyle = '#ff8888';
         ctx.beginPath();
         ctx.moveTo(forwardTip - 6, 0);
@@ -5501,6 +6872,7 @@ enemies.forEach(e => {
         ctx.fill();
         ctx.stroke();
 
+        // Top Layer: Crisp white glass reflection circle (Rotation-proof via ctx.arc)
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
         ctx.arc(e.radius * 0.1, 0, e.radius * 0.35, 0, Math.PI * 2);
@@ -5513,7 +6885,10 @@ enemies.forEach(e => {
 
 
     } else {
-  
+        // =========================================================================
+        // CONFIGURABLE VENTRAL BEAM CONE (UNDER LAYER DRAWN FIRST)
+        // =========================================================================
+        // EDIT THIS NUMBER TO ADJUST LENGTH: Larger values = longer cone, smaller = shorter cone!
         const coneLength = 14; 
         
         ctx.save();
@@ -5544,13 +6919,16 @@ enemies.forEach(e => {
         ctx.fill();
         ctx.restore();
 
-
+        // =========================================================================
+        // NATIVE SAUCER PLATING LAYERS (UNTOUCHED RESTORATION SYSTEM)
+        // =========================================================================
         // Basic UFO enemy type (Scaled up by an additional 10% from previous pass)
         ctx.beginPath();
-        ctx.ellipse(0, 2, 26.4, 10.56, 0, 0, Math.PI * 2); 
+        ctx.ellipse(0, 2, 26.4, 10.56, 0, 0, Math.PI * 2); // Shifted Y to 2, expanded width/height bounds
         ctx.fill();
         ctx.stroke();
 
+        // --- Interior Skewed Ring with Red Glow Effect ---
         ctx.save();
         ctx.strokeStyle = '#f16667';
         ctx.lineWidth = 2.2;
@@ -5559,15 +6937,18 @@ enemies.forEach(e => {
         ctx.shadowColor = '#ff3333';
         
         ctx.beginPath();
-        ctx.ellipse(0, 2, 17.16, 6.34, 0, 0, Math.PI * 2); 
+        ctx.ellipse(0, 2, 17.16, 6.34, 0, 0, Math.PI * 2); // Follows the 10% scaling and Y=2 alignment shift
         ctx.stroke();
         ctx.restore();
 
-   
+        // =========================================================================
+        // EXTRUDED ISOMETRIC COCKPIT COWL LAYER (LOWERED & SCALED 10%)
+        // =========================================================================
         ctx.save();
-        ctx.fillStyle = '#ffdddd'; 
+        ctx.fillStyle = '#ffdddd'; // Ultra-light soft pink/white glass canopy shade
         ctx.beginPath();
         
+        // Scaled up by 10% (Width 7.15, Height 4.62) and lowered down by exactly 2 pixels (Y = -4 instead of -6)
         ctx.ellipse(0, -4, 7.15, 4.62, 0, 0, Math.PI * 2);
 
         ctx.fill();
@@ -5581,29 +6962,34 @@ enemies.forEach(e => {
 
 
 
-            // CIVILIAN SHIP
+            // =========================================================================
+            // CIVILIAN TRAFFIC DRAWING ENGINE (NEON CYAN VISOR CONFIGURATION)
+            // =========================================================================
             civilianShips.forEach(ship => {
-             
+                if (!isInViewport(ship.x, ship.y, ship.radius * 2.5 + 16)) return;
+                // 1. DYNAMIC COMPONENT: Spawn engine particles straight into the world thread
                 if (Math.random() < 0.65) {
                     const perpAngle = ship.angle + Math.PI / 2;
-                    const exhaustSpreadOffset = (Math.random() * 6 - 3); 
+                    const exhaustSpreadOffset = (Math.random() * 6 - 3); // Spreads the exhaust trail evenly
                     
                     particles.push({
+                        // Anchors coordinates perfectly to the tail end of the civilian chassis frame
                         x: ship.x - Math.cos(ship.angle) * ship.radius + Math.cos(perpAngle) * exhaustSpreadOffset,
                         y: ship.y - Math.sin(ship.angle) * ship.radius + Math.sin(perpAngle) * exhaustSpreadOffset,
                         
+                        // Expels smoke backward relative to the transport's cruise speed
                         vx: -Math.cos(ship.angle) * 1.5 + (Math.random() * 0.4 - 0.2),
                         vy: -Math.sin(ship.angle) * 1.5 + (Math.random() * 0.4 - 0.2),
                         
                         life: 0.6,
                         decay: 0.04, 
-                        color: '#00ffff', 
+                        color: '#00ffff', // Custom cyan flame trail to match its hull lights
                         size: 3.5 + Math.random() * 2.0
                     });
                 }
 
-                //  CIV SHIP
-                ctx.save(); 
+                // 2. VECTOR DRAWING ROUTINE: Identical to Seeker but Cyan-Themed
+                ctx.save(); // Protects canvas state from leaking to subsequent renders
                 ctx.translate(ship.x, ship.y);
                 ctx.rotate(ship.angle);
                 
@@ -5613,7 +6999,7 @@ enemies.forEach(e => {
                 ctx.shadowColor = '#00ffff';
                 ctx.lineWidth = 1.8;
                 
-                // civ ship
+                // Fixed 1.1x Civilian scale base multiplier applied to the layout anchors
                 const currentRadius = ship.radius * 1.1;
                 const forwardTip = currentRadius * 2.1;
                 const tailWing   = -currentRadius * 1.5;
@@ -5632,7 +7018,7 @@ enemies.forEach(e => {
 
                 // LAYER B: NEON CYAN ENGINE ACCENT DECAL
                 ctx.save();
-                ctx.fillStyle = '#66ffff'; 
+                ctx.fillStyle = '#66ffff'; // High-visibility bright cyan engine glow accent
                 ctx.beginPath();
                 ctx.moveTo(innerNotch + 4, 0);
                 ctx.lineTo(tailWing + 2, -wingSpan * 0.35);
@@ -5642,9 +7028,9 @@ enemies.forEach(e => {
                 ctx.stroke();
                 ctx.restore();
 
-                // LAYER C: WHITE & CYAN COCKPIT CANOPY 
+                // LAYER C: WHITE & CYAN COCKPIT CANOPY (Glitch-Free Angular Safe Vectors)
                 ctx.save();
-                // Base Visor Layer
+                // Base Visor Layer: Sleek light cyan glass framing shell
                 ctx.fillStyle = '#88ffff';
                 ctx.beginPath();
                 ctx.moveTo(forwardTip - 6, 0);
@@ -5655,7 +7041,7 @@ enemies.forEach(e => {
                 ctx.fill();
                 ctx.stroke();
 
-                // Top Visor Layer
+                // Top Visor Layer: Symmetrical crisp white reflection point core
                 ctx.fillStyle = '#ffffff';
                 ctx.strokeStyle = '#ffffff';
                 ctx.beginPath();
@@ -5663,14 +7049,15 @@ enemies.forEach(e => {
                 ctx.fill();
                 ctx.stroke();
 
-                ctx.restore(); 
-                ctx.restore(); 
+                ctx.restore(); // Restores canopy shell state
+                ctx.restore(); // Restores civilian matrix translation/rotation state safely!
             });
 
 
 
             // Burst Particles
             particles.forEach(p => {
+                if (!isInViewport(p.x, p.y, p.size + 4)) return;
                 ctx.save();
                 ctx.globalAlpha = p.life;
                 ctx.fillStyle = p.color;
@@ -5685,6 +7072,7 @@ enemies.forEach(e => {
             ctx.rotate(player.angle);
             
             if (player.invulnerable === 0 || Math.floor(Date.now() / 60) % 2 === 0) {
+                // Safely execute active selection from lookups
                 try {
                     if (SHIP_SKINS[ACTIVE_SHIP_SKIN]) {
                         SHIP_SKINS[ACTIVE_SHIP_SKIN](ctx, player);
@@ -5692,19 +7080,22 @@ enemies.forEach(e => {
                         SHIP_SKINS['ORIGINAL'](ctx, player);
                     }
                 } catch(e) {
+                    // Fallback to protect main game loop thread from asset layout bugs
                     SHIP_SKINS['ORIGINAL'](ctx, player);
                 }
             }
             ctx.restore();
 
-    
+            // Retained secondary stack parent restore line
             ctx.restore(); 
 
-            ctx.save(); 
+            ctx.save(); // Opens isolated local context block layer safely
             
+            // HIGH-VISIBILITY RESCALE: Crisp white alpha mapping for deep space tracking
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
             ctx.lineWidth = 1.2;
             
+            // FIXED FOR THE DOTS: Sets a clean pattern of 3px dot length followed by 4px gap spacing
             if (ctx.setLineDash) {
                 ctx.setLineDash([3, 4]); 
             }
@@ -5714,15 +7105,17 @@ enemies.forEach(e => {
             const radarScreenCenterY = canvas.height / 2;
             
             ctx.beginPath();
-
+            // FIXED GAP DISTANCE: Shrinking the ring by 6 pixels pushes your ship's 
+            // native navigation arrows to the outside edge of the dots perfectly!
             ctx.arc(radarScreenCenterX, radarScreenCenterY, POINTER_AIM_RADIUS - 6, 0, Math.PI * 2);
             ctx.stroke();
             
+            // CRITICAL SOLID RESET: Empties line dashes so subsequent UI elements draw solid
             if (ctx.setLineDash) {
                 ctx.setLineDash([]); 
             }
             
-            ctx.restore(); 
+            ctx.restore(); // Closes isolated local context block layer perfectly balanced!
 
 
             const spaceportAngle = Math.atan2(
@@ -5810,14 +7203,29 @@ enemies.forEach(e => {
         }
 
         function gameLoop() {
-            update();
-            draw();
+            advancePiracyTimer();
+            if (gameStarted && !mobileSystemsPaused && !desktopPaused) {
+                update();
+                draw();
+                const now = Date.now();
+                if (now - lastAutosaveAt >= 5000) {
+                    saveGame();
+                    lastAutosaveAt = now;
+                }
+            }
             requestAnimationFrame(gameLoop);
         }
 
-        loadGame();
+        savedGameAvailable = loadGame();
         initWorld();
         updateUI();
+        renderMainMenu();
+        window.addEventListener('pagehide', () => {
+            if (gameStarted) {
+                advancePiracyTimer();
+                saveGame();
+            }
+        });
         requestAnimationFrame(gameLoop);
 
 
@@ -5828,8 +7236,10 @@ document.addEventListener('click', function(event) {
 
     const skinKey = btn.getAttribute('data-skin');
     
+    // Allow the transaction to proceed for 'RANDOM' even if it's already equipped to handle rerolls
     if (btn.disabled && skinKey !== 'RANDOM') return;
 
+    // --- HANDLE CHASSIS BACKUP RECOVERY TRANSACTIONS ---
     if (skinKey === 'BUYBACK_RECOVERY') {
         if (!player.lastRandomBackup) return;
         const buybackCost = 500;
@@ -5853,6 +7263,7 @@ document.addEventListener('click', function(event) {
         ACTIVE_SHIP_SKIN = 'RANDOM';
         applyShipModifiers('RANDOM');
         
+        // FIXED FOR COMFORT: Automatically fully restores shield arrays upon recovery checkout
         player.shield = player.maxShield;
 
         player.lastRandomBackup = currentActiveCache;
@@ -5887,6 +7298,7 @@ document.addEventListener('click', function(event) {
 
 if (skinKey === 'RANDOM') {
 
+    // Preserve the current random ship for buyback/recovery.
     if (window.proceduralShipCache) {
         player.lastRandomBackup = {
             ...window.proceduralShipCache,
@@ -5894,6 +7306,7 @@ if (skinKey === 'RANDOM') {
         };
     }
 
+    // Generate a completely new locked random configuration NOW.
     generateProceduralShipCache();
 
     player.randomShootDelay = null;
@@ -5905,7 +7318,7 @@ if (skinKey === 'RANDOM') {
 
 applyShipModifiers(skinKey);
 
-
+// Fully charge the newly generated ship at its true capacity.
 player.shield = player.maxShield;
     
 
@@ -5926,7 +7339,6 @@ player.shield = player.maxShield;
         saveGame();
     }
 });
-
 
 
 (function generateDynamicFavicon() {
@@ -5985,10 +7397,7 @@ player.shield = player.maxShield;
 })();
 
 
-
-// Copyright SPM - homeworld gen. ported from original illustrator script version - Smurphshire 2026
+// Copyright SPM - Version 1.1.3 - Smurphshire 2026
     </script>
 </body>
 </html>
-
-
