@@ -1,4 +1,4 @@
-
+<!-- STARJOURN ACE - PILOT EXPEDITION Version 1.1.3 by @smurphsire, homeworld, ship, & pilot generators copyright SPM 2026 -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -1337,7 +1337,7 @@
             </div>
             <div class="main-menu-stats" id="main-menu-stats" hidden>
                 <div class="main-menu-stat">
-                    <div class="main-menu-stat-label">Sector</div>
+                    <div class="main-menu-stat-label">Sector / Homeworld</div>
                     <div class="main-menu-stat-value" id="menu-sector"></div>
                 </div>
                 <div class="main-menu-stat">
@@ -1367,7 +1367,7 @@
         </main>
     </div>
 
-    <script type="text/plain" id="embedded-helmet-generator">
+    <script type="text/plain" id="embedded-helmet-generator"> 
 H4sIAAAAAAACE+19+3fbNtLo7/krUHW3khJKJqmHFdlyj2M7j3uSNsdK283N8fkKkZDEDUWyIOVHu/7f7xkAfAMk5Ve637nZTUORwGAwD2AwMwCeHX53+vPJ
 p88fz9A62rhHzw7hH+RibzVrEa8FLwi2j54hhNDhhkQYWWtMQxLNWr98et2btLKfPLwhs9alQ64Cn0YtZPleRLxo1rpy7Gg9s8mlY5Ee+6Ehx3MiB7u90MIu
 mRl9PQYVOZFLjt46qzU68b2I4jBCx2FEfQ9vI/SWuBsSoTfEIxRHPj3c4+V53TC6iZ/hz3P0V/IMfxb+dS90/nS81RQtfGoT2lv41we5MhtMV443RXr+dYBt
@@ -2981,7 +2981,7 @@ const SHIP_SHOP_PRICES = {
     'STARJOURNER': 900,           // STARJOURNER Fighter
     'MOSQUITO': 500,         // MOSQUITO Long-Range Escort
     'SCIENCE': 700,  // SCIENCE Research Vessel
-    'INTERCEPTOR': 1500, // INTERCEPT Tri-Core Fighter
+    'INTERCEPTOR': 2500, // INTERCEPT Tri-Core Fighter
     'RANDOM': 500               // PROCEDURAL RANDOM Hull Mixer
 };
 
@@ -3762,7 +3762,7 @@ function renderMainMenu() {
     launchButton.disabled = !pilotHelmetIcon;
 
     if (savedGameAvailable) {
-        document.getElementById('menu-sector').textContent = `Sector ${currentSector}, '${homeworld.name}'`;
+        document.getElementById('menu-sector').textContent = `Sector ${currentSector},  ${homeworld.name}`;
         document.getElementById('menu-wallet').textContent = `$${player.wallet}`;
         document.getElementById('menu-bank').textContent = `$${player.bank}`;
         document.getElementById('menu-earnings').textContent = `$${player.overallEarnings}`;
@@ -6256,7 +6256,7 @@ ctx.strokeRect(0, 0, 12000, 12000);
             ctx.fillStyle = '#d8ffff';
             ctx.font = 'bold 18px monospace';
             ctx.textAlign = 'center';
-            const homeworldLabel = `HOMEWORLD: "${homeworld.name.toUpperCase()}"`;            
+            const homeworldLabel = `HOMEWORLD: ${homeworld.name.toUpperCase()}`;            
 
             ctx.fillText(homeworldLabel, 0, -SPACEPORT.radius - 18);
             ctx.restore();
