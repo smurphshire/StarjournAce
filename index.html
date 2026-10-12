@@ -1,4 +1,4 @@
-<!-- STARJOURN ACE - PILOT EXPEDITION Version 1.1.3 by @smurphsire, homeworld, ship, & pilot generators copyright SPM 2026 -->
+<!-- STARJOURN ACE - PILOT EXPEDITION Version 1.1.6 by @smurphsire, homeworld, ship, & pilot generators copyright SPM 2026 -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -87,6 +87,20 @@
             display: none;
         }
 
+        #main-menu.is-settings-view .main-menu-title {
+            display: block;
+        }
+
+        #main-menu.is-settings-view .main-menu-subtitle,
+        #main-menu.is-settings-view .main-menu-portraits,
+        #main-menu.is-settings-view .main-menu-pilot,
+        #main-menu.is-settings-view .main-menu-stats,
+        #main-menu.is-settings-view .main-menu-status-row,
+        #main-menu.is-settings-view .main-menu-ship-stats,
+        #main-menu.is-settings-view .main-menu-world-custom {
+            display: none;
+        }
+
         .main-menu-title {
             width: 100%;
             padding-bottom: 10px;
@@ -165,6 +179,99 @@
             color: #7a7a99;
             font-size: 4rem;
             font-weight: bold;
+        }
+
+        .main-menu-world-custom {
+            margin: -10px 0 16px;
+            color: #ffca6a;
+            font-size: 0.7rem;
+            font-weight: bold;
+            letter-spacing: 0.12em;
+            text-shadow: 0 0 8px rgba(255, 202, 106, 0.28);
+        }
+
+        .main-menu-settings {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-height: min(68vh, 620px);
+            overflow-y: auto;
+            padding: 4px 3px 12px;
+            text-align: left;
+            scrollbar-width: thin;
+            scrollbar-color: #3b3b55 transparent;
+        }
+
+        .main-menu-settings[hidden] {
+            display: none;
+        }
+
+        .settings-group {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .settings-group-title {
+            grid-column: 1 / -1;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.18);
+            color: var(--accent-gold);
+            font-size: 0.68rem;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+        }
+
+        .settings-control {
+            display: flex;
+            min-width: 0;
+            flex-direction: column;
+            gap: 5px;
+            color: #b5b5c5;
+            font-size: 0.67rem;
+        }
+
+        .settings-control output {
+            color: #e7e7f2;
+            font-size: 0.65rem;
+            text-align: right;
+        }
+
+        .settings-range-heading {
+            display: flex;
+            justify-content: space-between;
+            gap: 5px;
+        }
+
+        .settings-control input[type="range"] {
+            width: 100%;
+            accent-color: var(--accent-gold);
+        }
+
+        .settings-check {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            min-height: 27px;
+            color: #c4c4d1;
+            font-size: 0.68rem;
+        }
+
+        .settings-check input {
+            accent-color: var(--accent-gold);
+        }
+
+        .settings-defaults {
+            width: 100%;
+            padding: 9px;
+            border-color: #777786;
+            color: #b8b8c5;
+            font-size: 0.7rem;
         }
 
         #pilot-helmet-preview {
@@ -249,10 +356,43 @@
             border-color: rgba(255, 153, 153, 0.28);
         }
 
+        .main-menu-piracy-status.no-piracy-history {
+            color: #9bd8ee;
+            border-color: rgba(155, 216, 238, 0.28);
+        }
+
         .main-menu-piracy-status.is-active {
             color: #ff3535;
             border-color: rgba(255, 53, 53, 0.55);
             text-shadow: 0 0 8px rgba(255, 53, 53, 0.45);
+        }
+
+        .main-menu-status-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            width: 100%;
+            margin: -8px 0 16px;
+        }
+
+        .main-menu-status-row .main-menu-piracy-status {
+            margin: 0;
+        }
+
+        .main-menu-ship-stats {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            width: 100%;
+            margin: -10px 0 16px;
+            padding: 9px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.02);
+            color: #a2a2b2;
+            font-size: 0.7rem;
+            font-weight: bold;
         }
 
         #menu-cargo-gold {
@@ -268,13 +408,103 @@
         }
 
         #launch-game {
-            width: min(100%, 360px);
-            margin-top: auto;
+            flex: 1;
+            width: auto;
             padding: 13px;
             border-color: var(--accent-gold);
             color: var(--accent-gold);
             font-size: 1.15rem;
             letter-spacing: 0.08em;
+        }
+
+        .main-menu-actions {
+            display: flex;
+            align-items: stretch;
+            gap: 8px;
+            width: min(100%, 360px);
+            margin-top: auto;
+        }
+
+        #export-player-card {
+            display: none;
+            flex: 0 0 48px;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        #export-player-card svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-width: 1.8;
+        }
+
+        #main-menu:not(.is-pause-menu) #open-settings {
+            display: flex;
+        }
+
+        #main-menu:not(.is-settings-view) #export-player-card {
+            display: flex;
+        }
+
+        #main-menu #export-player-card:disabled {
+            border-color: #333344;
+            color: #55556b;
+            filter: grayscale(1);
+            opacity: 0.55;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        #main-menu.is-pause-menu #open-settings {
+            display: flex;
+        }
+
+        #main-menu.is-settings-view #export-player-card,
+        #main-menu.is-pause-menu.is-settings-view #launch-game {
+            display: none;
+        }
+
+        #main-menu.is-pause-menu .main-menu-actions {
+            margin-top: 0;
+        }
+
+        #open-settings {
+            display: none;
+            flex: 0 0 48px;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        #open-settings svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-width: 1.8;
+        }
+
+        #open-settings .settings-back-icon {
+            display: none;
+        }
+
+        #main-menu.is-settings-view #open-settings .settings-back-icon {
+            display: block;
+        }
+
+        #main-menu.is-settings-view #open-settings .settings-sliders-icon {
+            display: none;
         }
 
         #launch-game:disabled {
@@ -679,6 +909,10 @@
             padding-bottom: 2px;
         }
 
+        .log-entry.contraband-log {
+            color: #d8959b;
+        }
+
         #mobile-controls {
             display: none;
             position: absolute;
@@ -919,6 +1153,14 @@
         }
 
         @media (max-width: 480px) {
+            .main-menu-status-row {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .settings-group {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
             #mobile-merchant-quick-trade.is-visible {
                 grid-template-columns: minmax(0, 1fr) minmax(0, 0.75fr) minmax(0, 1.65fr) auto;
                 gap: 4px;
@@ -1315,7 +1557,7 @@
     <div id="main-menu">
         <main class="main-menu-card" aria-labelledby="main-menu-title">
             <h1 class="main-menu-title" id="main-menu-title">STARJOURN ACE</h1>
-            <p class="main-menu-subtitle">- - EXPLORE THE INFINITE EXPANSE - - </p>
+            <p class="main-menu-subtitle">EXPLORE THE INFINITE EXPANSE.</p>
             <div class="main-menu-portraits">
                 <div class="main-menu-portrait">
                     <span class="main-menu-portrait-label">Homeworld</span>
@@ -1358,8 +1600,82 @@
                     <span id="menu-cargo-eridium"></span>
                 </div>
             </div>
-            <div class="main-menu-piracy-status" id="menu-piracy-status" role="status"></div>
-            <button class="btn" id="launch-game" type="button" disabled>Start Game</button>
+            <div class="main-menu-status-row">
+                <div class="main-menu-piracy-status" id="menu-piracy-status" role="status"></div>
+                <div class="main-menu-piracy-status" id="menu-bounty-status" role="status"></div>
+            </div>
+            <div class="main-menu-ship-stats" aria-label="Ship statistics">
+                <span>SHIPS LOST: <span id="menu-ships-destroyed">0</span></span>
+                <span>SHIPS PURCHASED: <span id="menu-ships-purchased">0</span></span>
+                <span>TRADES COMPLETED: <span id="menu-merchant-trades">0</span></span>
+            </div>
+            <div class="main-menu-world-custom" id="menu-world-custom" hidden>CUSTOM MODE</div>
+            <section class="main-menu-settings" id="main-menu-settings" aria-label="Expedition settings" hidden>
+                <div class="settings-group">
+                    <h2 class="settings-group-title">Audio</h2>
+                    <label class="settings-check">
+                        <input type="checkbox" data-setting="ambientMusic">
+                        Background Music
+                    </label>
+                    <label class="settings-control">
+                        <span class="settings-range-heading"><span>Master volume</span><output data-output="masterVolume"></output></span>
+                        <input type="range" data-setting="masterVolume" min="0" max="200" step="5">
+                    </label>
+                </div>
+                <div class="settings-group">
+                    <h2 class="settings-group-title">Space Balance Settings</h2>
+                    <label class="settings-control">
+                        <span class="settings-range-heading"><span>Enemy bullet damage</span><output data-output="enemyBulletDamage"></output></span>
+                        <input type="range" data-setting="enemyBulletDamage" min="0" max="300" step="10">
+                    </label>
+                    <label class="settings-control">
+                        <span class="settings-range-heading"><span>Enemy density</span><output data-output="enemyDensity"></output></span>
+                        <input type="range" data-setting="enemyDensity" min="0" max="200" step="10">
+                    </label>
+                    <label class="settings-control">
+                        <span class="settings-range-heading"><span>Merchant density</span><output data-output="merchantDensity"></output></span>
+                        <input type="range" data-setting="merchantDensity" min="0" max="200" step="10">
+                    </label>
+                    <label class="settings-control">
+                        <span class="settings-range-heading"><span>Asteroid density</span><output data-output="asteroidDensity"></output></span>
+                        <input type="range" data-setting="asteroidDensity" min="0" max="200" step="10">
+                    </label>
+                    <label class="settings-control">
+                        <span class="settings-range-heading"><span>Shield multiplier</span><output data-output="shieldMultiplier"></output></span>
+                        <input type="range" data-setting="shieldMultiplier" min="25" max="300" step="5">
+                    </label>
+                    <label class="settings-check">
+                        <input type="checkbox" data-setting="invincible">
+                        Invincibility
+                    </label>
+                </div>
+                <div class="settings-group">
+                    <h2 class="settings-group-title">Enemy Types</h2>
+                    <label class="settings-check"><input type="checkbox" data-setting="spawnNormal"> Enemy Raider Ships</label>
+                    <label class="settings-check"><input type="checkbox" data-setting="spawnSeekers"> Enemy Seeker Ships</label>
+                    <label class="settings-check"><input type="checkbox" data-setting="spawnPirates"> Enemy Pirate Hives</label>
+                </div>
+                <button class="btn settings-defaults" id="settings-defaults" type="button">Restore Default Settings</button>
+            </section>
+            <div class="main-menu-actions">
+                <button class="btn" id="export-player-card" type="button" aria-label="Export player card as PNG" title="Export player card as PNG">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M6 3.5h8l4 4v13H6z"></path>
+                        <path d="M14 3.5v4h4M9 11h6"></path>
+                        <path d="M12 13v5m0 0 2-2m-2 2-2-2"></path>
+                    </svg>
+                </button>
+                <button class="btn" id="launch-game" type="button" disabled>Start Game</button>
+                <button class="btn" id="open-settings" type="button" aria-label="Open settings" title="Open settings" aria-pressed="false">
+                    <svg class="settings-sliders-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M4 6h16M4 12h16M4 18h16"></path>
+                        <path d="M9 4v4m7 2v4m-5 2v4"></path>
+                    </svg>
+                    <svg class="settings-back-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="m14 5-7 7 7 7"></path><path d="M7 12h12"></path>
+                    </svg>
+                </button>
+            </div>
             <div class="main-menu-footer">
                 <button class="btn" id="menu-enable-audio" type="button">Enable Audio</button>
                 <button class="btn" id="menu-reset-game" type="button">Reset Game</button>
@@ -1519,8 +1835,8 @@ CCsKWa5jfW10uKV6fCjm591qaKQItbItS8kdn5bvwdluxZEovpkUVGFOCHCv6AlJNCXXDPz3cC+0qBNE
         const WORLD_SIZE = 12000; 
         const ASTEROID_SAFE_SPAWN_BUFFER = 300;
         const MERCHANT_RANGE = 120; 
-        const BASE_SECTOR_GOAL = 6000;
-        const SECTOR_GOAL_INCREASE = 2000;
+        const BASE_SECTOR_GOAL = 8000;
+        const SECTOR_GOAL_INCREASE = 2500;
         const POINTER_AIM_RADIUS =55; // 42 default
         const HOMEWORLD_TILT = 18 * Math.PI / 180;
         
@@ -1536,8 +1852,8 @@ CCsKWa5jfW10uKV6fCjm591qaKQItbItS8kdn5bvwdluxZEovpkUVGFOCHCv6AlJNCXXDPz3cC+0qBNE
         // Sector Environmental Palette Profiles
         const SECTOR_THEMES = {
             1: { name: "Andromeda Perimeter", primary: "#00ffff", background: "#020208", nebula: "rgba(0, 120, 255, 0.05)", generic: "#888899", modifiers: { enemySpawn: 1.2, pirateSpawn: 0.6, merchantSpawn: 1.3, asteroidSpawn: 1.2, goldYield: 0.05 } },
-            2: { name: "Outset Expanse", primary: "#fbfbcc", background: "#08060a", nebula: "rgba(0, 120, 255, 0.05)", generic: "#828e8d", modifiers: { enemySpawn: 1.35, pirateSpawn: 1.1, civilianSpawn: 1.25, merchantSpawn: 0.8, asteroidSpawn: 2.5, uraniumYield: 1.3 } },
-            3: { name: "The Keziah Colonies", primary: "#da70d6", background: "#06020c", nebula: "rgba(218, 112, 214, 0.05)", generic: "#998899", modifiers: { asteroidSpawn: 1.35, enemySpawn: 1.8, pirateSpawn: 1.7, goldYield: 0.4, uraniumYield: 0.4, eridiumYield: 0.9 } },
+            2: { name: "The Keziah Expanse", primary: "#fbfbcc", background: "#08060a", nebula: "rgba(0, 120, 255, 0.05)", generic: "#828e8d", modifiers: { enemySpawn: 1.35, pirateSpawn: 1.1, civilianSpawn: 1.25, merchantSpawn: 0.8, asteroidSpawn: 2.5, uraniumYield: 1.3 } },
+            3: { name: "Keziah Colonies", primary: "#da70d6", background: "#06020c", nebula: "rgba(218, 112, 214, 0.05)", generic: "#998899", modifiers: { asteroidSpawn: 1.35, enemySpawn: 1.8, pirateSpawn: 1.7, goldYield: 0.4, uraniumYield: 0.4, eridiumYield: 0.9 } },
             4: { name: "Zelion Territory", primary: "#39ff14", background: "#020603", nebula: "rgba(57, 255, 20, 0.04)", generic: "#8a998a", modifiers: { enemySpawn: 2.5, pirateSpawn: 0.2, asteroidSpawn: 3.2, uraniumYield: 2.1 } },
             5: { name: "Supernova Remnant", primary: "#ff6600", background: "#090302", nebula: "rgba(255, 102, 0, 0.06)", generic: "#aa9988", modifiers: { civilianSpawn: 0.4, merchantSpawn: 0.3, enemySpawn: 1.5, pirateSpawn: 1.5, uraniumYield: 0.6, eridiumYield: 1.25 } },
             6: { name: "Empyrean Empire", primary: "#d5f0f7", background: "#0b0b0b", nebula: "rgba(236, 0, 255, 0.05)", generic: "#bfe0d5", modifiers: { enemySpawn: 0.4, pirateSpawn: 0.1, merchantSpawn: 1.6, civilianSpawn: 2.5, asteroidSpawn: 1.3, goldYield: 1.7, uraniumYield: 1.2, eridiumYield: 1.5 } },
@@ -1545,7 +1861,7 @@ CCsKWa5jfW10uKV6fCjm591qaKQItbItS8kdn5bvwdluxZEovpkUVGFOCHCv6AlJNCXXDPz3cC+0qBNE
             8: { name: "Daxus Quadrant", primary: "#fbfbcc", background: "#08060a", nebula: "rgba(0, 120, 255, 0.05)", generic: "#828e8d", modifiers: { enemySpawn: 1.9, pirateSpawn: 1.2, civilianSpawn: 1.25, merchantSpawn: 1.8, asteroidSpawn: 2.5, uraniumYield: 1.3 } },
             9: { name: "Nebula Abyss", primary: "#7f77ed", background: "#09070a", nebula: "rgba(218, 112, 214, 0.08)", generic: "#998899", modifiers: { asteroidSpawn: 1.35, enemySpawn: 2.3, pirateSpawn: 2.3, goldYield: 1.4, uraniumYield: 0.4, eridiumYield: 1.9 } },
             10: { name: "The Far Reach", primary: "#8da39b", background: "#0a0705", nebula: "rgba(255, 232, 21, 0.03)", generic: "#a1a5b5", modifiers: { enemySpawn: 1.5, pirateSpawn: 0.7, asteroidSpawn: 3.2, uraniumYield: 2.1 } },
-            11: { name: "Nexus Void", primary: "#9ed1dd", background: "#07090a", nebula: "rgba(0, 182, 255, 0.06)", generic: "#aa9988", modifiers: { civilianSpawn: 1.4, pirateSpawn: 1.5, eridiumYield: 1.25 } },
+            11: { name: "Nexus Void", primary: "#9ed1dd", background: "#07090a", nebula: "rgba(0, 182, 255, 0.06)", generic: "#aa9988", modifiers: { civilianSpawn: 1.4, pirateSpawn: 1.5, merchantSpawn: 0.4, eridiumYield: 1.25 } },
             12: { name: "Uncharted Sector", primary: "#ddeff2", background: "#020202", nebula: "rgba(255, 0, 134, 0.05)", generic: "#a1a5b5", modifiers: { enemySpawn: 1.2, merchantSpawn: 1.2, civilianSpawn: 0.3, asteroidSpawn: 2.2, goldYield: 0.5 } }
             
 
@@ -2979,9 +3295,9 @@ let ACTIVE_SHIP_SKIN = 'RANDOM'; // Changed from 'const' to 'let' so it can be s
 const SHIP_SHOP_PRICES = {
     'ORIGINAL': 0,               // RETRO Starter Model
     'STARJOURNER': 900,           // STARJOURNER Fighter
-    'MOSQUITO': 500,         // MOSQUITO Long-Range Escort
+    'MOSQUITO': 1200,         // MOSQUITO Long-Range Escort
     'SCIENCE': 700,  // SCIENCE Research Vessel
-    'INTERCEPTOR': 2500, // INTERCEPT Tri-Core Fighter
+    'INTERCEPTOR': 3750, // INTERCEPT Tri-Core Fighter
     'RANDOM': 500               // PROCEDURAL RANDOM Hull Mixer
 };
 
@@ -3127,8 +3443,35 @@ window.closeShipyardModal = function() {
         let particles = [];
         let pirateStatusRemainingMs = 0;
         let piracyIncidents = 0;
+        let shipsDestroyed = 0;
+        let shipsPurchased = 0;
+        let merchantTrades = 0;
+        let bountiesClaimed = 0;
+        let bountyWalletTotal = 0;
         let lastPiracyTimerTick = performance.now();
         const SAVE_KEY = 'starpath-save-v1';
+        const DEFAULT_GAME_SETTINGS = Object.freeze({
+            ambientMusic: true,
+            masterVolume: 100,
+            enemyBulletDamage: 100,
+            enemyDensity: 100,
+            merchantDensity: 100,
+            asteroidDensity: 100,
+            shieldMultiplier: 100,
+            invincible: false,
+            spawnNormal: true,
+            spawnSeekers: true,
+            spawnPirates: true
+        });
+        const GAME_SETTING_LIMITS = {
+            masterVolume: [0, 200],
+            enemyBulletDamage: [0, 300],
+            enemyDensity: [0, 200],
+            merchantDensity: [0, 200],
+            asteroidDensity: [0, 200],
+            shieldMultiplier: [25, 300]
+        };
+        let gameSettings = { ...DEFAULT_GAME_SETTINGS };
         const PILOT_MENU_STICKER_BORDER_REDUCTION = 3;
         let homeworldCache = {};
         let pilotHelmetIcon = null;
@@ -3137,7 +3480,7 @@ window.closeShipyardModal = function() {
         let lastAutosaveAt = 0;
         let lastMenuSubtitleIndex = -1;
         const MAIN_MENU_SUBTITLES = [
-            '- - EXPLORE THE INFINITE EXPANSE - -'
+            'EXPLORE THE INFINITE EXPANSE'
         ];
         let pilotHelmetRequestNumber = 0;
         let pilotHelmetRequestId = null;
@@ -3629,6 +3972,24 @@ function generateHomeworldName() {
             if (gameStarted) saveGame();
         }
 
+function normalizeGameSettings(savedSettings) {
+    const settings = { ...DEFAULT_GAME_SETTINGS };
+    if (!savedSettings || typeof savedSettings !== 'object') return settings;
+
+    for (const setting of Object.keys(DEFAULT_GAME_SETTINGS)) {
+        if (typeof DEFAULT_GAME_SETTINGS[setting] === 'boolean') {
+            if (typeof savedSettings[setting] === 'boolean') settings[setting] = savedSettings[setting];
+        } else if (Number.isFinite(savedSettings[setting])) {
+            const [minimum, maximum] = GAME_SETTING_LIMITS[setting];
+            settings[setting] = Math.min(
+                maximum,
+                Math.max(minimum, savedSettings[setting])
+            );
+        }
+    }
+    return settings;
+}
+
  function saveGame() {
     try {
         localStorage.setItem(SAVE_KEY, JSON.stringify({
@@ -3654,6 +4015,12 @@ function generateHomeworldName() {
             pilotHelmetIcon,
             pirateStatusRemainingMs,
             piracyIncidents,
+            shipsDestroyed,
+            shipsPurchased,
+            merchantTrades,
+            bountiesClaimed,
+            bountyWalletTotal,
+            gameSettings,
             homeworldCache
         }));
     } catch (error) {
@@ -3673,6 +4040,22 @@ function loadGame() {
         piracyIncidents = Number.isFinite(saved.piracyIncidents)
             ? Math.max(0, Math.floor(saved.piracyIncidents))
             : 0;
+        shipsDestroyed = Number.isFinite(saved.shipsDestroyed)
+            ? Math.max(0, Math.floor(saved.shipsDestroyed))
+            : 0;
+        shipsPurchased = Number.isFinite(saved.shipsPurchased)
+            ? Math.max(0, Math.floor(saved.shipsPurchased))
+            : 0;
+        merchantTrades = Number.isFinite(saved.merchantTrades)
+            ? Math.max(0, Math.floor(saved.merchantTrades))
+            : 0;
+        bountiesClaimed = Number.isFinite(saved.bountiesClaimed)
+            ? Math.max(0, Math.floor(saved.bountiesClaimed))
+            : 0;
+        bountyWalletTotal = Number.isFinite(saved.bountyWalletTotal)
+            ? Math.max(0, Math.floor(saved.bountyWalletTotal))
+            : 0;
+        gameSettings = normalizeGameSettings(saved.gameSettings);
         lastPiracyTimerTick = performance.now();
         if (Number.isFinite(saved.player.x) && Number.isFinite(saved.player.y)) {
             player.x = ((saved.player.x % WORLD_SIZE) + WORLD_SIZE) % WORLD_SIZE;
@@ -3718,6 +4101,8 @@ function loadGame() {
         if (typeof applyShipModifiers === 'function') {
             applyShipModifiers(ACTIVE_SHIP_SKIN);
         }
+        syncSettingsControls();
+        applyAudioSettings();
 
         // =============================================================
         // STEP 2: LOAD SHIELD VALUE SAFELY INTO THE NEW MATURED CAPACITY
@@ -3740,10 +4125,164 @@ function resetGame() {
     window.location.reload();
 }
 
+function updateShipStatsDisplay() {
+    document.getElementById('menu-ships-destroyed').textContent = shipsDestroyed;
+    document.getElementById('menu-ships-purchased').textContent = shipsPurchased;
+    document.getElementById('menu-merchant-trades').textContent = merchantTrades;
+}
+
+function updateBountyDisplay() {
+    const bountyStatus = document.getElementById('menu-bounty-status');
+    bountyStatus.textContent = `BOUNTIES CLAIMED: ${bountiesClaimed} — $${bountyWalletTotal}`;
+    bountyStatus.classList.toggle('no-piracy-history', bountiesClaimed > piracyIncidents);
+}
+
+function hasCustomWorldSettings() {
+    return ['enemyBulletDamage', 'enemyDensity', 'merchantDensity', 'asteroidDensity', 'shieldMultiplier', 'invincible', 'spawnNormal', 'spawnSeekers', 'spawnPirates']
+        .some(setting => gameSettings[setting] !== DEFAULT_GAME_SETTINGS[setting]);
+}
+
+function updateWorldCustomDisplay() {
+    const label = document.getElementById('menu-world-custom');
+    label.hidden = !hasCustomWorldSettings();
+}
+
+function syncSettingsControls() {
+    document.querySelectorAll('[data-setting]').forEach(control => {
+        const setting = control.dataset.setting;
+        if (control.type === 'checkbox') {
+            control.checked = gameSettings[setting];
+        } else {
+            control.value = gameSettings[setting];
+            const output = document.querySelector(`[data-output="${setting}"]`);
+            if (output) output.value = `${gameSettings[setting]}%`;
+        }
+    });
+    updateWorldCustomDisplay();
+}
+
+function applyAudioSettings() {
+    if (!gameAudio.initialized) return;
+    const now = gameAudio.ctx.currentTime;
+    gameAudio.ambientEnabled = gameSettings.ambientMusic;
+    gameAudio.ambientGain.gain.setTargetAtTime(gameSettings.ambientMusic ? 1 : 0, now, 0.025);
+    gameAudio.master.gain.setTargetAtTime(gameAudio.muted ? 0 : 0.25 * gameSettings.masterVolume / 100, now, 0.025);
+}
+
+function applyEnemyTypeSettings() {
+    const isEnabled = enemy => enemy.type === 'pirate'
+        ? gameSettings.spawnPirates
+        : enemy.type === 'seeker'
+            ? gameSettings.spawnSeekers
+            : gameSettings.spawnNormal;
+    enemies = enemies.filter(isEnabled);
+    enemyBullets = enemyBullets.filter(bullet => !bullet.owner || isEnabled(bullet.owner));
+}
+
+function retainEnemyTypeCount(type, target) {
+    let retained = 0;
+    enemies = enemies.filter(enemy => {
+        if (enemy.type !== type) return true;
+        retained++;
+        return retained <= target;
+    });
+}
+
+function ensureSpecialEnemyPopulations() {
+    const sectorModifiers = getSectorModifiers();
+    const pirateTarget = gameSettings.spawnPirates && sectorModifiers.pirateSpawn > 0 && gameSettings.enemyDensity > 0
+        ? Math.ceil(2 * 1.2 * sectorModifiers.pirateSpawn * gameSettings.enemyDensity / 100) + 4
+        : 0;
+    const seekerTarget = gameSettings.spawnSeekers
+        ? Math.ceil(Math.max(1, Math.floor(currentSector / 2)) * gameSettings.enemyDensity / 100)
+        : 0;
+
+    retainEnemyTypeCount('pirate', pirateTarget);
+    retainEnemyTypeCount('seeker', seekerTarget);
+    enemyBullets = enemyBullets.filter(bullet => !bullet.owner || enemies.includes(bullet.owner));
+
+    while (enemies.filter(enemy => enemy.type === 'pirate').length < pirateTarget) spawnPirate();
+    while (enemies.filter(enemy => enemy.type === 'seeker').length < seekerTarget) spawnSeeker();
+}
+
+function spawnSettingsAsteroid() {
+    let x;
+    let y;
+    let distanceFromHomeworld;
+    do {
+        x = Math.random() * WORLD_SIZE;
+        y = Math.random() * WORLD_SIZE;
+        distanceFromHomeworld = Math.hypot(x - WORLD_SIZE / 2, y - WORLD_SIZE / 2);
+    } while (
+        distanceFromHomeworld < 450 ||
+        Math.hypot(wrappedDelta(player.x, x), wrappedDelta(player.y, y)) < ASTEROID_SAFE_SPAWN_BUFFER
+    );
+
+    const typeKeys = Object.keys(ASTEROID_TYPES);
+    spawnAsteroid(x, y, 3, typeKeys[Math.floor(Math.random() * typeKeys.length)]);
+}
+
+function syncWorldPopulations() {
+    applyEnemyTypeSettings();
+    ensureSpecialEnemyPopulations();
+
+    const sectorModifiers = getSectorModifiers();
+    const populationBase = 8 + Math.floor((currentSector - 1) / 2);
+    const totalEnemyTarget = Math.ceil(
+        populationBase * 1.2 * 1.2 * sectorModifiers.enemySpawn * gameSettings.enemyDensity / 100
+    );
+    const standardEnemyTarget = gameSettings.spawnNormal
+        ? Math.max(0, totalEnemyTarget - enemies.length)
+        : 0;
+    retainEnemyTypeCount('normal', standardEnemyTarget);
+    while (enemies.filter(enemy => enemy.type === 'normal').length < standardEnemyTarget) spawnEnemy();
+
+    const merchantTarget = Math.ceil(sectorModifiers.merchantSpawn * 10 * gameSettings.merchantDensity / 100);
+    merchants.length = Math.min(merchants.length, merchantTarget);
+    while (merchants.length < merchantTarget) spawnMerchant();
+
+    const asteroidTarget = Math.ceil(
+        (72 + (currentSector - 1) * 8) * 1.2 * sectorModifiers.asteroidSpawn * gameSettings.asteroidDensity / 100
+    );
+    asteroids.length = Math.min(asteroids.length, asteroidTarget);
+    while (asteroids.length < asteroidTarget) spawnSettingsAsteroid();
+}
+
+function updateGameSettings(setting, value) {
+    const oldShieldMaximum = player.maxShield;
+    const shieldRatio = oldShieldMaximum > 0 ? player.shield / oldShieldMaximum : 1;
+    gameSettings = normalizeGameSettings({ ...gameSettings, [setting]: value });
+    if (setting === 'ambientMusic' || setting === 'masterVolume') {
+        applyAudioSettings();
+    }
+    if (['enemyDensity', 'merchantDensity', 'asteroidDensity', 'spawnNormal', 'spawnSeekers', 'spawnPirates'].includes(setting)) {
+        syncWorldPopulations();
+    }
+    if (setting === 'shieldMultiplier') {
+        applyShipModifiers(ACTIVE_SHIP_SKIN);
+        player.shield = Math.max(1, Math.min(player.maxShield, Math.round(player.maxShield * shieldRatio)));
+    }
+    syncSettingsControls();
+    if (savedGameAvailable) saveGame();
+}
+
+function restoreDefaultSettings() {
+    const oldShieldMaximum = player.maxShield;
+    const shieldRatio = oldShieldMaximum > 0 ? player.shield / oldShieldMaximum : 1;
+    gameSettings = { ...DEFAULT_GAME_SETTINGS };
+    applyAudioSettings();
+    syncWorldPopulations();
+    applyShipModifiers(ACTIVE_SHIP_SKIN);
+    player.shield = Math.max(1, Math.min(player.maxShield, Math.round(player.maxShield * shieldRatio)));
+    syncSettingsControls();
+    if (savedGameAvailable) saveGame();
+}
+
 function renderMainMenu() {
     const menu = document.getElementById('main-menu');
     const stats = document.getElementById('main-menu-stats');
     const launchButton = document.getElementById('launch-game');
+    const exportButton = document.getElementById('export-player-card');
     const generateButton = document.getElementById('generate-pilot-icon');
     const regenerateButton = document.getElementById('regenerate-pilot-icon');
     const preview = document.getElementById('pilot-helmet-preview');
@@ -3752,6 +4291,14 @@ function renderMainMenu() {
     const shipPreview = document.getElementById('menu-ship-preview');
     const subtitle = document.querySelector('.main-menu-subtitle');
     const piracyStatus = document.getElementById('menu-piracy-status');
+    const settingsPanel = document.getElementById('main-menu-settings');
+    const settingsView = menu.classList.contains('is-settings-view');
+    settingsPanel.hidden = !settingsView;
+    document.getElementById('main-menu-title').textContent = settingsView ? 'EXPEDITION SETTINGS' : 'STARJOURN ACE';
+    const settingsButton = document.getElementById('open-settings');
+    settingsButton.setAttribute('aria-pressed', String(settingsView));
+    settingsButton.setAttribute('aria-label', settingsView ? 'Return to player card' : 'Open settings');
+    settingsButton.title = settingsView ? 'Return to player card' : 'Open settings';
 
     stats.hidden = !savedGameAvailable;
     generateButton.hidden = Boolean(pilotHelmetIcon);
@@ -3760,6 +4307,11 @@ function renderMainMenu() {
     regenerateButton.hidden = !pilotHelmetIcon;
     launchButton.textContent = savedGameAvailable ? 'Continue' : 'Start Game';
     launchButton.disabled = !pilotHelmetIcon;
+    exportButton.disabled = !savedGameAvailable;
+    exportButton.style.opacity = savedGameAvailable ? '1' : '0.55';
+    exportButton.style.filter = savedGameAvailable ? 'none' : 'grayscale(1)';
+    exportButton.style.borderColor = savedGameAvailable ? '' : '#333344';
+    exportButton.style.color = savedGameAvailable ? '' : '#55556b';
 
     if (savedGameAvailable) {
         document.getElementById('menu-sector').textContent = `Sector ${currentSector},  ${homeworld.name}`;
@@ -3780,6 +4332,9 @@ function renderMainMenu() {
     } else {
         piracyStatus.textContent = 'PIRACY STATUS: NONE';
     }
+    updateBountyDisplay();
+    updateShipStatsDisplay();
+    syncSettingsControls();
 
     if (homeworld.svg) {
         const iconSvg = homeworld.svg.replace('viewBox="0 0 1000 1000"', 'viewBox="250 250 500 500"');
@@ -3826,12 +4381,320 @@ function renderMainMenu() {
     menu.hidden = false;
 }
 
+function crc32(bytes) {
+    let crc = 0xffffffff;
+    for (const byte of bytes) {
+        crc ^= byte;
+        for (let bit = 0; bit < 8; bit++) {
+            crc = (crc >>> 1) ^ (0xedb88320 & -(crc & 1));
+        }
+    }
+    return (crc ^ 0xffffffff) >>> 0;
+}
+
+async function addPngResolution(blob, pixelsPerInch) {
+    const png = new Uint8Array(await blob.arrayBuffer());
+    const ihdrEnd = 8 + 4 + 4 + 13 + 4;
+    if (png.length < ihdrEnd || png[12] !== 0x49 || png[13] !== 0x48 || png[14] !== 0x44 || png[15] !== 0x52) {
+        throw new Error('Screenshot renderer returned an invalid PNG.');
+    }
+
+    const pixelsPerMeter = Math.round(pixelsPerInch / 0.0254);
+    const chunk = new Uint8Array(21);
+    const view = new DataView(chunk.buffer);
+    view.setUint32(0, 9);
+    chunk.set([0x70, 0x48, 0x59, 0x73], 4);
+    view.setUint32(8, pixelsPerMeter);
+    view.setUint32(12, pixelsPerMeter);
+    chunk[16] = 1;
+    view.setUint32(17, crc32(chunk.subarray(4, 17)));
+
+    const output = new Uint8Array(png.length + chunk.length);
+    output.set(png.subarray(0, ihdrEnd));
+    output.set(chunk, ihdrEnd);
+    output.set(png.subarray(ihdrEnd), ihdrEnd + chunk.length);
+    return new Blob([output], { type: 'image/png' });
+}
+
+async function exportPlayerCard() {
+    if (!savedGameAvailable || mainMenu.classList.contains('is-settings-view')) return;
+
+    try {
+        const card = document.querySelector('.main-menu-card');
+        const cardRect = card.getBoundingClientRect();
+        const width = Math.ceil(cardRect.width);
+        const title = card.querySelector('.main-menu-title');
+        const subtitle = card.querySelector('.main-menu-subtitle');
+        const titleStyle = getComputedStyle(title);
+        const subtitleStyle = getComputedStyle(subtitle);
+        const isPauseMenu = mainMenu.classList.contains('is-pause-menu');
+        const titleFontSize = parseFloat(titleStyle.fontSize) || 32;
+        const titlePaddingBottom = parseFloat(titleStyle.paddingBottom) || 0;
+        const titleBorderBottom = parseFloat(titleStyle.borderBottomWidth) || 0;
+        const titleHeight = title.getBoundingClientRect().height
+            || titleFontSize * 1.16 + titlePaddingBottom + titleBorderBottom;
+        const subtitleFontSize = parseFloat(subtitleStyle.fontSize) || 14;
+        const subtitleHeight = subtitle.getBoundingClientRect().height || subtitleFontSize * 1.15;
+        const contentYOffset = isPauseMenu
+            ? titleHeight + (parseFloat(subtitleStyle.marginTop) || 0) + subtitleHeight
+                + (parseFloat(subtitleStyle.marginBottom) || 0)
+            : 0;
+        const stats = card.querySelector('.main-menu-stats');
+        const statusRow = card.querySelector('.main-menu-status-row');
+        const shipStats = card.querySelector('.main-menu-ship-stats');
+        const worldCustom = card.querySelector('.main-menu-world-custom');
+        const regenerateButton = card.querySelector('#regenerate-pilot-icon');
+        const excludedControlsHeight = regenerateButton?.parentElement.getBoundingClientRect().height || 0;
+        const cardStyle = getComputedStyle(card);
+        const bottomPadding = parseFloat(cardStyle.paddingBottom) || 0;
+        const bottomBorder = parseFloat(cardStyle.borderBottomWidth) || 0;
+        const cardBottomRect = (worldCustom.hidden ? shipStats : worldCustom).getBoundingClientRect();
+        const height = Math.ceil(
+            cardBottomRect.bottom - cardRect.top - card.scrollTop
+            - excludedControlsHeight + bottomPadding + bottomBorder + contentYOffset
+        );
+        if (!width || !height) throw new Error('Player card has no renderable dimensions.');
+
+        const scale = 2;
+        const pixelWidth = width * scale;
+        const pixelHeight = height * scale;
+        const canvas = document.createElement('canvas');
+        canvas.width = pixelWidth;
+        canvas.height = pixelHeight;
+        const context = canvas.getContext('2d');
+        if (!context) throw new Error('Could not create the player card image.');
+        context.scale(scale, scale);
+
+        const roundedRect = (x, y, rectWidth, rectHeight, radius) => {
+            context.beginPath();
+            context.roundRect(x, y, rectWidth, rectHeight, radius);
+        };
+        const relativeRect = (element, excludePilotControl = false, includeContentOffset = true) => {
+            const rect = element.getBoundingClientRect();
+            return {
+                x: rect.left - cardRect.left,
+                y: rect.top - cardRect.top - card.scrollTop - (excludePilotControl ? excludedControlsHeight : 0)
+                    + (includeContentOffset ? contentYOffset : 0),
+                width: rect.width,
+                height: rect.height
+            };
+        };
+        const drawPanel = (element, excludePilotControl = false) => {
+            const rect = relativeRect(element, excludePilotControl);
+            const style = getComputedStyle(element);
+            const radius = parseFloat(style.borderTopLeftRadius) || 0;
+            roundedRect(rect.x, rect.y, rect.width, rect.height, radius);
+            context.fillStyle = style.backgroundColor;
+            context.fill();
+            if (parseFloat(style.borderTopWidth) > 0) {
+                context.strokeStyle = style.borderTopColor;
+                context.lineWidth = parseFloat(style.borderTopWidth);
+                context.stroke();
+            }
+            return rect;
+        };
+        const drawText = (element, text = element.innerText, excludePilotControl = false) => {
+            const rect = relativeRect(element, excludePilotControl);
+            const style = getComputedStyle(element);
+            context.font = style.font;
+            context.fillStyle = style.color;
+            context.textAlign = style.textAlign === 'start' ? 'left' : style.textAlign;
+            context.textBaseline = 'alphabetic';
+            const x = context.textAlign === 'center'
+                ? rect.x + rect.width / 2
+                : context.textAlign === 'right'
+                    ? rect.x + rect.width - (parseFloat(style.paddingRight) || 0)
+                    : rect.x + (parseFloat(style.paddingLeft) || 0);
+            const lineHeight = parseFloat(style.lineHeight) || rect.height;
+            const lines = String(text).trim().split('\n');
+            const firstBaseline = rect.y + (rect.height - lineHeight * lines.length) / 2 + lineHeight * 0.82;
+            lines.forEach((line, index) => context.fillText(line.trim(), x, firstBaseline + index * lineHeight));
+        };
+        const loadImage = async source => {
+            if (!source) return null;
+            const image = new Image();
+            image.src = source;
+            await image.decode();
+            return image;
+        };
+
+        context.save();
+        context.shadowColor = 'rgba(255, 215, 0, 0.22)';
+        context.shadowBlur = 28;
+        roundedRect(0.5, 0.5, width - 1, height - 1, 8);
+        context.fillStyle = '#0c0c12';
+        context.fill();
+        context.restore();
+        roundedRect(0.5, 0.5, width - 1, height - 1, 8);
+        context.strokeStyle = 'rgba(255, 215, 0, 0.62)';
+        context.lineWidth = 1;
+        context.stroke();
+
+        if (isPauseMenu) {
+            const headerTop = (parseFloat(cardStyle.borderTopWidth) || 0)
+                + (parseFloat(cardStyle.paddingTop) || 0);
+            context.font = titleStyle.font;
+            context.fillStyle = titleStyle.color;
+            context.textAlign = 'center';
+            context.textBaseline = 'alphabetic';
+            context.shadowColor = 'rgba(255, 215, 0, 0.25)';
+            context.shadowBlur = 12;
+            context.fillText('STARJOURN ACE', width / 2, headerTop + titleHeight - titlePaddingBottom - titleBorderBottom - titleFontSize * 0.24);
+            context.shadowBlur = 0;
+            context.strokeStyle = titleStyle.borderBottomColor;
+            context.lineWidth = Math.max(titleBorderBottom, 1);
+            context.beginPath();
+            context.moveTo(
+                (parseFloat(cardStyle.borderLeftWidth) || 0) + (parseFloat(cardStyle.paddingLeft) || 0),
+                headerTop + titleHeight - titleBorderBottom / 2
+            );
+            context.lineTo(
+                width - (parseFloat(cardStyle.borderRightWidth) || 0) - (parseFloat(cardStyle.paddingRight) || 0),
+                headerTop + titleHeight - titleBorderBottom / 2
+            );
+            context.stroke();
+            context.font = subtitleStyle.font;
+            context.fillStyle = subtitleStyle.color;
+            context.fillText(
+                'EXPLORE THE INFINITE EXPANSE.',
+                width / 2,
+                headerTop + titleHeight + (parseFloat(subtitleStyle.marginTop) || 0) + subtitleFontSize * 0.82
+            );
+        } else {
+            const titleRect = relativeRect(title, false, false);
+            context.font = titleStyle.font;
+            context.fillStyle = titleStyle.color;
+            context.textAlign = 'center';
+            context.textBaseline = 'alphabetic';
+            context.shadowColor = 'rgba(255, 215, 0, 0.25)';
+            context.shadowBlur = 12;
+            context.fillText(
+                'STARJOURN ACE',
+                titleRect.x + titleRect.width / 2,
+                titleRect.y + titleHeight - titlePaddingBottom - titleBorderBottom - titleFontSize * 0.24
+            );
+            context.shadowBlur = 0;
+            context.strokeStyle = titleStyle.borderBottomColor;
+            context.lineWidth = Math.max(titleBorderBottom, 1);
+            context.beginPath();
+            context.moveTo(titleRect.x, titleRect.y + titleRect.height - titleBorderBottom / 2);
+            context.lineTo(titleRect.x + titleRect.width, titleRect.y + titleRect.height - titleBorderBottom / 2);
+            context.stroke();
+            drawText(subtitle, undefined, false, false);
+        }
+
+        const portraits = card.querySelector('.main-menu-portraits');
+        const portraitsRect = relativeRect(portraits);
+        for (const [label, imageId] of [
+            ['Homeworld', 'menu-homeworld-preview'],
+            ['Pilot', 'pilot-helmet-preview'],
+            ['Ship', 'menu-ship-preview']
+        ]) {
+            let imageElement = document.getElementById(imageId);
+            if (label === 'Pilot' && imageElement.hidden) {
+                imageElement = document.getElementById('pilot-helmet-placeholder');
+            }
+            const frame = relativeRect(imageElement);
+            const labelElement = Array.from(portraits.querySelectorAll('.main-menu-portrait-label'))
+                .find(element => element.innerText.trim().toLowerCase() === label.toLowerCase());
+            drawText(labelElement);
+
+            roundedRect(frame.x, frame.y, frame.width, frame.height, 0);
+            context.fillStyle = '#000000';
+            context.fill();
+            context.strokeStyle = '#343443';
+            context.lineWidth = 1;
+            context.stroke();
+
+            if (label === 'Pilot' && imageElement.id === 'pilot-helmet-placeholder') {
+                context.fillStyle = '#7a7a99';
+                context.font = 'bold 64px sans-serif';
+                context.textAlign = 'center';
+                context.textBaseline = 'middle';
+                context.fillText('?', frame.x + frame.width / 2, frame.y + frame.height / 2);
+                continue;
+            }
+            const image = await loadImage(imageElement.getAttribute('src'));
+            if (!image) continue;
+            const imageStyle = getComputedStyle(imageElement);
+            const padding = parseFloat(imageStyle.paddingLeft) || 0;
+            const contentX = frame.x + padding + 1;
+            const contentY = frame.y + padding + 1;
+            const contentWidth = frame.width - padding * 2 - 2;
+            const contentHeight = frame.height - padding * 2 - 2;
+            const imageScale = Math.min(contentWidth / image.naturalWidth, contentHeight / image.naturalHeight);
+            const imageWidth = image.naturalWidth * imageScale;
+            const imageHeight = image.naturalHeight * imageScale;
+            context.drawImage(
+                image,
+                contentX + (contentWidth - imageWidth) / 2,
+                contentY + (contentHeight - imageHeight) / 2,
+                imageWidth,
+                imageHeight
+            );
+        }
+
+        if (!stats.hidden) {
+            for (const stat of stats.querySelectorAll('.main-menu-stat')) {
+                drawPanel(stat, true);
+                drawText(stat.querySelector('.main-menu-stat-label'), undefined, true);
+                drawText(stat.querySelector('.main-menu-stat-value'), undefined, true);
+            }
+            drawPanel(stats.querySelector('.main-menu-cargo'), true);
+            for (const cargoLabel of stats.querySelectorAll('.main-menu-cargo span')) {
+                drawText(cargoLabel, undefined, true);
+            }
+        }
+
+        drawPanel(statusRow, true);
+        for (const status of statusRow.children) {
+            drawPanel(status, true);
+            drawText(status, undefined, true);
+        }
+
+        drawPanel(shipStats, true);
+        for (const stat of shipStats.children) {
+            drawText(stat, undefined, true);
+        }
+        if (!worldCustom.hidden) {
+            drawText(worldCustom, undefined, true);
+        }
+
+        const pngBlob = await new Promise((resolve, reject) => {
+            canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Could not encode the player card PNG.')), 'image/png');
+        });
+        const resolvedPng = await addPngResolution(pngBlob, 192);
+        const now = new Date();
+        const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+        const downloadUrl = URL.createObjectURL(resolvedPng);
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = `PilotCard_${timestamp}.png`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+        showAlert('PILOT CARD EXPORTED AS PNG');
+    } catch (error) {
+        console.error('Player card export failed:', error);
+        showAlert('PILOT CARD EXPORT FAILED');
+        addLog(`Player card export failed: ${error.message}`);
+    }
+}
+
 document.getElementById('launch-game').addEventListener('click', () => {
     if (mainMenu.classList.contains('is-pause-menu')) {
 setDesktopPaused(false);
 return;
     }
     if (!pilotHelmetIcon) return;
+    mainMenu.classList.remove('is-settings-view');
+    document.getElementById('main-menu-settings').hidden = true;
+    document.getElementById('main-menu-title').textContent = 'STARJOURN ACE';
+    const settingsButton = document.getElementById('open-settings');
+    settingsButton.setAttribute('aria-pressed', 'false');
+    settingsButton.setAttribute('aria-label', 'Open settings');
+    settingsButton.title = 'Open settings';
     gameStarted = true;
     savedGameAvailable = true;
     saveGame();
@@ -3839,6 +4702,26 @@ return;
     document.getElementById('main-menu').hidden = true;
 });
 
+document.getElementById('export-player-card').addEventListener('click', exportPlayerCard);
+document.getElementById('open-settings').addEventListener('click', () => {
+    const settingsView = !mainMenu.classList.contains('is-settings-view');
+    mainMenu.classList.toggle('is-settings-view', settingsView);
+    document.getElementById('main-menu-settings').hidden = !settingsView;
+    document.getElementById('main-menu-title').textContent = settingsView ? 'EXPEDITION SETTINGS' : 'STARJOURN ACE';
+    const button = document.getElementById('open-settings');
+    button.setAttribute('aria-pressed', String(settingsView));
+    button.setAttribute('aria-label', settingsView ? 'Return to player card' : 'Open settings');
+    button.title = settingsView ? 'Return to player card' : 'Open settings';
+    if (settingsView) syncSettingsControls();
+});
+document.querySelectorAll('[data-setting]').forEach(control => {
+    const eventType = control.type === 'checkbox' ? 'change' : 'input';
+    control.addEventListener(eventType, () => {
+        const value = control.type === 'checkbox' ? control.checked : Number(control.value);
+        updateGameSettings(control.dataset.setting, value);
+    });
+});
+document.getElementById('settings-defaults').addEventListener('click', restoreDefaultSettings);
 document.getElementById('generate-pilot-icon').addEventListener('click', requestPilotHelmet);
 document.getElementById('regenerate-pilot-icon').addEventListener('click', requestPilotHelmet);
 document.getElementById('menu-enable-audio').addEventListener('click', () => {
@@ -3909,10 +4792,10 @@ document.getElementById('menu-reset-game').addEventListener('click', resetGame);
         canvas.addEventListener('pointercancel', releasePointer);
 
 
-        function addLog(text) {
+        function addLog(text, contraband = false) {
             const log = document.getElementById('msg-log');
             const entry = document.createElement('div');
-            entry.className = 'log-entry';
+            entry.className = contraband ? 'log-entry contraband-log' : 'log-entry';
             entry.innerText = `[${new Date().toLocaleTimeString()}] ${text}`;
             log.appendChild(entry);
             log.scrollTop = log.scrollHeight;
@@ -3929,9 +4812,12 @@ document.getElementById('menu-reset-game').addEventListener('click', resetGame);
             constructor() {
                 this.ctx = null;
                 this.master = null;
+                this.sfxGain = null;
+                this.ambientGain = null;
                 this.filter = null;
                 this.delay = null;
                 this.muted = true;
+                this.ambientEnabled = true;
                 this.initialized = false;
                 this.chordIndex = 0;
                 this.chords = [
@@ -3956,6 +4842,10 @@ document.getElementById('menu-reset-game').addEventListener('click', resetGame);
                 this.filter.frequency.setValueAtTime(850, this.ctx.currentTime);
                 this.delay = this.ctx.createDelay();
                 this.delay.delayTime.setValueAtTime(0.45, this.ctx.currentTime);
+                this.ambientGain = this.ctx.createGain();
+                this.ambientGain.gain.setValueAtTime(gameSettings.ambientMusic ? 1 : 0, this.ctx.currentTime);
+                this.sfxGain = this.ctx.createGain();
+                this.sfxGain.gain.setValueAtTime(1, this.ctx.currentTime);
 
                 const feedback = this.ctx.createGain();
                 feedback.gain.setValueAtTime(0.35, this.ctx.currentTime);
@@ -3963,10 +4853,12 @@ document.getElementById('menu-reset-game').addEventListener('click', resetGame);
                 feedback.connect(this.delay);
 
                 this.master = this.ctx.createGain();
-                this.master.gain.setValueAtTime(0, this.ctx.currentTime);
-                this.filter.connect(this.master);
+                this.master.gain.setValueAtTime(this.muted ? 0 : 0.25 * gameSettings.masterVolume / 100, this.ctx.currentTime);
+                this.filter.connect(this.ambientGain);
                 this.filter.connect(this.delay);
-                this.delay.connect(this.master);
+                this.delay.connect(this.ambientGain);
+                this.ambientGain.connect(this.master);
+                this.sfxGain.connect(this.master);
                 this.master.connect(this.ctx.destination);
                 this.initialized = true;
 
@@ -3976,8 +4868,8 @@ document.getElementById('menu-reset-game').addEventListener('click', resetGame);
                 setInterval(() => this.playAmbientNote(), 650);
             }
 
-            createTone(frequency, duration, type = 'triangle', volume = 0.15, endFrequency = frequency, outputNode = this.filter) {
-                if (!this.initialized || this.muted) return;
+            createTone(frequency, duration, type = 'triangle', volume = 0.15, endFrequency = frequency, outputNode = this.sfxGain) {
+                if (!this.initialized || this.muted || (outputNode === this.filter && !this.ambientEnabled)) return;
                 const now = this.ctx.currentTime;
                 const oscillator = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
@@ -3997,7 +4889,7 @@ document.getElementById('menu-reset-game').addEventListener('click', resetGame);
             }
 
             playSfx(frequency, duration, type = 'triangle', volume = 0.15, endFrequency = frequency) {
-                this.createTone(frequency, duration, type, volume, endFrequency, this.master);
+                this.createTone(frequency, duration, type, volume, endFrequency, this.sfxGain);
             }
 
             playAmbientNote() {
@@ -4026,8 +4918,7 @@ document.getElementById('menu-reset-game').addEventListener('click', resetGame);
                 this.init();
                 if (!this.initialized) return;
                 this.muted = !this.muted;
-                const now = this.ctx.currentTime;
-                this.master.gain.linearRampToValueAtTime(this.muted ? 0 : 0.25, now + 0.05);
+                applyAudioSettings();
                 document.getElementById('audio-toggle').innerText = this.muted ? 'Enable Audio' : 'Mute Audio';
                 document.getElementById('menu-enable-audio').innerText = this.muted ? 'Enable Audio' : 'Mute Audio';
             }
@@ -4053,11 +4944,18 @@ document.getElementById('menu-reset-game').addEventListener('click', resetGame);
             pauseButton.setAttribute('aria-pressed', String(paused));
             pauseButton.textContent = paused ? 'Resume' : 'Pause';
             mainMenu.classList.toggle('is-pause-menu', paused);
-
+ 
             if (paused) {
                 renderMainMenu();
                 document.getElementById('launch-game').textContent = 'Resume';
             } else {
+                mainMenu.classList.remove('is-settings-view');
+                document.getElementById('main-menu-settings').hidden = true;
+                document.getElementById('main-menu-title').textContent = 'STARJOURN ACE';
+                const settingsButton = document.getElementById('open-settings');
+                settingsButton.setAttribute('aria-pressed', 'false');
+                settingsButton.setAttribute('aria-label', 'Open settings');
+                settingsButton.title = 'Open settings';
                 mainMenu.hidden = true;
             }
         }
@@ -4211,6 +5109,15 @@ document.getElementById('menu-reset-game').addEventListener('click', resetGame);
             };
         }
 
+        function getEffectiveSectorModifiers() {
+            const modifiers = getSectorModifiers();
+            modifiers.enemySpawn *= gameSettings.enemyDensity / 100;
+            modifiers.pirateSpawn *= gameSettings.enemyDensity / 100;
+            modifiers.merchantSpawn *= gameSettings.merchantDensity / 100;
+            modifiers.asteroidSpawn *= gameSettings.asteroidDensity / 100;
+            return modifiers;
+        }
+
         function randomWorldPositionOutsideHomeworld() {
             let x;
             let y;
@@ -4290,6 +5197,7 @@ document.getElementById('menu-reset-game').addEventListener('click', resetGame);
         }
 
         function spawnEnemy() {
+            if (!gameSettings.spawnNormal) return;
             const position = randomWorldPositionOutsideHomeworld();
             enemies.push({
                 type: 'normal',
@@ -4305,6 +5213,7 @@ document.getElementById('menu-reset-game').addEventListener('click', resetGame);
         }
 
         function createPirate(x, y) {
+            if (!gameSettings.spawnPirates) return null;
             const pirate = {
                 type: 'pirate',
                 x, y,
@@ -4330,8 +5239,10 @@ document.getElementById('menu-reset-game').addEventListener('click', resetGame);
         }
 
         function spawnPirateAt(pirateX, pirateY) {
+            if (getEffectiveSectorModifiers().pirateSpawn <= 0) return;
             const pirate = createPirate(pirateX, pirateY);
-            const asteroidCount = 5 + Math.floor(Math.random() * 4);
+            if (!pirate) return;
+            const asteroidCount = Math.ceil((5 + Math.floor(Math.random() * 4)) * gameSettings.asteroidDensity / 100);
 
             for (let i = 0; i < asteroidCount; i++) {
                 const asteroidAngle = (i / asteroidCount) * Math.PI * 2 + Math.random() * 0.4;
@@ -4399,6 +5310,7 @@ document.getElementById('menu-reset-game').addEventListener('click', resetGame);
         }
 
         function spawnSeeker() {
+            if (!gameSettings.spawnSeekers) return;
             const horizontalRoute = Math.random() < 0.5;
             const direction = Math.random() < 0.5 ? 1 : -1;
             const speed = 1.25 + Math.random() * 0.65;
@@ -4444,11 +5356,13 @@ document.getElementById('menu-reset-game').addEventListener('click', resetGame);
         }
 
         function spawnPirateWave(count) {
+            if (!gameSettings.spawnNormal) return;
             const edgeDistance = Math.max(canvas.width, canvas.height) / 2 + 450;
             for (let i = 0; i < count; i++) {
                 const angle = Math.random() * Math.PI * 2;
                 const distance = edgeDistance + Math.random() * 350;
                 const enemy = {
+                    type: 'normal',
                     x: player.x + Math.cos(angle) * distance,
                     y: player.y + Math.sin(angle) * distance,
                     vx: 0,
@@ -4500,6 +5414,14 @@ function spawnBurst(x, y, color, count = 12) {
             });
         }
 
+        function getSectorRewardMultiplier() {
+            return 1 + ((currentSector - 1) * 0.333);
+        }
+
+        function getWalletRewardMultiplier() {
+            return getSectorRewardMultiplier() * (pirateStatusRemainingMs > 0 ? 2.5 : 1);
+        }
+
         function spawnCivilianPiracyLoot(ship) {
             const totalDrops = 24;
             const rareDrops = 5 + Math.floor(Math.random() * 3);
@@ -4545,7 +5467,7 @@ function spawnBurst(x, y, color, count = 12) {
             const activeTheme = SECTOR_THEMES[Math.min(12, currentSector)];
             ASTEROID_TYPES.GENERIC.color = activeTheme.generic;
 
-            const modifiers = getSectorModifiers();
+            const modifiers = getEffectiveSectorModifiers();
             const asteroidCount = Math.ceil((72 + ((currentSector - 1) * 8)) * 1.2 * modifiers.asteroidSpawn);
             for (let i = 0; i < asteroidCount; i++) {
                 let x, y, d;
@@ -4587,7 +5509,7 @@ for (let i = 0; i < 8; i++) {
     spawnHealthPack(); 
 } 
 
-for (let i = 0; i < Math.max(1, Math.floor(currentSector / 2)); i++) { 
+for (let i = 0; i < Math.ceil(Math.max(1, Math.floor(currentSector / 2)) * gameSettings.enemyDensity / 100); i++) { 
     spawnSeeker(); 
 } 
 
@@ -4610,14 +5532,14 @@ generateBackgroundAssets();
             const nextTheme = SECTOR_THEMES[Math.min(12, currentSector)] || { name: `Unknown Sector ${currentSector}`, primary: "#00ffff" };
 
             showAlert(`WARP SUCCESSFUL. ENTERING SYSTEM: ${nextTheme.name.toUpperCase()}`);
-            addLog(`Warp drive disengaged. System configuration shifts updated to match node coordinates.`);
+            addLog(`Warp drive disengaged. Checking systems... All systems nominal. Registration with sector homeworld complete. Cleared for departure...`);
             
             initWorld();
             saveGame();
         }
 
         function update() {
-            const modifiers = getSectorModifiers();
+            const modifiers = getEffectiveSectorModifiers();
             const asteroidTarget = Math.ceil((30 + ((currentSector - 1) * 3)) * 1.2 * modifiers.asteroidSpawn);
             if (asteroids.length < asteroidTarget) {
                 let keysArr = Object.keys(ASTEROID_TYPES);
@@ -4644,6 +5566,10 @@ generateBackgroundAssets();
             }
             while (healthPacks.length < 8) {
                 spawnHealthPack();
+            }
+            const merchantTarget = Math.ceil(10 * modifiers.merchantSpawn);
+            while (merchants.length < merchantTarget) {
+                spawnMerchant();
             }
 
             let baseDx = SPACEPORT.x - player.x;
@@ -5249,22 +6175,32 @@ generateBackgroundAssets();
                         spawnBurst(e.x, e.y, '#ff3333', 10);
                         if (e.hp <= 0) {
                             enemies.splice(eIdx, 1);
+                            if (e.stolenCargo) {
+                                spawnMineralDrops(e.x, e.y, e.stolenCargo);
+                                addLog(`Raider defeated! Stolen cargo dropped for recovery.`);
+                            }
+                            let bounty = null;
                             if (e.type === 'pirate') {
-                                if (e.stolenCargo) {
-                                    spawnMineralDrops(e.x, e.y, e.stolenCargo);
-                                    addLog('Rogue defeated! Cargo dropped for recovery.');
-                                } else {
+                                if (!e.stolenCargo) {
                                     const salvage = {
                                         gold: 1 + Math.floor(Math.random() * 3),
                                         uranium: 1 + Math.floor(Math.random() * 3),
                                         eridium: 1 + Math.floor(Math.random() * 3)
                                     };
                                     spawnMineralDrops(e.x, e.y, salvage);
-                                    player.wallet += 300;
-                                    addLog('Pirate defeated! Resources salvagable for recovery, and bounty bonus of \$300 paid.');
+                                    bounty = Math.floor(375 * getSectorRewardMultiplier());
+                                    player.wallet += bounty;
+                                    bountiesClaimed++;
+                                    bountyWalletTotal += bounty;
+                                    updateBountyDisplay();
+                                    addLog(`Pirate defeated! Resources salvagable for recovery, and bounty bonus of \$${bounty} paid.`);
                                 }
                             } else {
-                                player.wallet += 100;
+                                bounty = Math.floor(250 * getSectorRewardMultiplier());
+                                player.wallet += bounty;
+                                bountiesClaimed++;
+                                bountyWalletTotal += bounty;
+                                updateBountyDisplay();
                                 let mTypes = ['gold', 'uranium', 'eridium'];
                                 let dropped = mTypes[Math.floor(Math.random() * mTypes.length)];
 
@@ -5275,7 +6211,7 @@ generateBackgroundAssets();
                                 });
                             }
                             gameAudio.playDamage();
-                            if (e.type !== 'pirate') addLog(`Raider destroyed! Bounty of \$100 recovered.`);
+                            if (e.type !== 'pirate') addLog(`Raider destroyed! Bounty of \$${bounty} recovered.`);
                             saveGame();
                         }
                         break;
@@ -5289,6 +6225,7 @@ generateBackgroundAssets();
                         civilianShips.splice(shipIdx, 1);
                         pirateStatusRemainingMs += 60000;
                         piracyIncidents++;
+                        updateBountyDisplay();
                         saveGame();
 
                         spawnCivilianPiracyLoot(ship);
@@ -5296,7 +6233,7 @@ generateBackgroundAssets();
                         spawnPirateWave(3);
                         spawnBurst(ship.x, ship.y, '#00ffff', 20);
                         gameAudio.playDamage();
-                        addLog('Civilian vessel destroyed. PIRATE STATUS ACTIVE for 60 seconds.');
+                        addLog('Civilian vessel destroyed. PIRATE STATUS ACTIVE for 60 seconds.', true);
                         showAlert('PIRATE STATUS: SPACEPORT SERVICES LOCKED');
                         break;
                     }
@@ -5308,12 +6245,15 @@ generateBackgroundAssets();
                 const pack = healthPacks[packIdx];
                 if (distanceBetween(player, pack) < player.radius + pack.radius) {
                     const recovery = player.maxShield * (0.25 + Math.random() * 0.15);
-                    const cacheReward = 100 + Math.floor(Math.random() * 201);
+                    const contrabandActive = pirateStatusRemainingMs > 0;
+                    const cacheReward = Math.floor(
+                        (100 + Math.floor(Math.random() * 201)) * getWalletRewardMultiplier()
+                    );
                     player.shield = Math.min(player.maxShield, player.shield + recovery);
                     player.wallet += cacheReward;
                     spawnBurst(pack.x, pack.y, '#00ffff', 12);
                     gameAudio.playSupplyCache();
-                    addLog(`Supply cache collected. Shield recovery +${Math.round(recovery)}. Wallet +\$${cacheReward}.`);
+                    addLog(`${contrabandActive ? 'Contraband collected' : 'Supply cache collected'}. Shield recovery +${Math.round(recovery)}. Wallet +\$${cacheReward}.`, contrabandActive);
                     saveGame();
                     healthPacks.splice(packIdx, 1);
                 }
@@ -5393,16 +6333,19 @@ for (let idx = minerals.length - 1; idx >= 0; idx--) {
         // RARE MATERIAL: large instant wallet reward
         } else if (m.type === 'rare') {
 
-            const sectorMultiplier = 1 + ((currentSector - 1) * 0.333);
+            const contrabandActive = pirateStatusRemainingMs > 0;
             const rareReward = Math.floor(
-                (200 + Math.floor(Math.random() * 101)) * sectorMultiplier
+                (200 + Math.floor(Math.random() * 101)) * getWalletRewardMultiplier()
             );
             player.wallet += rareReward;
 
             gameAudio.playSupplyCache();
             spawnBurst(m.x, m.y, MINERAL_COLORS[m.type], 36);
 
-            addLog(`RARE MATERIAL! Wallet +$${rareReward}.`);
+            addLog(
+                `${contrabandActive ? 'Rarity smuggled' : 'Rare Materials Found'}! Wallet +$${rareReward}.`,
+                contrabandActive
+            );
 
         // NORMAL MATERIALS: existing cargo behavior
         } else {
@@ -5452,8 +6395,8 @@ for (let idx = minerals.length - 1; idx >= 0; idx--) {
                     const eb = enemyBullets[j];
                     if (distanceBetween(player, eb) < player.radius) {
                         eb.life = 0; 
-                        damagePlayer(12, eb.owner || null);
-                        spawnBurst(player.x, player.y, '#ff3333', 8);
+                        damagePlayer(12 * gameSettings.enemyBulletDamage / 100, eb.owner || null);
+                        spawnBurst(player.x, player.y, '#ff3333', 10);
                         
                         if (player.needsNewShip) {
                             break;
@@ -5473,6 +6416,7 @@ function applyShipModifiers(skinKey) {
     if (!skinKey) return;
 
     const mods = SHIP_STAT_MODIFIERS[skinKey] || SHIP_STAT_MODIFIERS['STARJOURNER'];
+    player.shootDelay = 188;
     player.thrust = mods.thrust;
     player.friction = mods.friction;
 
@@ -5571,7 +6515,7 @@ if (sTrait === 'SHIELD_BOOST') {
     }
     
     // --- 3. COMMIT SHIELD CALCULATIONS TO PLAYER OBJECT ---
-    player.maxShield = targetMaxShield;
+    player.maxShield = Math.max(1, Math.floor(targetMaxShield * gameSettings.shieldMultiplier / 100));
     player.shieldRegenInterval = targetRegenInterval;
     player.shieldDamageAbsorption = targetAbsorption;
 
@@ -5597,6 +6541,10 @@ if (sTrait === 'SHIELD_BOOST') {
 
         function damagePlayer(amount, source = null) {
             if (player.needsNewShip) return;
+            if (gameSettings.invincible) {
+                player.invulnerable = 35;
+                return;
+            }
 
             // --- FORCE FIELD DAMAGE REDUCTION MATRIX ---
             // Reduces incoming amount by 25% if FORCE_FIELD trait is active, otherwise takes 100%
@@ -5608,10 +6556,12 @@ if (sTrait === 'SHIELD_BOOST') {
             
             if (player.shield <= 0) {
                 player.shield = 0;
-                if (source && source.type === 'pirate') {
+                shipsDestroyed++;
+                updateShipStatsDisplay();
+                if (source && enemies.includes(source)) {
                     source.stolenCargo = { ...player.cargo };
                     player.cargo = { gold: 0, uranium: 0, eridium: 0 };
-                    addLog('Killed by pirate! CARGO CONFISCATED! Get it BACK!');
+                    addLog(`Killed by ${source.type === 'pirate' ? 'pirate' : 'raider'}! CARGO CONFISCATED! Defeat them to get it back!`);
                 } else {
                     player.cargo.gold = Math.floor(player.cargo.gold / 2);
                     player.cargo.uranium = Math.floor(player.cargo.uranium / 2);
@@ -6102,6 +7052,8 @@ function updateUI() {
             }
 
             player.wallet += tradePayout;
+            merchantTrades++;
+            updateShipStatsDisplay();
             gameAudio.playTrade();
             saveGame();
 
@@ -6111,8 +7063,11 @@ function updateUI() {
 
             
             // Cycle merchant positions onto border regions cleanly
-            spawnBurst(m.x, m.y, '#ffffff', 10);
-            spawnBurst(m.x, m.y, '#ffd700', 10);
+            spawnBurst(m.x, m.y, '#ffffff', 22);
+            spawnBurst(m.x, m.y, '#ffffff', 22);
+            spawnBurst(m.x, m.y, '#ffffff', 22);
+            spawnBurst(m.x, m.y, '#00ffff', 22);
+            spawnBurst(m.x, m.y, '#ffd700', 22);
             merchants = merchants.filter(merchantShip => merchantShip.id !== m.id);
             spawnMerchant();
             
@@ -7174,11 +8129,11 @@ enemies.forEach(e => {
                 ctx.restore();
             }
 
-            const cargoPirate = enemies.find(enemy => enemy.type === 'pirate' && enemy.stolenCargo);
-            if (cargoPirate) {
+            const cargoCarrier = enemies.find(enemy => enemy.stolenCargo);
+            if (cargoCarrier) {
                 const pirateAngle = Math.atan2(
-                    wrappedDelta(player.y, cargoPirate.y),
-                    wrappedDelta(player.x, cargoPirate.x)
+                    wrappedDelta(player.y, cargoCarrier.y),
+                    wrappedDelta(player.x, cargoCarrier.x)
                 );
                 const pirateIndicatorDistance = indicatorDistance + 21;
                 const pirateIndicatorX = canvas.width / 2 + Math.cos(pirateAngle) * pirateIndicatorDistance;
@@ -7252,6 +8207,8 @@ document.addEventListener('click', function(event) {
         }
 
         player.wallet -= buybackCost;
+        shipsPurchased++;
+        updateShipStatsDisplay();
         
         const currentActiveCache = window.proceduralShipCache ? { ...window.proceduralShipCache, savedShootDelay: player.shootDelay } : null;
         window.proceduralShipCache = { ...player.lastRandomBackup };
@@ -7294,6 +8251,8 @@ document.addEventListener('click', function(event) {
     }
 
     player.wallet -= cost;
+    shipsPurchased++;
+    updateShipStatsDisplay();
     ACTIVE_SHIP_SKIN = skinKey; 
 
 if (skinKey === 'RANDOM') {
@@ -7397,7 +8356,7 @@ player.shield = player.maxShield;
 })();
 
 
-// Copyright SPM - Version 1.1.3 - Smurphshire 2026
+// Copyright SPM - Version 1.1.6 - Smurphshire 2026
     </script>
 </body>
 </html>
