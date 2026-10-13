@@ -1,4 +1,4 @@
-<!-- STARJOURN ACE - PILOT EXPEDITION Version 1.1.6 by @smurphsire, homeworld, ship, & pilot generators copyright SPM 2026 -->
+<!-- STARJOURN ACE - PILOT EXPEDITION Version 1.2.6 by @smurphsire, homeworld, ship, & pilot generators copyright SPM 2026 -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -69,6 +69,38 @@
             text-align: center;
         }
 
+        #quit-game {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            z-index: 1;
+            display: grid;
+            width: auto;
+            height: auto;
+            padding: 5px 8px;
+            place-items: center;
+            border: 1px solid #363643;
+            border-radius: 4px;
+            background: #111126;
+            color: #777786;
+            font-size: 0.62rem;
+            cursor: pointer;
+        }
+
+        #quit-game:hover {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        #quit-game svg {
+            width: 14px;
+            height: 14px;
+            fill: none;
+            stroke: currentColor;
+            stroke-linecap: round;
+            stroke-width: 2;
+        }
+
         #main-menu.is-pause-menu {
             position: absolute;
             inset: 0;
@@ -91,6 +123,10 @@
             display: block;
         }
 
+        #main-menu.is-save-manager-view .main-menu-title {
+            display: block;
+        }
+
         #main-menu.is-settings-view .main-menu-subtitle,
         #main-menu.is-settings-view .main-menu-portraits,
         #main-menu.is-settings-view .main-menu-pilot,
@@ -98,6 +134,18 @@
         #main-menu.is-settings-view .main-menu-status-row,
         #main-menu.is-settings-view .main-menu-ship-stats,
         #main-menu.is-settings-view .main-menu-world-custom {
+            display: none;
+        }
+
+        #main-menu.is-save-manager-view .main-menu-subtitle,
+        #main-menu.is-save-manager-view .main-menu-portraits,
+        #main-menu.is-save-manager-view .main-menu-pilot,
+        #main-menu.is-save-manager-view .main-menu-stats,
+        #main-menu.is-save-manager-view .main-menu-status-row,
+        #main-menu.is-save-manager-view .main-menu-ship-stats,
+        #main-menu.is-save-manager-view .main-menu-world-custom,
+        #main-menu.is-save-manager-view #main-menu-settings,
+        #main-menu.is-save-manager-view .main-menu-footer {
             display: none;
         }
 
@@ -425,7 +473,7 @@
             margin-top: auto;
         }
 
-        #export-player-card {
+        #save-manager-toggle {
             display: none;
             flex: 0 0 48px;
             align-items: center;
@@ -435,7 +483,7 @@
             color: var(--accent-gold);
         }
 
-        #export-player-card svg {
+        #save-manager-toggle svg {
             width: 20px;
             height: 20px;
             fill: none;
@@ -449,11 +497,11 @@
             display: flex;
         }
 
-        #main-menu:not(.is-settings-view) #export-player-card {
+        #main-menu:not(.is-settings-view) #save-manager-toggle {
             display: flex;
         }
 
-        #main-menu #export-player-card:disabled {
+        #main-menu #save-manager-toggle:disabled {
             border-color: #333344;
             color: #55556b;
             filter: grayscale(1);
@@ -466,9 +514,47 @@
             display: flex;
         }
 
-        #main-menu.is-settings-view #export-player-card,
+        #main-menu.is-settings-view #save-manager-toggle,
         #main-menu.is-pause-menu.is-settings-view #launch-game {
             display: none;
+        }
+
+        .save-manager-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-height: min(68vh, 620px);
+            overflow-y: auto;
+            padding: 10px 3px 12px;
+            text-align: left;
+            scrollbar-width: thin;
+            scrollbar-color: #3b3b55 transparent;
+        }
+
+        .save-manager-panel[hidden] {
+            display: none;
+        }
+
+        .save-manager-actions {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        .save-manager-readme {
+            padding: 12px;
+            border: 1px solid rgba(255, 215, 0, 0.24);
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.02);
+            color: #c5c5d2;
+            font-size: 0.8rem;
+            line-height: 1.55;
+            white-space: pre-line;
+        }
+
+        .save-manager-readme strong {
+            color: var(--accent-gold);
         }
 
         #main-menu.is-pause-menu .main-menu-actions {
@@ -1556,6 +1642,11 @@
 
     <div id="main-menu">
         <main class="main-menu-card" aria-labelledby="main-menu-title">
+            <button class="btn" id="quit-game" type="button" aria-label="Quit game" title="Quit game">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="m6 6 12 12M18 6 6 18"></path>
+                </svg>
+            </button>
             <h1 class="main-menu-title" id="main-menu-title">STARJOURN ACE</h1>
             <p class="main-menu-subtitle">EXPLORE THE INFINITE EXPANSE.</p>
             <div class="main-menu-portraits">
@@ -1657,12 +1748,26 @@
                 </div>
                 <button class="btn settings-defaults" id="settings-defaults" type="button">Restore Default Settings</button>
             </section>
+            <section class="save-manager-panel" id="save-manager-panel" aria-label="Save manager" hidden>
+                <div class="save-manager-actions">
+                    <button class="btn" id="download-save-data" type="button">Download Save Data</button>
+                    <button class="btn" id="download-pilot-card" type="button">Download Pilot Card</button>
+                    <button class="btn" id="import-player-save" type="button">Import Save Data</button>
+                    <input id="import-player-save-file" type="file" accept=".json,application/json" hidden>
+                </div>
+                <div class="save-manager-readme">
+                     <strong>Download Save Data</strong> saves your progress as a JSON file. To restore it, open this menu and choose Import Save Data, then select the JSON backup file. WARNING! Importing replaces your current save and reloads the game.
+
+                    <strong>Download Pilot Card</strong> Saves a PNG image of your current game stats as shown on the main menu.  Use this to share your progress with friends or online, share the worlds you discover with the community!
+
+                    <strong>Import Save Data</strong> allows you to load a previously saved JSON file to restore your progress.  This will overwrite your current save and reload the game, so be sure to back up your current save first!
+                </div>
+            </section>
             <div class="main-menu-actions">
-                <button class="btn" id="export-player-card" type="button" aria-label="Export player card as PNG" title="Export player card as PNG">
+                <button class="btn" id="save-manager-toggle" type="button" aria-label="Open Save Manager" title="Open Save Manager" aria-pressed="false">
                     <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M6 3.5h8l4 4v13H6z"></path>
-                        <path d="M14 3.5v4h4M9 11h6"></path>
-                        <path d="M12 13v5m0 0 2-2m-2 2-2-2"></path>
+                        <path d="M4 4h13l3 3v13H4z"></path>
+                        <path d="M8 4v6h8V4M8 20v-6h8v6M17 7h.01"></path>
                     </svg>
                 </button>
                 <button class="btn" id="launch-game" type="button" disabled>Start Game</button>
@@ -2098,7 +2203,14 @@ const SHIP_SKINS = {
         // ==========================================
         ctx.fillStyle = '#1e1b18'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
         ctx.beginPath(); ctx.moveTo(0, -32); ctx.bezierCurveTo(6, -32, 8, -26, 8, -12); ctx.lineTo(8, 28); ctx.bezierCurveTo(4, 32, -4, 32, -8, 28); ctx.lineTo(-8, -12); ctx.bezierCurveTo(-8, -26, -6, -32, 0, -32); ctx.closePath(); ctx.fill(); ctx.stroke();
-        ctx.fillRect(14, -22, 10, 46); ctx.fillRect(-24, -22, 10, 46);
+        // --- Side Rectangles with Thin Lavender Stroke ---
+        ctx.strokeStyle = '#e1c6e5';
+        ctx.lineWidth = 1;
+        ctx.fillRect(14, -22, 10, 46);   ctx.strokeRect(14, -22, 10, 46);
+        ctx.fillRect(-24, -22, 10, 46);  ctx.strokeRect(-24, -22, 10, 46);
+        // --- Reset back to white, 2px stroke for the wings ---
+        ctx.strokeStyle = '#ffffff'; 
+        ctx.lineWidth = 2;   
         ctx.beginPath(); ctx.moveTo(26, -2); ctx.lineTo(52, 40); ctx.lineTo(26, 34); ctx.closePath(); ctx.fill(); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(-26, -2); ctx.lineTo(-52, 40); ctx.lineTo(-26, 34); ctx.closePath(); ctx.fill(); ctx.stroke();
 
@@ -2418,10 +2530,14 @@ const SHIP_SKINS = {
 
         // Continuous row of engine nozzles running cleanly all across the back
         ctx.fillStyle = '#1e1b18';
+        ctx.strokeStyle = '#ffffff'; // Sets the stroke color to white
+        ctx.lineWidth = 1;          // Sets the thickness of the outline (adjust as needed)
+
         // Draws 12 engine nozzles sequentially from the far left wing edge to the far right cockpit foot
         for (let i = 0; i < 12; i++) {
             let startX = -38 + (i * 6.5);
             ctx.fillRect(startX, 38, 4.5, 12);
+            ctx.strokeRect(startX, 38, 4.5, 12); // Draws the white outline around the rectangle
         }
 
         // Inner Spinning Core Plate
@@ -2956,8 +3072,16 @@ const SHIP_SKINS = {
             // Main Core Fuselage Overlay
             ctx.fillStyle = '#1e1b18'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.moveTo(0, noseY); ctx.bezierCurveTo(bulbWidth, noseY, bulbWidth, -15, bulbWidth, 0); ctx.bezierCurveTo(bulbWidth * 0.5, 20, 7, 28, 7, 32); ctx.bezierCurveTo(3, 36, -3, 36, -7, 32); ctx.bezierCurveTo(-bulbWidth * 0.5, 20, -bulbWidth, -15, -bulbWidth, 0); ctx.bezierCurveTo(-bulbWidth, -15, -bulbWidth, noseY, 0, noseY);
-            ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.moveTo(0, noseY); 
+            ctx.bezierCurveTo(bulbWidth, noseY, bulbWidth, -15, bulbWidth, 0); 
+            ctx.bezierCurveTo(bulbWidth * 0.5, 20, 7, 28, 7, 32); 
+            ctx.bezierCurveTo(3, 36, -3, 36, -7, 32); 
+            ctx.bezierCurveTo(-7, 28, -bulbWidth * 0.5, 20, -bulbWidth, 0); 
+            ctx.bezierCurveTo(-bulbWidth, -15, -bulbWidth, noseY, 0, noseY); 
+            ctx.closePath(); 
+            ctx.fill(); 
+            ctx.stroke();
+
 
             // Dynamic Proportional Triangle Pinstripe (Set to your perfected 0.75 ratio)
             ctx.fillStyle = window.proceduralShipCache.trimColor;
@@ -3450,6 +3574,7 @@ window.closeShipyardModal = function() {
         let bountyWalletTotal = 0;
         let lastPiracyTimerTick = performance.now();
         const SAVE_KEY = 'starpath-save-v1';
+        let isImportingSave = false;
         const DEFAULT_GAME_SETTINGS = Object.freeze({
             ambientMusic: true,
             masterVolume: 100,
@@ -3991,6 +4116,7 @@ function normalizeGameSettings(savedSettings) {
 }
 
  function saveGame() {
+    if (isImportingSave) return false;
     try {
         localStorage.setItem(SAVE_KEY, JSON.stringify({
             currentSector,
@@ -4023,8 +4149,10 @@ function normalizeGameSettings(savedSettings) {
             gameSettings,
             homeworldCache
         }));
+        return true;
     } catch (error) {
         console.warn('Starpath save unavailable:', error);
+        return false;
     }
 }
 
@@ -4282,7 +4410,10 @@ function renderMainMenu() {
     const menu = document.getElementById('main-menu');
     const stats = document.getElementById('main-menu-stats');
     const launchButton = document.getElementById('launch-game');
-    const exportButton = document.getElementById('export-player-card');
+    const saveManagerPanel = document.getElementById('save-manager-panel');
+    const downloadSaveButton = document.getElementById('download-save-data');
+    const downloadCardButton = document.getElementById('download-pilot-card');
+    const saveManagerButton = document.getElementById('save-manager-toggle');
     const generateButton = document.getElementById('generate-pilot-icon');
     const regenerateButton = document.getElementById('regenerate-pilot-icon');
     const preview = document.getElementById('pilot-helmet-preview');
@@ -4293,12 +4424,19 @@ function renderMainMenu() {
     const piracyStatus = document.getElementById('menu-piracy-status');
     const settingsPanel = document.getElementById('main-menu-settings');
     const settingsView = menu.classList.contains('is-settings-view');
+    const saveManagerView = menu.classList.contains('is-save-manager-view');
     settingsPanel.hidden = !settingsView;
-    document.getElementById('main-menu-title').textContent = settingsView ? 'EXPEDITION SETTINGS' : 'STARJOURN ACE';
+    saveManagerPanel.hidden = !saveManagerView;
+    document.getElementById('main-menu-title').textContent = settingsView
+        ? 'EXPEDITION SETTINGS'
+        : saveManagerView ? 'SAVE MANAGER' : 'STARJOURN ACE';
     const settingsButton = document.getElementById('open-settings');
     settingsButton.setAttribute('aria-pressed', String(settingsView));
     settingsButton.setAttribute('aria-label', settingsView ? 'Return to player card' : 'Open settings');
     settingsButton.title = settingsView ? 'Return to player card' : 'Open settings';
+    saveManagerButton.setAttribute('aria-pressed', String(saveManagerView));
+    saveManagerButton.setAttribute('aria-label', saveManagerView ? 'Close Save Manager' : 'Open Save Manager');
+    saveManagerButton.title = saveManagerView ? 'Close Save Manager' : 'Open Save Manager';
 
     stats.hidden = !savedGameAvailable;
     generateButton.hidden = Boolean(pilotHelmetIcon);
@@ -4307,11 +4445,8 @@ function renderMainMenu() {
     regenerateButton.hidden = !pilotHelmetIcon;
     launchButton.textContent = savedGameAvailable ? 'Continue' : 'Start Game';
     launchButton.disabled = !pilotHelmetIcon;
-    exportButton.disabled = !savedGameAvailable;
-    exportButton.style.opacity = savedGameAvailable ? '1' : '0.55';
-    exportButton.style.filter = savedGameAvailable ? 'none' : 'grayscale(1)';
-    exportButton.style.borderColor = savedGameAvailable ? '' : '#333344';
-    exportButton.style.color = savedGameAvailable ? '' : '#55556b';
+    downloadSaveButton.disabled = !savedGameAvailable;
+    downloadCardButton.disabled = !savedGameAvailable;
 
     if (savedGameAvailable) {
         document.getElementById('menu-sector').textContent = `Sector ${currentSector},  ${homeworld.name}`;
@@ -4392,6 +4527,17 @@ function crc32(bytes) {
     return (crc ^ 0xffffffff) >>> 0;
 }
 
+function downloadFile(blob, filename) {
+    const downloadUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+}
+
 async function addPngResolution(blob, pixelsPerInch) {
     const png = new Uint8Array(await blob.arrayBuffer());
     const ihdrEnd = 8 + 4 + 4 + 13 + 4;
@@ -4418,8 +4564,14 @@ async function addPngResolution(blob, pixelsPerInch) {
 
 async function exportPlayerCard() {
     if (!savedGameAvailable || mainMenu.classList.contains('is-settings-view')) return;
+    const wasSaveManagerView = mainMenu.classList.contains('is-save-manager-view');
 
     try {
+        if (wasSaveManagerView) {
+            mainMenu.classList.remove('is-save-manager-view');
+            document.getElementById('save-manager-panel').hidden = true;
+            renderMainMenu();
+        }
         const card = document.querySelector('.main-menu-card');
         const cardRect = card.getBoundingClientRect();
         const width = Math.ceil(cardRect.width);
@@ -4666,19 +4818,57 @@ async function exportPlayerCard() {
         const resolvedPng = await addPngResolution(pngBlob, 192);
         const now = new Date();
         const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
-        const downloadUrl = URL.createObjectURL(resolvedPng);
-        const link = document.createElement('a');
-        link.href = downloadUrl;
-        link.download = `PilotCard_${timestamp}.png`;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+        downloadFile(resolvedPng, `PilotCard_${timestamp}.png`);
         showAlert('PILOT CARD EXPORTED AS PNG');
     } catch (error) {
         console.error('Player card export failed:', error);
         showAlert('PILOT CARD EXPORT FAILED');
         addLog(`Player card export failed: ${error.message}`);
+    } finally {
+        if (wasSaveManagerView) {
+            mainMenu.classList.add('is-save-manager-view');
+            renderMainMenu();
+        }
+    }
+}
+
+function exportGameSave() {
+    if (!savedGameAvailable) return;
+
+    try {
+        if (!saveGame()) throw new Error('Could not save the current game before export.');
+        const saveData = localStorage.getItem(SAVE_KEY);
+        if (!saveData) throw new Error('The saved game data could not be read.');
+        const now = new Date();
+        const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+        downloadFile(new Blob([saveData], { type: 'application/json' }), `PilotSave_${timestamp}.json`);
+        showAlert('SAVE DATA EXPORTED');
+    } catch (error) {
+        console.error('Game save export failed:', error);
+        showAlert('SAVE DATA EXPORT FAILED');
+        addLog(`Game save export failed: ${error.message}`);
+    }
+}
+
+async function importGameSave(file) {
+    try {
+        const saveData = await file.text();
+        const parsedSave = JSON.parse(saveData);
+        if (!parsedSave || typeof parsedSave !== 'object' || Array.isArray(parsedSave)
+            || !parsedSave.player || typeof parsedSave.player !== 'object' || Array.isArray(parsedSave.player)) {
+            throw new Error('This file is not a valid STARJOURN ACE save.');
+        }
+        if (!window.confirm('Import this save? It will replace the active save for this game.')) return;
+
+        isImportingSave = true;
+        localStorage.setItem(SAVE_KEY, saveData);
+        showAlert('SAVE IMPORTED - RELOADING');
+        window.location.reload();
+    } catch (error) {
+        isImportingSave = false;
+        console.error('Game save import failed:', error);
+        showAlert('SAVE IMPORT FAILED');
+        addLog(`Game save import failed: ${error.message}`);
     }
 }
 
@@ -4689,7 +4879,9 @@ return;
     }
     if (!pilotHelmetIcon) return;
     mainMenu.classList.remove('is-settings-view');
+    mainMenu.classList.remove('is-save-manager-view');
     document.getElementById('main-menu-settings').hidden = true;
+    document.getElementById('save-manager-panel').hidden = true;
     document.getElementById('main-menu-title').textContent = 'STARJOURN ACE';
     const settingsButton = document.getElementById('open-settings');
     settingsButton.setAttribute('aria-pressed', 'false');
@@ -4702,11 +4894,43 @@ return;
     document.getElementById('main-menu').hidden = true;
 });
 
-document.getElementById('export-player-card').addEventListener('click', exportPlayerCard);
+document.getElementById('quit-game').addEventListener('click', () => {
+    if (!window.confirm('Are you sure you want to quit the game?')) return;
+    if (gameStarted) {
+        advancePiracyTimer();
+        if (!saveGame()) {
+            showAlert('GAME COULD NOT SAVE - QUIT CANCELLED');
+            return;
+        }
+    }
+    window.close();
+});
+
+document.getElementById('download-save-data').addEventListener('click', exportGameSave);
+document.getElementById('download-pilot-card').addEventListener('click', exportPlayerCard);
+document.getElementById('import-player-save').addEventListener('click', () => {
+    document.getElementById('import-player-save-file').click();
+});
+document.getElementById('import-player-save-file').addEventListener('change', event => {
+    const [file] = event.currentTarget.files;
+    if (file) importGameSave(file);
+    event.currentTarget.value = '';
+});
+document.getElementById('save-manager-toggle').addEventListener('click', () => {
+    const saveManagerView = !mainMenu.classList.contains('is-save-manager-view');
+    mainMenu.classList.remove('is-settings-view');
+    mainMenu.classList.toggle('is-save-manager-view', saveManagerView);
+    document.getElementById('main-menu-settings').hidden = true;
+    document.getElementById('save-manager-panel').hidden = !saveManagerView;
+    document.getElementById('main-menu-title').textContent = saveManagerView ? 'SAVE MANAGER' : 'STARJOURN ACE';
+    renderMainMenu();
+});
 document.getElementById('open-settings').addEventListener('click', () => {
     const settingsView = !mainMenu.classList.contains('is-settings-view');
+    mainMenu.classList.remove('is-save-manager-view');
     mainMenu.classList.toggle('is-settings-view', settingsView);
     document.getElementById('main-menu-settings').hidden = !settingsView;
+    document.getElementById('save-manager-panel').hidden = true;
     document.getElementById('main-menu-title').textContent = settingsView ? 'EXPEDITION SETTINGS' : 'STARJOURN ACE';
     const button = document.getElementById('open-settings');
     button.setAttribute('aria-pressed', String(settingsView));
@@ -4950,7 +5174,9 @@ document.getElementById('menu-reset-game').addEventListener('click', resetGame);
                 document.getElementById('launch-game').textContent = 'Resume';
             } else {
                 mainMenu.classList.remove('is-settings-view');
+                mainMenu.classList.remove('is-save-manager-view');
                 document.getElementById('main-menu-settings').hidden = true;
+                document.getElementById('save-manager-panel').hidden = true;
                 document.getElementById('main-menu-title').textContent = 'STARJOURN ACE';
                 const settingsButton = document.getElementById('open-settings');
                 settingsButton.setAttribute('aria-pressed', 'false');
@@ -5532,7 +5758,7 @@ generateBackgroundAssets();
             const nextTheme = SECTOR_THEMES[Math.min(12, currentSector)] || { name: `Unknown Sector ${currentSector}`, primary: "#00ffff" };
 
             showAlert(`WARP SUCCESSFUL. ENTERING SYSTEM: ${nextTheme.name.toUpperCase()}`);
-            addLog(`Warp drive disengaged. Checking systems... All systems nominal. Registration with sector homeworld complete. Cleared for departure...`);
+            addLog(`Warp drive disengaged. Entering system: ${nextTheme.name.toUpperCase()}. Checking ship systems... All systems nominal. Registration with sector homeworld complete. Cleared for departure...`);
             
             initWorld();
             saveGame();
@@ -7217,6 +7443,9 @@ ctx.strokeRect(0, 0, 12000, 12000);
             ctx.restore();
             }
 
+            // Stations sit above the homeworld and below all other world entities.
+            drawMerchantStations();
+
             // Resource Collectibles
             minerals.forEach(m => {
                 if (!isInViewport(m.x, m.y, 16)) return;
@@ -7470,7 +7699,8 @@ ctx.strokeRect(0, 0, 12000, 12000);
 
                     
 
-// Merchant Vessels
+// Merchant Vessels - deferred foreground pass
+function drawMerchantStations() {
 merchants.forEach(m => {
     if (!isInViewport(m.x, m.y, MERCHANT_RANGE + 80)) return;
     ctx.save();
@@ -7670,7 +7900,7 @@ merchants.forEach(m => {
     
     ctx.restore(); 
 });
-
+}
 
 
 
@@ -8021,7 +8251,6 @@ enemies.forEach(e => {
 
             });
 
-
             ctx.save();
             ctx.translate(player.x, player.y);
             ctx.rotate(player.angle);
@@ -8176,7 +8405,7 @@ enemies.forEach(e => {
         updateUI();
         renderMainMenu();
         window.addEventListener('pagehide', () => {
-            if (gameStarted) {
+            if (gameStarted && !isImportingSave) {
                 advancePiracyTimer();
                 saveGame();
             }
@@ -8356,7 +8585,7 @@ player.shield = player.maxShield;
 })();
 
 
-// Copyright SPM - Version 1.1.6 - Smurphshire 2026
+// Copyright SPM - Version 1.2.6 - Smurphshire 2026
     </script>
 </body>
 </html>
