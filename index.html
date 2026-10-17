@@ -1648,7 +1648,7 @@
                 </svg>
             </button>
             <h1 class="main-menu-title" id="main-menu-title">STARJOURN ACE</h1>
-            <p class="main-menu-subtitle">EXPLORE THE INFINITE EXPANSE.</p>
+            <p class="main-menu-subtitle">EXPLORE THE INFINITE EXPANSE</p>
             <div class="main-menu-portraits">
                 <div class="main-menu-portrait">
                     <span class="main-menu-portrait-label">Homeworld</span>
@@ -1714,22 +1714,22 @@
                     </label>
                 </div>
                 <div class="settings-group">
-                    <h2 class="settings-group-title">Space Balance Settings</h2>
+                    <h2 class="settings-group-title">Difficulty Settings</h2>
                     <label class="settings-control">
                         <span class="settings-range-heading"><span>Enemy bullet damage</span><output data-output="enemyBulletDamage"></output></span>
-                        <input type="range" data-setting="enemyBulletDamage" min="0" max="300" step="10">
+                        <input type="range" data-setting="enemyBulletDamage" min="0" max="500" step="10">
                     </label>
                     <label class="settings-control">
                         <span class="settings-range-heading"><span>Enemy density</span><output data-output="enemyDensity"></output></span>
-                        <input type="range" data-setting="enemyDensity" min="0" max="200" step="10">
+                        <input type="range" data-setting="enemyDensity" min="0" max="500" step="10">
                     </label>
                     <label class="settings-control">
                         <span class="settings-range-heading"><span>Merchant density</span><output data-output="merchantDensity"></output></span>
-                        <input type="range" data-setting="merchantDensity" min="0" max="200" step="10">
+                        <input type="range" data-setting="merchantDensity" min="0" max="250" step="10">
                     </label>
                     <label class="settings-control">
                         <span class="settings-range-heading"><span>Asteroid density</span><output data-output="asteroidDensity"></output></span>
-                        <input type="range" data-setting="asteroidDensity" min="0" max="200" step="10">
+                        <input type="range" data-setting="asteroidDensity" min="0" max="500" step="10">
                     </label>
                     <label class="settings-control">
                         <span class="settings-range-heading"><span>Shield multiplier</span><output data-output="shieldMultiplier"></output></span>
@@ -1745,6 +1745,20 @@
                     <label class="settings-check"><input type="checkbox" data-setting="spawnNormal"> Enemy Raider Ships</label>
                     <label class="settings-check"><input type="checkbox" data-setting="spawnSeekers"> Enemy Seeker Ships</label>
                     <label class="settings-check"><input type="checkbox" data-setting="spawnPirates"> Enemy Pirate Hives</label>
+                </div>
+                <div class="settings-group">
+                    <h2 class="settings-group-title">Navigation Settings</h2>
+                    <label class="settings-control">
+                        <span class="settings-range-heading"><span>Touch-to-shoot ring size</span><output data-output="touchAimRingSize"></output></span>
+                        <input type="range" data-setting="touchAimRingSize" min="0" max="250" step="1">
+                    </label>
+                    <label class="settings-control">
+                        <span class="settings-range-heading"><span>Touch-to-shoot ring opacity</span><output data-output="touchAimRingOpacity"></output></span>
+                        <input type="range" data-setting="touchAimRingOpacity" min="0" max="100" step="1">
+                    </label>
+                    <label class="settings-check"><input type="checkbox" data-setting="showHomeworldPointer"> Homeworld pointer</label>
+                    <label class="settings-check"><input type="checkbox" data-setting="showMerchantPointer"> Merchant pointer</label>
+                    <label class="settings-check"><input type="checkbox" data-setting="showThiefPointer"> Thief pointer</label>
                 </div>
                 <button class="btn settings-defaults" id="settings-defaults" type="button">Restore Default Settings</button>
             </section>
@@ -1940,9 +1954,9 @@ CCsKWa5jfW10uKV6fCjm591qaKQItbItS8kdn5bvwdluxZEovpkUVGFOCHCv6AlJNCXXDPz3cC+0qBNE
         const WORLD_SIZE = 12000; 
         const ASTEROID_SAFE_SPAWN_BUFFER = 300;
         const MERCHANT_RANGE = 120; 
-        const BASE_SECTOR_GOAL = 8000;
+        const BASE_SECTOR_GOAL = 7500;
         const SECTOR_GOAL_INCREASE = 2500;
-        const POINTER_AIM_RADIUS =55; // 42 default
+        const POINTER_AIM_RADIUS = 55; // 42 default
         const HOMEWORLD_TILT = 18 * Math.PI / 180;
         
         let keys = {};
@@ -1957,11 +1971,11 @@ CCsKWa5jfW10uKV6fCjm591qaKQItbItS8kdn5bvwdluxZEovpkUVGFOCHCv6AlJNCXXDPz3cC+0qBNE
         // Sector Environmental Palette Profiles
         const SECTOR_THEMES = {
             1: { name: "Andromeda Perimeter", primary: "#00ffff", background: "#020208", nebula: "rgba(0, 120, 255, 0.05)", generic: "#888899", modifiers: { enemySpawn: 1.2, pirateSpawn: 0.6, merchantSpawn: 1.3, asteroidSpawn: 1.2, goldYield: 0.05 } },
-            2: { name: "The Keziah Expanse", primary: "#fbfbcc", background: "#08060a", nebula: "rgba(0, 120, 255, 0.05)", generic: "#828e8d", modifiers: { enemySpawn: 1.35, pirateSpawn: 1.1, civilianSpawn: 1.25, merchantSpawn: 0.8, asteroidSpawn: 2.5, uraniumYield: 1.3 } },
+            2: { name: "Outset Expanse", primary: "#fbfbcc", background: "#08060a", nebula: "rgba(0, 120, 255, 0.05)", generic: "#828e8d", modifiers: { enemySpawn: 1.35, pirateSpawn: 1.1, civilianSpawn: 1.25, merchantSpawn: 0.8, asteroidSpawn: 2.5, uraniumYield: 1.3 } },
             3: { name: "Keziah Colonies", primary: "#da70d6", background: "#06020c", nebula: "rgba(218, 112, 214, 0.05)", generic: "#998899", modifiers: { asteroidSpawn: 1.35, enemySpawn: 1.8, pirateSpawn: 1.7, goldYield: 0.4, uraniumYield: 0.4, eridiumYield: 0.9 } },
             4: { name: "Zelion Territory", primary: "#39ff14", background: "#020603", nebula: "rgba(57, 255, 20, 0.04)", generic: "#8a998a", modifiers: { enemySpawn: 2.5, pirateSpawn: 0.2, asteroidSpawn: 3.2, uraniumYield: 2.1 } },
             5: { name: "Supernova Remnant", primary: "#ff6600", background: "#090302", nebula: "rgba(255, 102, 0, 0.06)", generic: "#aa9988", modifiers: { civilianSpawn: 0.4, merchantSpawn: 0.3, enemySpawn: 1.5, pirateSpawn: 1.5, uraniumYield: 0.6, eridiumYield: 1.25 } },
-            6: { name: "Empyrean Empire", primary: "#d5f0f7", background: "#0b0b0b", nebula: "rgba(236, 0, 255, 0.05)", generic: "#bfe0d5", modifiers: { enemySpawn: 0.4, pirateSpawn: 0.1, merchantSpawn: 1.6, civilianSpawn: 2.5, asteroidSpawn: 1.3, goldYield: 1.7, uraniumYield: 1.2, eridiumYield: 1.5 } },
+            6: { name: "Astrealus Empire", primary: "#d5f0f7", background: "#0b0b0b", nebula: "rgba(236, 0, 255, 0.05)", generic: "#bfe0d5", modifiers: { enemySpawn: 0.4, pirateSpawn: 0.1, merchantSpawn: 1.6, civilianSpawn: 2.5, asteroidSpawn: 1.3, goldYield: 1.7, uraniumYield: 1.2, eridiumYield: 1.5 } },
             7: { name: "Solitude Pass", primary: "#7c7c7c", background: "#020208", nebula: "rgba(0, 120, 255, 0.05)", generic: "#888899", modifiers: { enemySpawn: 0.9, pirateSpawn: 0.1, merchantSpawn: 0.8, civilianSpawn: 0.2, asteroidSpawn: 1.9, goldYield: 1.2, uraniumYield: 1.2, eridiumYield: 1.6 } },
             8: { name: "Daxus Quadrant", primary: "#fbfbcc", background: "#08060a", nebula: "rgba(0, 120, 255, 0.05)", generic: "#828e8d", modifiers: { enemySpawn: 1.9, pirateSpawn: 1.2, civilianSpawn: 1.25, merchantSpawn: 1.8, asteroidSpawn: 2.5, uraniumYield: 1.3 } },
             9: { name: "Nebula Abyss", primary: "#7f77ed", background: "#09070a", nebula: "rgba(218, 112, 214, 0.08)", generic: "#998899", modifiers: { asteroidSpawn: 1.35, enemySpawn: 2.3, pirateSpawn: 2.3, goldYield: 1.4, uraniumYield: 0.4, eridiumYield: 1.9 } },
@@ -1969,7 +1983,6 @@ CCsKWa5jfW10uKV6fCjm591qaKQItbItS8kdn5bvwdluxZEovpkUVGFOCHCv6AlJNCXXDPz3cC+0qBNE
             11: { name: "Nexus Void", primary: "#9ed1dd", background: "#07090a", nebula: "rgba(0, 182, 255, 0.06)", generic: "#aa9988", modifiers: { civilianSpawn: 1.4, pirateSpawn: 1.5, merchantSpawn: 0.4, eridiumYield: 1.25 } },
             12: { name: "Uncharted Sector", primary: "#ddeff2", background: "#020202", nebula: "rgba(255, 0, 134, 0.05)", generic: "#a1a5b5", modifiers: { enemySpawn: 1.2, merchantSpawn: 1.2, civilianSpawn: 0.3, asteroidSpawn: 2.2, goldYield: 0.5 } }
             
-
 
 
         };
@@ -3586,15 +3599,22 @@ window.closeShipyardModal = function() {
             invincible: false,
             spawnNormal: true,
             spawnSeekers: true,
-            spawnPirates: true
+            spawnPirates: true,
+            touchAimRingSize: 100,
+            touchAimRingOpacity: 30,
+            showHomeworldPointer: true,
+            showMerchantPointer: true,
+            showThiefPointer: true
         });
         const GAME_SETTING_LIMITS = {
             masterVolume: [0, 200],
-            enemyBulletDamage: [0, 300],
-            enemyDensity: [0, 200],
-            merchantDensity: [0, 200],
-            asteroidDensity: [0, 200],
-            shieldMultiplier: [25, 300]
+            enemyBulletDamage: [0, 500],
+            enemyDensity: [0, 500],
+            merchantDensity: [0, 250],
+            asteroidDensity: [0, 500],
+            shieldMultiplier: [25, 300],
+            touchAimRingSize: [0, 250],
+            touchAimRingOpacity: [0, 100]
         };
         let gameSettings = { ...DEFAULT_GAME_SETTINGS };
         const PILOT_MENU_STICKER_BORDER_REDUCTION = 3;
@@ -4283,7 +4303,11 @@ function syncSettingsControls() {
         } else {
             control.value = gameSettings[setting];
             const output = document.querySelector(`[data-output="${setting}"]`);
-            if (output) output.value = `${gameSettings[setting]}%`;
+        if (output) {
+            output.value = setting === 'touchAimRingSize' && gameSettings[setting] === 0
+                ? 'Off'
+                : `${gameSettings[setting]}%`;
+        }
         }
     });
     updateWorldCustomDisplay();
@@ -4708,7 +4732,7 @@ async function exportPlayerCard() {
             context.font = subtitleStyle.font;
             context.fillStyle = subtitleStyle.color;
             context.fillText(
-                'EXPLORE THE INFINITE EXPANSE.',
+                'EXPLORE THE INFINITE EXPANSE',
                 width / 2,
                 headerTop + titleHeight + (parseFloat(subtitleStyle.marginTop) || 0) + subtitleFontSize * 0.82
             );
@@ -5815,12 +5839,13 @@ generateBackgroundAssets();
                 const pointerDx = pointerControls.x - canvas.width / 2;
                 const pointerDy = pointerControls.y - canvas.height / 2;
                 const pointerDistance = Math.hypot(pointerDx, pointerDy);
+                const pointerAimRadius = POINTER_AIM_RADIUS * gameSettings.touchAimRingSize / 100;
 
                 if (pointerDistance > 0) {
                     player.angle = Math.atan2(pointerDy, pointerDx);
                 }
 
-                if (pointerControls.fireOnly || pointerDistance <= POINTER_AIM_RADIUS) {
+                if (pointerControls.fireOnly || (pointerAimRadius > 0 && pointerDistance <= pointerAimRadius)) {
                     pointerFire = true;
                 } else {
                     pointerThrust = true;
@@ -8276,23 +8301,26 @@ enemies.forEach(e => {
             ctx.save(); // Opens isolated local context block layer safely
             
             // HIGH-VISIBILITY RESCALE: Crisp white alpha mapping for deep space tracking
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+            ctx.strokeStyle = `rgba(255, 255, 255, ${gameSettings.touchAimRingOpacity / 100})`;
             ctx.lineWidth = 1.2;
             
             // FIXED FOR THE DOTS: Sets a clean pattern of 3px dot length followed by 4px gap spacing
             if (ctx.setLineDash) {
-                ctx.setLineDash([3, 4]); 
+                ctx.setLineDash([2, 4]); 
             }
             
             // Hardscreen monitor viewport center variables
             const radarScreenCenterX = canvas.width / 2;
             const radarScreenCenterY = canvas.height / 2;
             
-            ctx.beginPath();
-            // FIXED GAP DISTANCE: Shrinking the ring by 6 pixels pushes your ship's 
-            // native navigation arrows to the outside edge of the dots perfectly!
-            ctx.arc(radarScreenCenterX, radarScreenCenterY, POINTER_AIM_RADIUS - 6, 0, Math.PI * 2);
-            ctx.stroke();
+            const touchAimRingScale = gameSettings.touchAimRingSize / 100;
+            if (touchAimRingScale > 0) {
+                ctx.beginPath();
+                // FIXED GAP DISTANCE: Shrinking the ring by 6 pixels pushes your ship's
+                // native navigation arrows to the outside edge of the dots perfectly!
+                ctx.arc(radarScreenCenterX, radarScreenCenterY, (POINTER_AIM_RADIUS - 6) * touchAimRingScale, 0, Math.PI * 2);
+                ctx.stroke();
+            }
             
             // CRITICAL SOLID RESET: Empties line dashes so subsequent UI elements draw solid
             if (ctx.setLineDash) {
@@ -8302,53 +8330,21 @@ enemies.forEach(e => {
             ctx.restore(); // Closes isolated local context block layer perfectly balanced!
 
 
-            const spaceportAngle = Math.atan2(
-                wrappedDelta(player.y, SPACEPORT.y),
-                wrappedDelta(player.x, SPACEPORT.x)
-            );
             const indicatorDistance = 60; // player nav pointer indicator icon distance standard
-            const indicatorX = canvas.width / 2 + Math.cos(spaceportAngle) * indicatorDistance;
-            const indicatorY = canvas.height / 2 + Math.sin(spaceportAngle) * indicatorDistance;
-
-            ctx.save();
-            ctx.translate(indicatorX, indicatorY);
-            ctx.rotate(spaceportAngle);
-            ctx.globalAlpha = 0.5;
-            ctx.fillStyle = '#ffffff';
-            ctx.shadowBlur = 6;
-            ctx.shadowColor = '#ffffff';
-            ctx.beginPath();
-            ctx.moveTo(5, 0);
-            ctx.lineTo(-4, -3);
-            ctx.lineTo(-4, 3);
-            ctx.closePath();
-            ctx.fill();
-            ctx.restore();
-
-            let nearestMerchant = null;
-            let nearestMerchantDistance = Infinity;
-            merchants.forEach(merchant => {
-                const merchantDistance = distanceBetween(player, merchant);
-                if (merchantDistance < nearestMerchantDistance) {
-                    nearestMerchant = merchant;
-                    nearestMerchantDistance = merchantDistance;
-                }
-            });
-
-            if (nearestMerchant) {
-                const merchantAngle = Math.atan2(
-                    wrappedDelta(player.y, nearestMerchant.y),
-                    wrappedDelta(player.x, nearestMerchant.x)
+            if (gameSettings.showHomeworldPointer) {
+                const spaceportAngle = Math.atan2(
+                    wrappedDelta(player.y, SPACEPORT.y),
+                    wrappedDelta(player.x, SPACEPORT.x)
                 );
-                const merchantIndicatorDistance = indicatorDistance + 10;
-                const merchantIndicatorX = canvas.width / 2 + Math.cos(merchantAngle) * merchantIndicatorDistance;
-                const merchantIndicatorY = canvas.height / 2 + Math.sin(merchantAngle) * merchantIndicatorDistance;
-
+                const indicatorX = canvas.width / 2 + Math.cos(spaceportAngle) * indicatorDistance;
+                const indicatorY = canvas.height / 2 + Math.sin(spaceportAngle) * indicatorDistance;
                 ctx.save();
-                ctx.translate(merchantIndicatorX, merchantIndicatorY);
-                ctx.rotate(merchantAngle);
+                ctx.translate(indicatorX, indicatorY);
+                ctx.rotate(spaceportAngle);
                 ctx.globalAlpha = 0.5;
-                ctx.fillStyle = '#ffd700';
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowBlur = 6;
+                ctx.shadowColor = '#ffffff';
                 ctx.beginPath();
                 ctx.moveTo(5, 0);
                 ctx.lineTo(-4, -3);
@@ -8358,31 +8354,68 @@ enemies.forEach(e => {
                 ctx.restore();
             }
 
-            const cargoCarrier = enemies.find(enemy => enemy.stolenCargo);
-            if (cargoCarrier) {
-                const pirateAngle = Math.atan2(
-                    wrappedDelta(player.y, cargoCarrier.y),
-                    wrappedDelta(player.x, cargoCarrier.x)
-                );
-                const pirateIndicatorDistance = indicatorDistance + 21;
-                const pirateIndicatorX = canvas.width / 2 + Math.cos(pirateAngle) * pirateIndicatorDistance;
-                const pirateIndicatorY = canvas.height / 2 + Math.sin(pirateAngle) * pirateIndicatorDistance;
+            if (gameSettings.showMerchantPointer) {
+                let nearestMerchant = null;
+                let nearestMerchantDistance = Infinity;
+                merchants.forEach(merchant => {
+                    const merchantDistance = distanceBetween(player, merchant);
+                    if (merchantDistance < nearestMerchantDistance) {
+                        nearestMerchant = merchant;
+                        nearestMerchantDistance = merchantDistance;
+                    }
+                });
 
-                ctx.save();
-                ctx.translate(pirateIndicatorX, pirateIndicatorY);
-                ctx.rotate(pirateAngle);
-                ctx.globalAlpha = 0.7;
-                ctx.fillStyle = '#ff4f5e';
-                ctx.strokeStyle = '#ffd4d8';
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.moveTo(6, 0);
-                ctx.lineTo(-5, -4);
-                ctx.lineTo(-5, 4);
-                ctx.closePath();
-                ctx.fill();
-                ctx.stroke();
-                ctx.restore();
+                if (nearestMerchant) {
+                    const merchantAngle = Math.atan2(
+                        wrappedDelta(player.y, nearestMerchant.y),
+                        wrappedDelta(player.x, nearestMerchant.x)
+                    );
+                    const merchantIndicatorDistance = indicatorDistance + 10;
+                    const merchantIndicatorX = canvas.width / 2 + Math.cos(merchantAngle) * merchantIndicatorDistance;
+                    const merchantIndicatorY = canvas.height / 2 + Math.sin(merchantAngle) * merchantIndicatorDistance;
+
+                    ctx.save();
+                    ctx.translate(merchantIndicatorX, merchantIndicatorY);
+                    ctx.rotate(merchantAngle);
+                    ctx.globalAlpha = 0.5;
+                    ctx.fillStyle = '#ffd700';
+                    ctx.beginPath();
+                    ctx.moveTo(5, 0);
+                    ctx.lineTo(-4, -3);
+                    ctx.lineTo(-4, 3);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+
+            if (gameSettings.showThiefPointer) {
+                const cargoCarrier = enemies.find(enemy => enemy.stolenCargo);
+                if (cargoCarrier) {
+                    const pirateAngle = Math.atan2(
+                        wrappedDelta(player.y, cargoCarrier.y),
+                        wrappedDelta(player.x, cargoCarrier.x)
+                    );
+                    const pirateIndicatorDistance = indicatorDistance + 21;
+                    const pirateIndicatorX = canvas.width / 2 + Math.cos(pirateAngle) * pirateIndicatorDistance;
+                    const pirateIndicatorY = canvas.height / 2 + Math.sin(pirateAngle) * pirateIndicatorDistance;
+
+                    ctx.save();
+                    ctx.translate(pirateIndicatorX, pirateIndicatorY);
+                    ctx.rotate(pirateAngle);
+                    ctx.globalAlpha = 0.7;
+                    ctx.fillStyle = '#ff4f5e';
+                    ctx.strokeStyle = '#ffd4d8';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(6, 0);
+                    ctx.lineTo(-5, -4);
+                    ctx.lineTo(-5, 4);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                    ctx.restore();
+                }
             }
         }
 
